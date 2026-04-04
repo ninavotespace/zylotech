@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Free Image Converter - Convert PNG, JPG, WEBP, GIF, BMP, ICO, AVIF | ZyloTech</title>
+    <meta name="description" content="Free online image converter. Convert between PNG, JPG, WEBP, GIF, BMP, ICO, AVIF, TIFF, and HEIC. 100% browser-based, no upload required.">
+    <meta name="keywords" content="free image converter, convert to png, convert to jpg, convert to webp, convert to gif, convert to ico, avif converter, heic converter">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Image Converter - Convert PNG, JPG, WEBP, GIF, ICO | ZyloTech">
+    <meta property="og:description" content="Free online image converter. Convert between 10+ image formats. 100% browser-based, private, no upload.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/image-converter.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Image Converter - ZyloTech">
+    <meta name="twitter:description" content="Convert images online for free. PNG, JPG, WEBP, GIF, BMP, ICO, AVIF, TIFF, HEIC.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/image-converter.html">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/include.js"></script>
+
+    <!-- Library for HEIC support -->
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/heic2any.min.js"></script>
+
+    <style>
+        .drop-zone { border: 2px dashed #334155; transition: all 0.3s ease; background: #1e293b; }
+        .drop-zone.drag-over { border-color: #10b981; background-color: #064e3b; }
+        .loading-spinner { width: 40px; height: 40px; border: 3px solid #334155; border-top-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .format-btn { transition: all 0.2s; border: 2px solid #334155; background: #1e293b; color: #e2e8f0; }
+        .format-btn.active { border-color: #10b981; background-color: #064e3b; color: #10b981; }
+        .format-group { transition: all 0.2s ease; }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10b981;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #059669; transform: scale(1.1); }
+
+        /* Feature section styles */
+        .feature-section {
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        .feature-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .feature-title {
+            font-weight: 600;
+            color: #10b981;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+        .feature-desc {
+            font-size: 0.7rem;
+            color: #94a3b8;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        /* Fix for white cards inside dark theme */
+        .bg-white, .bg-gray-50, .bg-gray-100 {
+            background-color: #1e293b !important;
+            color: #e2e8f0;
+        }
+        .text-gray-600, .text-gray-500, .text-gray-400, .text-gray-700, .text-gray-800 {
+            color: #cbd5e1 !important;
+        }
+        .text-green-600, .text-green-700 {
+            color: #10b981 !important;
+        }
+        .border-gray-200, .border-gray-300 {
+            border-color: #334155 !important;
+        }
+        .bg-gray-50, .bg-gray-100 {
+            background-color: #0f172a !important;
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-green-900/30 rounded-full mb-3 border border-green-500/30">
+                <i class="fas fa-image text-green-400"></i>
+                <span class="text-sm text-green-300">Free • Browser-Based • Private</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">
+                <i class="fas fa-image text-green-400 mr-2"></i>
+                Free Image Converter
+            </h1>
+            <p class="text-gray-400">Convert between 10+ image formats | 100% private - all in your browser</p>
+            <div class="inline-flex items-center gap-2 mt-3 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full shadow-lg">
+                <i class="fas fa-chart-simple"></i>
+                <span id="viewCounter" class="font-bold">0</span>
+                <span class="text-sm">conversions completed</span>
+            </div>
+        </div>
+
+        <!-- Upload Area -->
+        <div id="dropZone" class="drop-zone rounded-xl p-8 text-center cursor-pointer mb-6 shadow-sm">
+            <i class="fas fa-cloud-upload-alt text-5xl text-gray-500 mb-3"></i>
+            <p class="text-gray-300 mb-2 font-medium">Drag & drop any image or click to browse</p>
+            <p class="text-sm text-gray-500">Supports: PNG, JPG, JPEG, WEBP, GIF, BMP, ICO, AVIF, TIFF, HEIC, SVG</p>
+            <input type="file" id="fileInput" class="hidden" accept="image/*,.heic,.heif,.tiff,.tif,.svg">
+        </div>
+
+        <!-- Preview -->
+        <div id="previewSection" class="hidden rounded-xl p-6 shadow-sm mb-6" style="background: #1e293b;">
+            <div class="flex gap-6 flex-wrap md:flex-nowrap">
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-300 mb-2 text-center">Original</h3>
+                    <img id="originalPreview" class="w-full max-h-48 object-contain rounded-lg border border-gray-700">
+                    <p id="originalInfo" class="text-xs text-gray-500 text-center mt-2"></p>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-300 mb-2 text-center">Converted</h3>
+                    <img id="convertedPreview" class="w-full max-h-48 object-contain rounded-lg border border-gray-700" style="background: #0f172a;">
+                    <p id="convertedInfo" class="text-xs text-gray-500 text-center mt-2"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Format Selection -->
+        <div id="downloadSection" class="hidden rounded-xl p-6 shadow-sm mb-6" style="background: #1e293b;">
+            <div class="mb-6">
+                <label class="block text-gray-300 font-semibold mb-3">Select Output Format:</label>
+
+                <!-- Row 1 -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 mb-3">
+                    <button data-format="png" class="format-btn px-3 py-2 rounded-lg border-2 transition text-sm">
+                        <i class="fas fa-file-image text-blue-400 mr-1"></i> PNG
+                    </button>
+                    <button data-format="jpg" class="format-btn px-3 py-2 rounded-lg border-2 transition text-sm">
+                        <i class="fas fa-file-image text-orange-400 mr-1"></i> JPG
+                    </button>
+                    <button data-format="webp" class="format-btn px-3 py-2 rounded-lg border-2 transition text-sm">
+                        <i class="fas fa-file-image text-purple-400 mr-1"></i> WEBP
+                    </button>
+                    <button data-format="gif" class="format-btn px-3 py-2 rounded-lg border-2 transition text-sm">
+                        <i class="fas fa-file-image text-yellow-400 mr-1"></i> GIF
+                    </button>
+                    <button data-format="bmp" class="format-btn px-3 py-2 rounded-lg border-2 transition text-sm">
+                        <i class="fas fa-file-image text-gray-400 mr-1"></i> BMP
+                    </button>
+                </div>
+                <!-- Row 2 -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                    <button data-format="ico" class="format-btn px-3 py-2 rounded-lg border-2 transition text-sm">
+                        <i class="fas fa-file-image text-red-400 mr-1"></i> ICO
+                    </button>
+                    <button data-format="avif" class="format-btn px-3 py-2 rounded-lg border-2 transition text-sm">
+                        <i class="fas fa-file-image text-indigo-400 mr-1"></i> AVIF
+                    </button>
+                    <button data-format="tiff" class="format-btn px-3 py-2 rounded-lg border-2 transition text-sm">
+                        <i class="fas fa-file-image text-teal-400 mr-1"></i> TIFF
+                    </button>
+                    <button data-format="heic" class="format-btn px-3 py-2 rounded-lg border-2 transition text-sm">
+                        <i class="fas fa-mobile-alt text-pink-400 mr-1"></i> HEIC
+                    </button>
+                    <button data-format="svg" class="format-btn px-3 py-2 rounded-lg border-2 transition text-sm">
+                        <i class="fas fa-vector-square text-emerald-400 mr-1"></i> SVG
+                    </button>
+                </div>
+            </div>
+
+            <!-- JPG Quality -->
+            <div id="qualityContainer" class="hidden mb-6">
+                <label class="block text-gray-300 font-semibold mb-2">JPG Quality: <span id="qualityValue" class="text-green-400">90</span>%</label>
+                <input type="range" id="qualitySlider" min="10" max="100" value="90" class="w-full">
+            </div>
+
+            <!-- ICO Size -->
+            <div id="icoSizeContainer" class="hidden mb-6">
+                <label class="block text-gray-300 font-semibold mb-2">ICO Size (pixels):</label>
+                <select id="icoSize" class="w-full px-3 py-2 border border-gray-700 rounded-lg bg-gray-800 text-white">
+                    <option value="16">16×16 (Browser tab)</option>
+                    <option value="32">32×32 (Standard favicon)</option>
+                    <option value="48" selected>48×48 (Google Search)</option>
+                    <option value="64">64×64</option>
+                    <option value="128">128×128 (High quality)</option>
+                    <option value="256">256×256 (Best quality)</option>
+                </select>
+            </div>
+
+            <!-- GIF Options -->
+            <div id="gifContainer" class="hidden mb-6">
+                <label class="block text-gray-300 font-semibold mb-2">GIF Settings:</label>
+                <div class="flex gap-4">
+                    <label class="flex items-center gap-2 text-gray-300">
+                        <input type="checkbox" id="gifLoop" checked> Loop forever
+                    </label>
+                    <label class="flex items-center gap-2 text-gray-300">
+                        <span>Delay (ms):</span>
+                        <input type="number" id="gifDelay" value="100" min="10" max="500" class="w-20 px-2 py-1 border border-gray-700 rounded-lg bg-gray-800 text-white">
+                    </label>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Note: Animated GIF input will output static GIF (first frame only)</p>
+            </div>
+
+            <!-- Format Info -->
+            <div id="formatAdvice" class="bg-blue-900/30 border border-blue-500/30 rounded-xl p-4 mb-6 hidden">
+                <div class="flex gap-3">
+                    <i class="fas fa-info-circle text-blue-400 text-xl"></i>
+                    <div id="formatAdviceText" class="text-sm text-blue-300"></div>
+                </div>
+            </div>
+
+            <button id="downloadBtn" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 transition flex items-center justify-center gap-2">
+                <i class="fas fa-download"></i> Download Converted Image
+            </button>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="hidden text-center py-8">
+            <div class="loading-spinner mx-auto mb-3"></div>
+            <p id="loadingText" class="text-gray-400">Converting...</p>
+        </div>
+
+        <!-- Supported Formats Info -->
+        <div class="rounded-xl p-6 shadow-sm mt-8" style="background: #1e293b;">
+            <h2 class="text-xl font-bold text-white mb-4 text-center">Supported Format Conversions</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div class="text-center p-3 rounded-lg" style="background: #0f172a;">
+                    <i class="fas fa-check-circle text-green-500 mb-1"></i>
+                    <p class="font-semibold text-gray-300">Input Formats</p>
+                    <p class="text-gray-500">PNG, JPG, JPEG, WEBP, GIF, BMP, ICO, AVIF, TIFF, HEIC, SVG</p>
+                </div>
+                <div class="text-center p-3 rounded-lg" style="background: #0f172a;">
+                    <i class="fas fa-arrow-right text-green-500 mb-1"></i>
+                    <p class="font-semibold text-gray-300">Output Formats</p>
+                    <p class="text-gray-500">PNG, JPG, WEBP, GIF, BMP, ICO, AVIF, TIFF</p>
+                </div>
+                <div class="text-center p-3 rounded-lg" style="background: #0f172a;">
+                    <i class="fas fa-shield-alt text-green-500 mb-1"></i>
+                    <p class="font-semibold text-gray-300">Privacy</p>
+                    <p class="text-gray-500">No upload. All local.</p>
+                </div>
+                <div class="text-center p-3 rounded-lg" style="background: #0f172a;">
+                    <i class="fas fa-tachometer-alt text-green-500 mb-1"></i>
+                    <p class="font-semibold text-gray-300">Max Size</p>
+                    <p class="text-gray-500">Up to 50MB</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Section for SEO -->
+        <div class="feature-section">
+            <h2 class="section-title">Free Image Converter Features</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                <div class="feature-card">
+                    <i class="fas fa-images feature-icon text-green-400"></i>
+                    <div class="feature-title">10+ Formats</div>
+                    <div class="feature-desc">PNG, JPG, WEBP, GIF, BMP, ICO, AVIF, TIFF, HEIC</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-compress feature-icon text-green-400"></i>
+                    <div class="feature-title">Quality Control</div>
+                    <div class="feature-desc">Adjust JPG quality (10-100%)</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-crop-alt feature-icon text-green-400"></i>
+                    <div class="feature-title">ICO Resizing</div>
+                    <div class="feature-desc">16×16 to 256×256 pixels</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-mobile-alt feature-icon text-green-400"></i>
+                    <div class="feature-title">HEIC Support</div>
+                    <div class="feature-desc">Convert iPhone photos</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt feature-icon text-green-400"></i>
+                    <div class="feature-title">100% Private</div>
+                    <div class="feature-desc">No uploads, all local</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-download feature-icon text-green-400"></i>
+                    <div class="feature-title">Instant Download</div>
+                    <div class="feature-desc">Convert and download</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Counter
+        let conversionCount = localStorage.getItem('imageConverterCount') || 0;
+        document.getElementById('viewCounter').textContent = conversionCount;
+
+        function incrementCounter() {
+            conversionCount++;
+            localStorage.setItem('imageConverterCount', conversionCount);
+            document.getElementById('viewCounter').textContent = conversionCount;
+        }
+
+        // Main variables
+        let originalFile = null;
+        let originalImageUrl = null;
+        let currentConvertedBlob = null;
+        let currentFormat = 'png';
+        let originalImageElement = null;
+        let isHeicFile = false;
+
+        // DOM Elements
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewSection = document.getElementById('previewSection');
+        const downloadSection = document.getElementById('downloadSection');
+        const originalPreview = document.getElementById('originalPreview');
+        const convertedPreview = document.getElementById('convertedPreview');
+        const originalInfo = document.getElementById('originalInfo');
+        const convertedInfo = document.getElementById('convertedInfo');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const loading = document.getElementById('loading');
+        const loadingText = document.getElementById('loadingText');
+        const qualityContainer = document.getElementById('qualityContainer');
+        const icoSizeContainer = document.getElementById('icoSizeContainer');
+        const gifContainer = document.getElementById('gifContainer');
+        const qualitySlider = document.getElementById('qualitySlider');
+        const qualityValue = document.getElementById('qualityValue');
+        const icoSize = document.getElementById('icoSize');
+        const formatAdvice = document.getElementById('formatAdvice');
+        const formatAdviceText = document.getElementById('formatAdviceText');
+        const gifLoop = document.getElementById('gifLoop');
+        const gifDelay = document.getElementById('gifDelay');
+
+        // Format advice messages
+        const adviceMessages = {
+            png: 'PNG is best for images with transparency, logos, and screenshots. Lossless compression preserves quality.',
+            jpg: 'JPG is best for photographs. Use higher quality (80-100%) for better results.',
+            webp: 'WEBP offers better compression than JPG/PNG. Supports transparency and animation.',
+            gif: 'GIF supports animation but limited to 256 colors. Best for simple animations and memes.',
+            bmp: 'BMP is uncompressed - very large file size. Not recommended for web use.',
+            ico: 'ICO is for website favicons. 48×48 recommended for Google Search results.',
+            avif: 'AVIF is the newest format with best compression. Excellent for web images.',
+            tiff: 'TIFF is for professional printing. Large file size, lossless quality.',
+            heic: 'HEIC is Apple\'s format. Convert to JPG/PNG for broader compatibility.',
+            svg: 'SVG is vector-based - scales infinitely. Converting raster to SVG may not work well.'
+        };
+
+        // Format buttons
+        const formatBtns = document.querySelectorAll('.format-btn');
+        formatBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                formatBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFormat = btn.dataset.format;
+
+                qualityContainer.classList.add('hidden');
+                icoSizeContainer.classList.add('hidden');
+                gifContainer.classList.add('hidden');
+
+                if (currentFormat === 'jpg') qualityContainer.classList.remove('hidden');
+                if (currentFormat === 'ico') icoSizeContainer.classList.remove('hidden');
+                if (currentFormat === 'gif') gifContainer.classList.remove('hidden');
+
+                formatAdvice.classList.remove('hidden');
+                formatAdviceText.innerHTML = adviceMessages[currentFormat] || 'Select a format for your converted image.';
+
+                if (originalFile && originalImageElement) {
+                    convertImage();
+                }
+            });
+        });
+
+        qualitySlider.addEventListener('input', () => {
+            qualityValue.textContent = qualitySlider.value;
+            if (originalFile && currentFormat === 'jpg' && originalImageElement) convertImage();
+        });
+
+        icoSize.addEventListener('change', () => {
+            if (originalFile && currentFormat === 'ico' && originalImageElement) convertImage();
+        });
+
+        // Upload handlers
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && (file.type.startsWith('image/') || file.name.match(/\.(heic|heif|tiff|tif|svg)$/i))) {
+                handleFile(file);
+            } else {
+                alert('Please drop an image file');
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) handleFile(e.target.files[0]);
+        });
+
+        // Handle file upload
+        async function handleFile(file) {
+            originalFile = file;
+            isHeicFile = file.name.match(/\.(heic|heif)$/i) ? true : false;
+
+            loading.classList.remove('hidden');
+            loadingText.textContent = 'Loading image...';
+
+            try {
+                let processedFile = file;
+
+                // Handle HEIC files
+                if (isHeicFile && typeof heic2any !== 'undefined') {
+                    loadingText.textContent = 'Converting HEIC to PNG...';
+                    const blob = await heic2any({
+                        blob: file,
+                        toType: 'image/png',
+                        quality: 0.9
+                    });
+                    processedFile = new File([blob], file.name.replace(/\.(heic|heif)$/i, '.png'), { type: 'image/png' });
+                }
+
+                if (originalImageUrl) URL.revokeObjectURL(originalImageUrl);
+                originalImageUrl = URL.createObjectURL(processedFile);
+                originalPreview.src = originalImageUrl;
+
+                const sizeKB = (processedFile.size / 1024).toFixed(1);
+                originalInfo.textContent = `${file.name} (${sizeKB} KB)`;
+
+                previewSection.classList.remove('hidden');
+                originalImageElement = await loadImage(originalImageUrl);
+                await convertImage();
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error loading image. Please try another file.');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        // Convert image
+        async function convertImage() {
+            if (!originalFile || !originalImageElement) return;
+
+            loading.classList.remove('hidden');
+            loadingText.textContent = 'Converting...';
+            downloadSection.classList.add('hidden');
+            convertedPreview.src = '';
+
+            try {
+                const img = originalImageElement;
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                if (currentFormat === 'ico') {
+                    const size = parseInt(icoSize.value);
+                    const minDim = Math.min(width, height);
+                    const scale = size / minDim;
+                    width = Math.round(width * scale);
+                    height = Math.round(height * scale);
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+
+                if (currentFormat === 'jpg') {
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, width, height);
+                }
+
+                ctx.drawImage(img, 0, 0, width, height);
+
+                let mimeType;
+                let quality = parseInt(qualitySlider.value) / 100;
+
+                switch(currentFormat) {
+                    case 'png': mimeType = 'image/png'; break;
+                    case 'jpg': mimeType = 'image/jpeg'; break;
+                    case 'webp': mimeType = 'image/webp'; break;
+                    case 'gif': mimeType = 'image/gif'; break;
+                    case 'bmp': mimeType = 'image/bmp'; break;
+                    case 'ico': mimeType = 'image/x-icon'; break;
+                    case 'avif': mimeType = 'image/avif'; break;
+                    case 'tiff': mimeType = 'image/tiff'; break;
+                    default: mimeType = 'image/png';
+                }
+
+                if (currentFormat === 'ico') {
+                    currentConvertedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                } else if (currentFormat === 'gif') {
+                    currentConvertedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/gif'));
+                } else {
+                    currentConvertedBlob = await new Promise(resolve => canvas.toBlob(resolve, mimeType, quality));
+                }
+
+                const convertedUrl = URL.createObjectURL(currentConvertedBlob);
+                convertedPreview.src = convertedUrl;
+                const convertedSizeKB = (currentConvertedBlob.size / 1024).toFixed(1);
+                convertedInfo.textContent = `${currentFormat.toUpperCase()} (${convertedSizeKB} KB)`;
+
+                downloadSection.classList.remove('hidden');
+                incrementCounter();
+
+            } catch (error) {
+                console.error('Conversion error:', error);
+                alert('Error converting image. Try a different format.');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        function loadImage(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = url;
+            });
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            if (!currentConvertedBlob) return;
+            const originalName = originalFile.name.split('.')[0];
+            const extension = currentFormat;
+            const fileName = `${originalName}_converted.${extension}`;
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(currentConvertedBlob);
+            link.download = fileName;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(link.href), 100);
+        });
+
+        // Show initial advice
+        formatAdvice.classList.remove('hidden');
+        formatAdviceText.innerHTML = adviceMessages.png;
+    </script>
+</body>
+</html>

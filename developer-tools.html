@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Developer Tools - JSON, YAML, TOML, SQL, CSS, JS, HTML, XML | ZyloTech</title>
+    <meta name="description" content="Free developer tools online. Convert between JSON, YAML, TOML, SQL. Minify/Beautify CSS, JavaScript, HTML. Format XML. 100% browser-based.">
+    <meta name="keywords" content="free developer tools, json to yaml, yaml to json, json to toml, sql to json, css minifier, js beautifier, html formatter, xml formatter">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Developer Tools - JSON, YAML, TOML, SQL, CSS, JS, HTML, XML | ZyloTech">
+    <meta property="og:description" content="Free developer tools. Convert between JSON, YAML, TOML, SQL. Minify/Beautify CSS, JS, HTML. Format XML. 100% browser-based.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/developer-tools.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Developer Tools - ZyloTech">
+    <meta name="twitter:description" content="Free developer tools: JSON, YAML, TOML, SQL, CSS, JS, HTML, XML converters and formatters.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/developer-tools.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@iarna/toml@2.2.5/dist/toml.min.js"></script>
+    <script src="js/include.js"></script>
+
+    <style>
+        :root { --primary: #8b5cf6; --primary-hover: #7c3aed; --accent: #a78bfa; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #2e1065 100%); color: #f1f5f9; min-height: 100vh; }
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: #1f2937; }
+        .tab-btn { position: relative; padding: 12px 20px; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s ease; color: #94a3b8; cursor: pointer; font-size: 0.9rem; }
+        .tab-btn.active { border-bottom-color: var(--primary); color: white; }
+        .tool-btn { transition: all 0.2s; border: 1px solid #e5e7eb; }
+        .tool-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        textarea { font-family: 'Monaco', 'Menlo', 'Courier New', monospace; font-size: 12px; line-height: 1.5; resize: vertical; }
+        .copy-btn { background: #e2e8f0; border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+        .copy-btn:hover { background: var(--primary); color: white; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .hidden { display: none !important; }
+        .error-border { border-color: #ef4444 !important; }
+        .success-border { border-color: var(--primary) !important; }
+        .min-height-300 { min-height: 300px; }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #8b5cf6;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #7c3aed; transform: scale(1.1); }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-4">
+                <i class="fas fa-code text-purple-400"></i>
+                <span class="text-sm text-gray-200">Free • Browser-Based • No Server</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-2">
+                <i class="fas fa-terminal mr-2 text-purple-400"></i>Free Developer Tools
+            </h1>
+            <p class="text-gray-300 max-w-2xl mx-auto">JSON ↔ YAML ↔ TOML • SQL ↔ JSON • CSS/JS/HTML Minifier/Beautifier • XML Formatter. 100% Free.</p>
+            <div class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full shadow-lg">
+                <i class="fas fa-chart-simple"></i>
+                <span id="view-counter" class="font-bold">0</span>
+                <span class="text-sm">conversions done</span>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="glass rounded-2xl p-2 mb-6 flex flex-wrap justify-center">
+            <button id="tab-json-yaml" class="tab-btn active rounded-xl px-4 py-2"><i class="fab fa-js mr-1"></i>JSON ↔ YAML</button>
+            <button id="tab-json-toml" class="tab-btn rounded-xl px-4 py-2"><i class="fas fa-file-alt mr-1"></i>JSON ↔ TOML</button>
+            <button id="tab-sql-json" class="tab-btn rounded-xl px-4 py-2"><i class="fas fa-database mr-1"></i>SQL ↔ JSON</button>
+            <button id="tab-css" class="tab-btn rounded-xl px-4 py-2"><i class="fab fa-css3-alt mr-1"></i>CSS</button>
+            <button id="tab-js" class="tab-btn rounded-xl px-4 py-2"><i class="fab fa-js mr-1"></i>JavaScript</button>
+            <button id="tab-html" class="tab-btn rounded-xl px-4 py-2"><i class="fab fa-html5 mr-1"></i>HTML</button>
+            <button id="tab-xml" class="tab-btn rounded-xl px-4 py-2"><i class="fas fa-code mr-1"></i>XML</button>
+        </div>
+
+        <!-- ==================== JSON ↔ YAML ==================== -->
+        <div id="json-yaml-tool">
+            <div class="glass p-6 rounded-2xl">
+                <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fab fa-js text-purple-500"></i>JSON ↔ YAML Converter</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Input</label>
+                        <textarea id="json-input" rows="12" class="w-full p-3 border rounded-lg font-mono text-sm" placeholder='{"name": "John", "age": 30, "city": "Nairobi"}'></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="json-to-yaml" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">→ Convert to YAML</button>
+                            <button id="clear-json" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Clear</button>
+                            <button id="copy-json" class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Output</label>
+                        <textarea id="yaml-output" rows="12" class="w-full p-3 border rounded-lg font-mono text-sm bg-gray-50" readonly></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="yaml-to-json" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">← Convert to JSON</button>
+                            <button id="clear-yaml" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Clear</button>
+                            <button id="copy-yaml" class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="json-yaml-error" class="text-red-500 text-sm mt-2 hidden"></div>
+            </div>
+        </div>
+
+        <!-- ==================== JSON ↔ TOML ==================== -->
+        <div id="json-toml-tool" class="hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-file-alt text-purple-500"></i>JSON ↔ TOML Converter</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Input</label>
+                        <textarea id="json2-input" rows="12" class="w-full p-3 border rounded-lg font-mono text-sm" placeholder='{"title": "Example", "owner": {"name": "Tom"}}'></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="json-to-toml" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">→ Convert to TOML</button>
+                            <button id="clear-json2" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Clear</button>
+                            <button id="copy-json2" class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Output</label>
+                        <textarea id="toml-output" rows="12" class="w-full p-3 border rounded-lg font-mono text-sm bg-gray-50" readonly></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="toml-to-json" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">← Convert to JSON</button>
+                            <button id="clear-toml" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Clear</button>
+                            <button id="copy-toml" class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="json-toml-error" class="text-red-500 text-sm mt-2 hidden"></div>
+            </div>
+        </div>
+
+        <!-- ==================== SQL ↔ JSON ==================== -->
+        <div id="sql-json-tool" class="hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-database text-purple-500"></i>SQL ↔ JSON Converter</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">SQL INSERT Statements</label>
+                        <textarea id="sql-input" rows="12" class="w-full p-3 border rounded-lg font-mono text-sm" placeholder="INSERT INTO users (id, name, age) VALUES (1, 'John', 30);&#10;INSERT INTO users (id, name, age) VALUES (2, 'Jane', 25);"></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="sql-to-json" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">→ Convert to JSON</button>
+                            <button id="clear-sql" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Clear</button>
+                            <button id="copy-sql" class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">JSON Output</label>
+                        <textarea id="json3-output" rows="12" class="w-full p-3 border rounded-lg font-mono text-sm bg-gray-50" readonly></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="json-to-sql" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">← Convert to SQL</button>
+                            <button id="clear-json3" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Clear</button>
+                            <button id="copy-json3" class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="sql-json-error" class="text-red-500 text-sm mt-2 hidden"></div>
+            </div>
+        </div>
+
+        <!-- ==================== CSS MINIFIER/BEAUTIFIER ==================== -->
+        <div id="css-tool" class="hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fab fa-css3-alt text-purple-500"></i>CSS Formatter</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Input CSS</label>
+                        <textarea id="css-input" rows="12" class="w-full p-3 border rounded-lg font-mono text-sm" placeholder="body{color:red;background:#fff;} .btn{padding:10px;margin:5px;}"></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="css-beautify" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Beautify</button>
+                            <button id="css-minify" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Minify</button>
+                            <button id="clear-css" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Clear</button>
+                            <button id="copy-css" class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Output CSS</label>
+                        <textarea id="css-output" rows="12" class="w-full p-3 border rounded-lg font-mono text-sm bg-gray-50" readonly></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="swap-css" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">← Swap</button>
+                            <button id="copy-css-output" class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== JS MINIFIER/BEAUTIFIER ==================== -->
+        <div id="js-tool" class="hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fab fa-js text-purple-500"></i>JavaScript Formatter</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Input JavaScript</label>
+                        <textarea id="js-input" rows="12" class="w-full p-3 border rounded-lg font-mono text-sm" placeholder='function hello(){console.log("Hello");} const x=10;'></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="js-beautify" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Beautify</button>
+                            <button id="js-minify" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Minify</button>
+                            <button id="clear-js" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Clear</button>
+                            <button id="copy-js" class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Output JavaScript</label>
+                        <textarea id="js-output" rows="12" class="w-full p-3 border rounded-lg font-mono text-sm bg-gray-50" readonly></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="swap-js" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">← Swap</button>
+                            <button id="copy-js-output" class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== HTML MINIFIER/BEAUTIFIER ==================== -->
+        <div id="html-tool" class="hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fab fa-html5 text-purple-500"></i>HTML Formatter</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Input HTML</label>
+                        <textarea id="html-input" rows="12" class="w-full p-3 border rounded-lg font-mono text-sm" placeholder='<!DOCTYPE html><html><body><h1>Title</h1><p>Text</p></body></html>'></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="html-beautify" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Beautify</button>
+                            <button id="html-minify" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Minify</button>
+                            <button id="clear-html" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Clear</button>
+                            <button id="copy-html" class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Output HTML</label>
+                        <textarea id="html-output" rows="12" class="w-full p-3 border rounded-lg font-mono text-sm bg-gray-50" readonly></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="swap-html" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">← Swap</button>
+                            <button id="copy-html-output" class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== XML FORMATTER ==================== -->
+        <div id="xml-tool" class="hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-code text-purple-500"></i>XML Formatter</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Input XML</label>
+                        <textarea id="xml-input" rows="12" class="w-full p-3 border rounded-lg font-mono text-sm" placeholder='<root><person><name>John</name><age>30</age></person></root>'></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="xml-format" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Format XML</button>
+                            <button id="xml-minify" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Minify XML</button>
+                            <button id="clear-xml" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">Clear</button>
+                            <button id="copy-xml" class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Output XML</label>
+                        <textarea id="xml-output" rows="12" class="w-full p-3 border rounded-lg font-mono text-sm bg-gray-50" readonly></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="swap-xml" class="tool-btn bg-gray-100 px-3 py-1 rounded text-sm">← Swap</button>
+                            <button id="copy-xml-output" class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="xml-error" class="text-red-500 text-sm mt-2 hidden"></div>
+            </div>
+        </div>
+
+        <!-- Feature Section for SEO -->
+        <div class="mt-12 p-6 bg-white/5 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-3">Free Developer Tools Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div><i class="fas fa-code text-purple-400 mr-2"></i> <strong>JSON ↔ YAML</strong> - Convert config files</div>
+                <div><i class="fas fa-file-alt text-purple-400 mr-2"></i> <strong>JSON ↔ TOML</strong> - Modern config format</div>
+                <div><i class="fas fa-database text-purple-400 mr-2"></i> <strong>SQL ↔ JSON</strong> - Convert database data</div>
+                <div><i class="fab fa-css3-alt text-purple-400 mr-2"></i> <strong>CSS Formatter</strong> - Minify or beautify CSS</div>
+                <div><i class="fab fa-js text-purple-400 mr-2"></i> <strong>JS Formatter</strong> - Minify or beautify JavaScript</div>
+                <div><i class="fab fa-html5 text-purple-400 mr-2"></i> <strong>HTML Formatter</strong> - Minify or beautify HTML</div>
+                <div><i class="fas fa-code text-purple-400 mr-2"></i> <strong>XML Formatter</strong> - Format or minify XML</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Counter
+        let operationCount = localStorage.getItem('devConverterCount') || 0;
+        document.getElementById('view-counter').textContent = operationCount;
+        function incrementCounter() { operationCount++; localStorage.setItem('devConverterCount', operationCount); document.getElementById('view-counter').textContent = operationCount; }
+
+        // Toast
+        let toastTimeout;
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas fa-check-circle mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            const tools = ['json-yaml', 'json-toml', 'sql-json', 'css', 'js', 'html', 'xml'];
+            tools.forEach(t => {
+                document.getElementById(`${t}-tool`).classList.add('hidden');
+            });
+            document.getElementById(`${tabName}-tool`).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        document.getElementById('tab-json-yaml').addEventListener('click', () => switchTab('json-yaml'));
+        document.getElementById('tab-json-toml').addEventListener('click', () => switchTab('json-toml'));
+        document.getElementById('tab-sql-json').addEventListener('click', () => switchTab('sql-json'));
+        document.getElementById('tab-css').addEventListener('click', () => switchTab('css'));
+        document.getElementById('tab-js').addEventListener('click', () => switchTab('js'));
+        document.getElementById('tab-html').addEventListener('click', () => switchTab('html'));
+        document.getElementById('tab-xml').addEventListener('click', () => switchTab('xml'));
+
+        // ==================== JSON ↔ YAML ====================
+        const jsonInput = document.getElementById('json-input');
+        const yamlOutput = document.getElementById('yaml-output');
+        const jsonYamlError = document.getElementById('json-yaml-error');
+
+        document.getElementById('json-to-yaml').addEventListener('click', () => {
+            try {
+                const obj = JSON.parse(jsonInput.value);
+                yamlOutput.value = jsyaml.dump(obj);
+                jsonYamlError.classList.add('hidden');
+                incrementCounter();
+            } catch(e) {
+                jsonYamlError.textContent = 'Invalid JSON: ' + e.message;
+                jsonYamlError.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('yaml-to-json').addEventListener('click', () => {
+            try {
+                const obj = jsyaml.load(yamlOutput.value);
+                jsonInput.value = JSON.stringify(obj, null, 2);
+                jsonYamlError.classList.add('hidden');
+                incrementCounter();
+            } catch(e) {
+                jsonYamlError.textContent = 'Invalid YAML: ' + e.message;
+                jsonYamlError.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('clear-json').addEventListener('click', () => { jsonInput.value = ''; yamlOutput.value = ''; });
+        document.getElementById('clear-yaml').addEventListener('click', () => { yamlOutput.value = ''; });
+        document.getElementById('copy-json').addEventListener('click', () => { navigator.clipboard.writeText(jsonInput.value); showToast('Copied!'); });
+        document.getElementById('copy-yaml').addEventListener('click', () => { navigator.clipboard.writeText(yamlOutput.value); showToast('Copied!'); });
+
+        // Set default JSON
+        jsonInput.value = '{\n  "name": "John Doe",\n  "age": 30,\n  "city": "Nairobi",\n  "skills": ["JavaScript", "Python", "React"]\n}';
+
+        // ==================== JSON ↔ TOML ====================
+        const json2Input = document.getElementById('json2-input');
+        const tomlOutput = document.getElementById('toml-output');
+        const jsonTomlError = document.getElementById('json-toml-error');
+
+        document.getElementById('json-to-toml').addEventListener('click', () => {
+            try {
+                const obj = JSON.parse(json2Input.value);
+                tomlOutput.value = toml.stringify(obj);
+                jsonTomlError.classList.add('hidden');
+                incrementCounter();
+            } catch(e) {
+                jsonTomlError.textContent = 'Invalid JSON: ' + e.message;
+                jsonTomlError.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('toml-to-json').addEventListener('click', () => {
+            try {
+                const obj = toml.parse(tomlOutput.value);
+                json2Input.value = JSON.stringify(obj, null, 2);
+                jsonTomlError.classList.add('hidden');
+                incrementCounter();
+            } catch(e) {
+                jsonTomlError.textContent = 'Invalid TOML: ' + e.message;
+                jsonTomlError.classList.remove('hidden');
+            }
+        });
+
+        json2Input.value = '{\n  "title": "Example Config",\n  "database": {\n    "host": "localhost",\n    "port": 5432\n  }\n}';
+
+        // ==================== SQL ↔ JSON ====================
+        const sqlInput = document.getElementById('sql-input');
+        const json3Output = document.getElementById('json3-output');
+        const sqlJsonError = document.getElementById('sql-json-error');
+
+        function parseSQLToJSON(sql) {
+            const lines = sql.split(';').filter(l => l.trim());
+            const results = [];
+            for (const line of lines) {
+                const match = line.match(/INSERT INTO \w+ \((.+?)\) VALUES \((.+?)\)/i);
+                if (match) {
+                    const columns = match[1].split(',').map(c => c.trim());
+                    const values = match[2].split(',').map(v => v.trim().replace(/^['"]|['"]$/g, ''));
+                    const obj = {};
+                    columns.forEach((col, idx) => { obj[col] = values[idx]; });
+                    results.push(obj);
+                }
+            }
+            return results;
+        }
+
+        function jsonToSQL(json, tableName = 'table_name') {
+            const data = JSON.parse(json);
+            if (!Array.isArray(data)) return '-- Input must be an array of objects';
+            const columns = Object.keys(data[0]);
+            const sqlStatements = data.map(row => {
+                const values = columns.map(col => {
+                    const val = row[col];
+                    return typeof val === 'string' ? `'${val.replace(/'/g, "''")}'` : val;
+                });
+                return `INSERT INTO ${tableName} (${columns.join(', ')}) VALUES (${values.join(', ')});`;
+            });
+            return sqlStatements.join('\n');
+        }
+
+        document.getElementById('sql-to-json').addEventListener('click', () => {
+            try {
+                const json = parseSQLToJSON(sqlInput.value);
+                json3Output.value = JSON.stringify(json, null, 2);
+                sqlJsonError.classList.add('hidden');
+                incrementCounter();
+            } catch(e) {
+                sqlJsonError.textContent = 'Error parsing SQL: ' + e.message;
+                sqlJsonError.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('json-to-sql').addEventListener('click', () => {
+            try {
+                const sql = jsonToSQL(json3Output.value, 'users');
+                sqlInput.value = sql;
+                sqlJsonError.classList.add('hidden');
+                incrementCounter();
+            } catch(e) {
+                sqlJsonError.textContent = 'Invalid JSON: ' + e.message;
+                sqlJsonError.classList.remove('hidden');
+            }
+        });
+
+        sqlInput.value = "INSERT INTO users (id, name, age, city) VALUES (1, 'John', 30, 'Nairobi');\nINSERT INTO users (id, name, age, city) VALUES (2, 'Jane', 25, 'Mombasa');";
+
+        // ==================== CSS ====================
+        const cssInput = document.getElementById('css-input');
+        const cssOutput = document.getElementById('css-output');
+
+        function beautifyCSS(css) {
+            let beautified = '';
+            let indent = 0;
+            const lines = css.replace(/\s*([{};])\s*/g, '$1\n').split('\n');
+            for (let line of lines) {
+                line = line.trim();
+                if (line.includes('}')) indent--;
+                if (line) beautified += '  '.repeat(Math.max(0, indent)) + line + '\n';
+                if (line.includes('{')) indent++;
+            }
+            return beautified;
+        }
+
+        function minifyCSS(css) {
+            return css.replace(/\s+/g, ' ').replace(/\s*([{};:,])\s*/g, '$1').trim();
+        }
+
+        document.getElementById('css-beautify').addEventListener('click', () => {
+            cssOutput.value = beautifyCSS(cssInput.value);
+            incrementCounter();
+        });
+        document.getElementById('css-minify').addEventListener('click', () => {
+            cssOutput.value = minifyCSS(cssInput.value);
+            incrementCounter();
+        });
+        document.getElementById('swap-css').addEventListener('click', () => {
+            const temp = cssInput.value;
+            cssInput.value = cssOutput.value;
+            cssOutput.value = temp;
+        });
+        cssInput.value = 'body{background:#f0f0f0;color:#333;font-family:Arial,sans-serif;} .container{width:100%;max-width:1200px;margin:0 auto;} .btn{padding:10px 20px;background:#007bff;color:#fff;border-radius:5px;}';
+
+        // ==================== JavaScript ====================
+        const jsInput = document.getElementById('js-input');
+        const jsOutput = document.getElementById('js-output');
+
+        function beautifyJS(js) {
+            let indent = 0;
+            let result = '';
+            const lines = js.split(/\n/);
+            for (let line of lines) {
+                line = line.trim();
+                if (line.includes('}')) indent--;
+                if (line) result += '  '.repeat(Math.max(0, indent)) + line + '\n';
+                if (line.includes('{')) indent++;
+            }
+            return result;
+        }
+
+        function minifyJS(js) {
+            return js.replace(/\/\/.*$/gm, '').replace(/\s+/g, ' ').replace(/\s*([{};(),=])\s*/g, '$1').trim();
+        }
+
+        document.getElementById('js-beautify').addEventListener('click', () => {
+            jsOutput.value = beautifyJS(jsInput.value);
+            incrementCounter();
+        });
+        document.getElementById('js-minify').addEventListener('click', () => {
+            jsOutput.value = minifyJS(jsInput.value);
+            incrementCounter();
+        });
+        document.getElementById('swap-js').addEventListener('click', () => {
+            const temp = jsInput.value;
+            jsInput.value = jsOutput.value;
+            jsOutput.value = temp;
+        });
+        jsInput.value = 'function greet(name){console.log("Hello, "+name);} const numbers=[1,2,3,4,5]; const doubled=numbers.map(n=>n*2);';
+
+        // ==================== HTML ====================
+        const htmlInput = document.getElementById('html-input');
+        const htmlOutput = document.getElementById('html-output');
+
+        function beautifyHTML(html) {
+            let indent = 0;
+            let result = '';
+            const lines = html.replace(/>\s*</g, '>\n<').split('\n');
+            for (let line of lines) {
+                line = line.trim();
+                if (line.match(/<\/[^>]+>/)) indent--;
+                if (line) result += '  '.repeat(Math.max(0, indent)) + line + '\n';
+                if (line.match(/<[^\/][^>]*>/) && !line.match(/\/>/)) indent++;
+            }
+            return result;
+        }
+
+        function minifyHTML(html) {
+            return html.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
+        }
+
+        document.getElementById('html-beautify').addEventListener('click', () => {
+            htmlOutput.value = beautifyHTML(htmlInput.value);
+            incrementCounter();
+        });
+        document.getElementById('html-minify').addEventListener('click', () => {
+            htmlOutput.value = minifyHTML(htmlInput.value);
+            incrementCounter();
+        });
+        document.getElementById('swap-html').addEventListener('click', () => {
+            const temp = htmlInput.value;
+            htmlInput.value = htmlOutput.value;
+            htmlOutput.value = temp;
+        });
+        htmlInput.value = '<!DOCTYPE html><html><head><title>My Page</title></head><body><h1>Welcome</h1><p>This is a paragraph.</p><div class="container"><span>Content</span></div></body></html>';
+
+        // ==================== XML ====================
+        const xmlInput = document.getElementById('xml-input');
+        const xmlOutput = document.getElementById('xml-output');
+        const xmlError = document.getElementById('xml-error');
+
+        function formatXML(xml) {
+            let formatted = '';
+            let indent = 0;
+            const lines = xml.replace(/>\s*</g, '>\n<').split('\n');
+            for (let line of lines) {
+                line = line.trim();
+                if (line.match(/<\/[^>]+>/)) indent--;
+                if (line) formatted += '  '.repeat(Math.max(0, indent)) + line + '\n';
+                if (line.match(/<[^\/][^>]*>/) && !line.match(/\/>/)) indent++;
+            }
+            return formatted;
+        }
+
+        function minifyXML(xml) {
+            return xml.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
+        }
+
+        document.getElementById('xml-format').addEventListener('click', () => {
+            try {
+                xmlOutput.value = formatXML(xmlInput.value);
+                xmlError.classList.add('hidden');
+                incrementCounter();
+            } catch(e) {
+                xmlError.textContent = 'Error formatting XML: ' + e.message;
+                xmlError.classList.remove('hidden');
+            }
+        });
+        document.getElementById('xml-minify').addEventListener('click', () => {
+            xmlOutput.value = minifyXML(xmlInput.value);
+            incrementCounter();
+        });
+        document.getElementById('swap-xml').addEventListener('click', () => {
+            const temp = xmlInput.value;
+            xmlInput.value = xmlOutput.value;
+            xmlOutput.value = temp;
+        });
+        xmlInput.value = '<bookstore><book category="fiction"><title lang="en">The Hobbit</title><author>J.R.R. Tolkien</author><price>12.99</price></book><book category="non-fiction"><title lang="en">Learning XML</title><author>Erik T. Ray</author><price>39.95</price></book></bookstore>';
+
+        // Copy buttons for all outputs
+        document.getElementById('copy-css-output').addEventListener('click', () => { navigator.clipboard.writeText(cssOutput.value); showToast('Copied!'); });
+        document.getElementById('copy-js-output').addEventListener('click', () => { navigator.clipboard.writeText(jsOutput.value); showToast('Copied!'); });
+        document.getElementById('copy-html-output').addEventListener('click', () => { navigator.clipboard.writeText(htmlOutput.value); showToast('Copied!'); });
+        document.getElementById('copy-xml-output').addEventListener('click', () => { navigator.clipboard.writeText(xmlOutput.value); showToast('Copied!'); });
+        document.getElementById('copy-css').addEventListener('click', () => { navigator.clipboard.writeText(cssInput.value); showToast('Copied!'); });
+        document.getElementById('copy-js').addEventListener('click', () => { navigator.clipboard.writeText(jsInput.value); showToast('Copied!'); });
+        document.getElementById('copy-html').addEventListener('click', () => { navigator.clipboard.writeText(htmlInput.value); showToast('Copied!'); });
+        document.getElementById('copy-xml').addEventListener('click', () => { navigator.clipboard.writeText(xmlInput.value); showToast('Copied!'); });
+
+        // Clear buttons
+        document.getElementById('clear-css').addEventListener('click', () => { cssInput.value = ''; cssOutput.value = ''; });
+        document.getElementById('clear-js').addEventListener('click', () => { jsInput.value = ''; jsOutput.value = ''; });
+        document.getElementById('clear-html').addEventListener('click', () => { htmlInput.value = ''; htmlOutput.value = ''; });
+        document.getElementById('clear-xml').addEventListener('click', () => { xmlInput.value = ''; xmlOutput.value = ''; });
+        document.getElementById('clear-json2').addEventListener('click', () => { json2Input.value = ''; tomlOutput.value = ''; });
+        document.getElementById('clear-toml').addEventListener('click', () => { tomlOutput.value = ''; });
+        document.getElementById('clear-sql').addEventListener('click', () => { sqlInput.value = ''; json3Output.value = ''; });
+        document.getElementById('clear-json3').addEventListener('click', () => { json3Output.value = ''; });
+    </script>
+</body>
+</html>

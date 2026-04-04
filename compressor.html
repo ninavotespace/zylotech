@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free ZIP & GZIP Compressor - Compress Files Online | ZyloTech</title>
+    <meta name="description" content="Free online compression tool. Create ZIP archives, extract ZIP files, compress to GZIP, decompress GZIP. 100% browser-based, no upload required.">
+    <meta name="keywords" content="free zip compressor, gzip compressor, zip extractor online, compress files free, browser compression tool">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free ZIP & GZIP Compressor - Compress Files Online | ZyloTech">
+    <meta property="og:description" content="Free online compression tool. Create ZIP archives, extract ZIP files, compress to GZIP. 100% browser-based.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/compressor.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free ZIP & GZIP Compressor - ZyloTech">
+    <meta name="twitter:description" content="Compress and extract ZIP and GZIP files online for free.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/compressor.html">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    <script src="js/include.js"></script>
+
+    <style>
+        :root { --primary: #6366f1; --primary-hover: #4f46e5; --success: #10b981; --error: #ef4444; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: #f1f5f9; min-height: 100vh; }
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: #1f2937; }
+        .tab-btn { position: relative; padding: 10px 16px; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s ease; color: #94a3b8; cursor: pointer; white-space: nowrap; }
+        .tab-btn.active { border-bottom-color: var(--primary); color: var(--primary); }
+        .tab-btn:hover { color: white; }
+        .drop-zone { border: 2px dashed #cbd5e1; transition: all 0.2s ease; cursor: pointer; }
+        .drop-zone:hover, .drop-zone.drag-over { border-color: var(--primary); background: #eef2ff; }
+        textarea { font-family: 'Fira Code', 'Consolas', monospace; font-size: 13px; line-height: 1.5; }
+        @media (max-width: 768px) { .grid-cols-2 { grid-template-columns: 1fr; } .tab-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; } }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #6366f1;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #4f46e5; transform: scale(1.1); }
+    </style>
+</head>
+<body>
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <div id="loader" class="fixed inset-0 bg-gray-900/90 backdrop-blur flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="animate-spin w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p class="text-lg font-medium text-white">Loading compression libraries...</p>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-5 py-3 rounded-lg shadow-lg transform translate-y-20 transition-transform duration-300 z-50 flex items-center gap-3">
+        <i id="toast-icon" class="fas fa-check-circle text-green-400"></i>
+        <span id="toast-msg">Ready</span>
+    </div>
+
+    <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-4">
+                <i class="fas fa-shield-alt text-green-400"></i>
+                <span class="text-sm text-gray-200">Free • Client-Side • Zero Uploads • Secure</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-2">
+                <i class="fas fa-compress-arrows-alt mr-2 text-indigo-400"></i>Free Compression Tool
+            </h1>
+            <p class="text-gray-300 max-w-2xl mx-auto">Create ZIP archives, extract ZIP files, compress to GZIP, decompress GZIP. 100% free and private.</p>
+        </div>
+
+        <div class="glass rounded-xl p-2 mb-6 tab-scroll flex gap-1 overflow-x-auto justify-center">
+            <button class="tab-btn active" data-tab="zip-create"><i class="fas fa-file-archive mr-2"></i>Create ZIP</button>
+            <button class="tab-btn" data-tab="zip-extract"><i class="fas fa-folder-open mr-2"></i>Extract ZIP</button>
+            <button class="tab-btn" data-tab="gzip-compress"><i class="fas fa-compress mr-2"></i>GZIP Compress</button>
+            <button class="tab-btn" data-tab="gzip-decompress"><i class="fas fa-expand mr-2"></i>GZIP Decompress</button>
+        </div>
+
+        <div id="tool-area" class="space-y-4"></div>
+
+        <!-- Feature Section for SEO -->
+        <div class="mt-12 p-6 bg-white/5 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-3">Free Compression Tool Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div><i class="fas fa-file-archive text-indigo-400 mr-2"></i> <strong>Create ZIP</strong> - Compress multiple files into ZIP</div>
+                <div><i class="fas fa-folder-open text-indigo-400 mr-2"></i> <strong>Extract ZIP</strong> - Extract and download individual files</div>
+                <div><i class="fas fa-compress text-indigo-400 mr-2"></i> <strong>GZIP Compress</strong> - Compress files to .gz format</div>
+                <div><i class="fas fa-expand text-indigo-400 mr-2"></i> <strong>GZIP Decompress</strong> - Extract .gz files</div>
+                <div><i class="fas fa-shield-alt text-indigo-400 mr-2"></i> <strong>100% Private</strong> - No uploads, all local</div>
+                <div><i class="fas fa-chart-simple text-indigo-400 mr-2"></i> <strong>Compression Ratio</strong> - See how much you saved</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // ==================== UTILITIES ====================
+        const $ = s => document.querySelector(s);
+        const $$ = s => Array.from(document.querySelectorAll(s));
+
+        const showToast = (msg, type='success') => {
+            const icon = type==='success' ? 'fa-check-circle text-green-400' : type==='error' ? 'fa-exclamation-circle text-red-400' : 'fa-info-circle text-blue-400';
+            $('#toast-icon').className = `fas mr-2 ${icon}`;
+            $('#toast-msg').textContent = msg;
+            $('#toast').style.transform = 'translateY(0)';
+            clearTimeout(window._toastTimeout);
+            window._toastTimeout = setTimeout(() => $('#toast').style.transform = 'translateY(200px)', 3000);
+        };
+
+        const formatBytes = (bytes, decimals = 2) => {
+            if (!+bytes) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+        };
+
+        const downloadBlob = (blob, filename) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+            showToast('Download started!');
+        };
+
+        // ==================== TOOLS CONFIG ====================
+        const tools = {
+            'zip-create': {
+                title: 'Create ZIP Archive',
+                desc: 'Select multiple files to compress into a .zip file.',
+                accept: '*',
+                multiple: true,
+                action: async (files) => {
+                    if (!files || files.length === 0) throw new Error('No files selected');
+                    const zip = new JSZip();
+                    let totalSize = 0;
+
+                    for (const file of files) {
+                        zip.file(file.name, file);
+                        totalSize += file.size;
+                    }
+
+                    const content = await zip.generateAsync({
+                        type: 'blob',
+                        compression: 'DEFLATE',
+                        compressionOptions: { level: 6 }
+                    });
+
+                    return { blob: content, name: 'archive.zip', size: content.size, originalSize: totalSize };
+                }
+            },
+            'zip-extract': {
+                title: 'Extract ZIP Archive',
+                desc: 'Upload a .zip file to view and download its contents.',
+                accept: '.zip',
+                multiple: false,
+                action: async (files) => {
+                    if (!files || files.length === 0) throw new Error('No file selected');
+                    const file = files[0];
+
+                    try {
+                        const zip = await JSZip.loadAsync(file);
+                        const fileList = [];
+
+                        zip.forEach((relativePath, zipEntry) => {
+                            if (!zipEntry.dir) {
+                                fileList.push({ name: relativePath, entry: zipEntry });
+                            }
+                        });
+
+                        if (fileList.length === 0) throw new Error('ZIP file appears to be empty or contains only folders.');
+
+                        return { type: 'list', list: fileList, originalName: file.name };
+                    } catch (e) {
+                        throw new Error('Invalid or corrupted ZIP file.');
+                    }
+                }
+            },
+            'gzip-compress': {
+                title: 'GZIP Compress',
+                desc: 'Compress a file to GZIP format.',
+                accept: '*',
+                multiple: false,
+                action: async (files) => {
+                    if (!files || files.length === 0) throw new Error('No file selected');
+                    const file = files[0];
+
+                    const buffer = await file.arrayBuffer();
+                    const data = new Uint8Array(buffer);
+
+                    const compressed = pako.gzip(data);
+                    const blob = new Blob([compressed], { type: 'application/gzip' });
+
+                    return {
+                        blob,
+                        name: file.name + '.gz',
+                        size: compressed.length,
+                        originalSize: data.length
+                    };
+                }
+            },
+            'gzip-decompress': {
+                title: 'GZIP Decompress',
+                desc: 'Decompress a .gz file.',
+                accept: '.gz,.gzip',
+                multiple: false,
+                action: async (files) => {
+                    if (!files || files.length === 0) throw new Error('No file selected');
+                    const file = files[0];
+
+                    const buffer = await file.arrayBuffer();
+                    const data = new Uint8Array(buffer);
+
+                    try {
+                        const decompressed = pako.inflate(data);
+                        const blob = new Blob([decompressed], { type: 'application/octet-stream' });
+
+                        let name = 'decompressed.bin';
+                        if (file.name.endsWith('.gz')) {
+                            name = file.name.slice(0, -3);
+                        } else if (file.name.endsWith('.gzip')) {
+                            name = file.name.slice(0, -5);
+                        }
+
+                        return {
+                            blob,
+                            name,
+                            size: decompressed.length,
+                            originalSize: data.length
+                        };
+                    } catch (e) {
+                        throw new Error('Invalid GZIP data or corrupted file.');
+                    }
+                }
+            }
+        };
+
+        // ==================== STATE & UI ====================
+        let currentTab = 'zip-create';
+        let selectedFiles = []; // Store files here globally for the current tab
+
+        const renderTool = key => {
+            currentTab = key;
+            selectedFiles = []; // Reset files on tab switch
+            const t = tools[key];
+
+            let html = `
+                <div class="glass p-6 animate-fade">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-800">${t.title}</h2>
+                            <p class="text-sm text-gray-500">${t.desc}</p>
+                        </div>
+                    </div>
+            `;
+
+            html += `
+                    <div id="input-container" class="mb-4">
+                        <div id="drop-zone" class="drop-zone p-8 rounded-lg text-center bg-gray-50">
+                            <i class="fas fa-cloud-upload-alt text-3xl text-indigo-400 mb-2"></i>
+                            <p class="text-sm text-gray-600 mb-2">Drop file${t.multiple ? 's' : ''} here or click to browse</p>
+                            <input type="file" id="file-input" class="hidden" accept="${t.accept}" ${t.multiple ? 'multiple' : ''}>
+                            <button onclick="$('#file-input').click()" class="btn-action px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded-lg">Select File${t.multiple ? 's' : ''}</button>
+                        </div>
+                    </div>
+
+                    <div id="file-list" class="hidden mb-4 space-y-2"></div>
+
+                    <div id="result-area" class="hidden mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <div class="flex justify-between items-center flex-wrap gap-4">
+                            <div>
+                                <p class="font-bold text-green-800">Success!</p>
+                                <p id="result-stats" class="text-sm text-green-600"></p>
+                            </div>
+                            <button id="download-btn" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium"><i class="fas fa-download mr-2"></i>Download</button>
+                        </div>
+                    </div>
+
+                    <div id="error-area" class="hidden mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700"></div>
+
+                    <div class="flex justify-end">
+                        <button id="process-btn" class="btn-action px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fas fa-cog mr-2"></i> Process
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            $('#tool-area').innerHTML = html;
+
+            // Bind Events
+            const dropZone = $('#drop-zone');
+            const fileInput = $('#file-input');
+            const processBtn = $('#process-btn');
+
+            // Drag & Drop
+            dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+            dropZone.addEventListener('drop', e => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                handleFiles(e.dataTransfer.files);
+            });
+            dropZone.addEventListener('click', e => {
+                if (e.target !== fileInput && !e.target.closest('button')) fileInput.click();
+            });
+            fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+            // Process Button
+            processBtn.addEventListener('click', async () => {
+                processBtn.disabled = true;
+                processBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+                $('#error-area').classList.add('hidden');
+                $('#result-area').classList.add('hidden');
+
+                try {
+                    // Use the globally stored selectedFiles
+                    const result = await t.action(selectedFiles);
+
+                    if (result.type === 'list') {
+                        showZipList(result.list, result.originalName);
+                    } else {
+                        $('#result-stats').textContent = `Original: ${formatBytes(result.originalSize)} → Result: ${formatBytes(result.size)}`;
+                        if (result.originalSize > 0) {
+                             const ratio = Math.round((1 - result.size/result.originalSize)*100);
+                             $('#result-stats').textContent += ` (${ratio > 0 ? ratio + '% smaller' : Math.abs(ratio) + '% larger'})`;
+                        }
+
+                        $('#download-btn').onclick = () => downloadBlob(result.blob, result.name);
+                        $('#result-area').classList.remove('hidden');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    $('#error-area').textContent = `Error: ${err.message}`;
+                    $('#error-area').classList.remove('hidden');
+                } finally {
+                    processBtn.disabled = false;
+                    processBtn.innerHTML = '<i class="fas fa-cog mr-2"></i> Process';
+                }
+            });
+        };
+
+        const handleFiles = (files) => {
+            if (!files || files.length === 0) return;
+
+            // Store files in global state
+            selectedFiles = Array.from(files);
+
+            const list = $('#file-list');
+            list.innerHTML = '';
+            list.classList.remove('hidden');
+            $('#drop-zone').classList.add('hidden');
+
+            selectedFiles.forEach(f => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-3 bg-gray-100 rounded text-sm border border-gray-200';
+                div.innerHTML = `
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <i class="fas fa-file text-indigo-500"></i>
+                        <span class="truncate font-medium">${f.name}</span>
+                    </div>
+                    <span class="text-gray-500 whitespace-nowrap ml-2">${formatBytes(f.size)}</span>
+                `;
+                list.appendChild(div);
+            });
+        };
+
+        const showZipList = (files, zipName) => {
+            const listContainer = $('#file-list');
+            listContainer.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <p class="font-bold text-gray-700">Contents of ${zipName}:</p>
+                    <span class="text-xs text-gray-500">${files.length} files</span>
+                </div>
+                <div class="space-y-1 max-h-60 overflow-y-auto pr-1">
+                </div>
+            `;
+
+            const innerContainer = listContainer.querySelector('.space-y-1');
+            listContainer.classList.remove('hidden');
+            $('#drop-zone').classList.add('hidden');
+
+            // Limit display to first 100 files to prevent DOM freeze
+            const displayFiles = files.slice(0, 100);
+
+            displayFiles.forEach(f => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-2 bg-white border border-gray-200 rounded text-sm hover:bg-indigo-50 transition-colors group';
+
+                // Get just the filename from path
+                const fileName = f.name.split('/').pop();
+
+                div.innerHTML = `
+                    <span class="truncate max-w-[200px] text-gray-700" title="${f.name}">
+                        <i class="fas fa-file-alt mr-2 text-gray-400"></i>${fileName}
+                    </span>
+                    <button class="opacity-0 group-hover:opacity-100 text-indigo-600 hover:text-indigo-800 text-xs font-bold px-2 py-1 bg-indigo-100 rounded transition-all download-single">
+                        Download
+                    </button>
+                `;
+
+                div.querySelector('.download-single').onclick = (e) => {
+                    e.stopPropagation();
+                    const btn = e.target;
+                    btn.textContent = '...';
+                    f.entry.async('blob').then(blob => {
+                        downloadBlob(blob, fileName);
+                        btn.textContent = 'Done';
+                        setTimeout(() => btn.textContent = 'Download', 2000);
+                    }).catch(err => {
+                        showToast('Failed to extract file', 'error');
+                        btn.textContent = 'Error';
+                    });
+                };
+                innerContainer.appendChild(div);
+            });
+
+            if (files.length > 100) {
+                const more = document.createElement('div');
+                more.className = 'text-center text-xs text-gray-500 mt-2 p-2';
+                more.textContent = `... and ${files.length - 100} more files`;
+                innerContainer.appendChild(more);
+            }
+        };
+
+        // ==================== INIT ====================
+        window.addEventListener('load', () => {
+            if (typeof JSZip === 'undefined' || typeof pako === 'undefined') {
+                $('#loader').innerHTML = `<div class="text-center"><i class="fas fa-exclamation-triangle text-4xl text-yellow-500 mb-4"></i><p class="text-white text-lg">Failed to load libraries.<br>Check internet connection.</p></div>`;
+                return;
+            }
+            $('#loader').classList.add('hidden');
+
+            $$('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    $$('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderTool(btn.dataset.tab);
+                });
+            });
+
+            renderTool(currentTab);
+        });
+    </script>
+</body>
+</html>

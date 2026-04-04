@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- BRANDING & SEO -->
+    <title>Free Karaoke Studio - Create Karaoke Videos Online | ZyloTech</title>
+    <meta name="description" content="Free online karaoke studio. Create professional karaoke videos with lyrics sync. Remove vocals, add word-by-word highlighting, export as video. 100% browser-based.">
+    <meta name="keywords" content="free karaoke, karaoke maker, vocal remover, karaoke video creator, lyric sync, online karaoke studio">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Karaoke Studio - Create Karaoke Videos | ZyloTech">
+    <meta property="og:description" content="Create professional karaoke videos online for free. Sync lyrics, remove vocals, export as video.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/karaoke.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Karaoke Studio - ZyloTech">
+    <meta name="twitter:description" content="Create karaoke videos online for free. Perfect for singers and content creators.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/karaoke.html">
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="msapplication-TileColor" content="#ec4899">
+    <meta name="theme-color" content="#0f172a">
+
+    <!-- Stylesheets -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Paystack Inline JS -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+
+    <!-- JSZip for downloading both files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+
+        body {
+            background-color: #020617;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+            margin: 0;
+            /* Mobile Performance Optimization */
+            touch-action: manipulation;
+        }
+
+        .bg-gradient-animate {
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+        }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* CANVAS POSITIONING - EXACT MATCH TO YOUR WORKING CODE */
+        #karaoke-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; object-fit: contain;
+        }
+
+        #setup-modal, #download-modal, #library-modal, #paywall-modal { backdrop-filter: blur(10px); background: rgba(0,0,0,0.9); transition: opacity 0.3s ease; }
+
+        /* Header Styling */
+        header {
+            position: relative;
+            z-index: 30;
+        }
+
+        /* Controls Bar */
+        #controls-bar {
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            height: 100px;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            z-index: 20;
+        }
+
+        /* REC INDICATOR - Fixed Position to stay within Canvas Area */
+        .recording-indicator {
+            position: fixed; /* Changed to fixed to ensure it stays visible relative to viewport */
+            top: 140px; /* Positioned below the two headers (approx 80px + 60px) */
+            right: 20px;
+            background: red; color: white; padding: 5px 10px;
+            border-radius: 4px; font-weight: bold; font-size: 12px;
+            display: none; z-index: 15; /* Below headers (30) but above canvas (1) */
+            animation: pulse 1s infinite;
+            pointer-events: none; /* Let clicks pass through to canvas if needed */
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* Sync Button States */
+        .sync-active {
+            background: linear-gradient(to right, #10b981, #059669) !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+            border-color: #34d399 !important;
+        }
+        .sync-paused {
+            background: #334155 !important;
+            border-color: #475569 !important;
+            color: #94a3b8;
+        }
+
+        /* Manual Tap Button */
+        .tap-sync-btn {
+            background: linear-gradient(to right, #f59e0b, #d97706) !important;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+            border-color: #fbbf24 !important;
+        }
+
+        /* Custom Range Slider for Speed */
+        input[type=range].speed-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range].speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #fbbf24;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+        }
+        input[type=range].speed-slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #475569;
+            border-radius: 2px;
+        }
+
+        /* TOOLTIP STYLES */
+        .tooltip-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            width: 220px;
+            background-color: #1e293b;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 100;
+            bottom: 125%; /* Position above */
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid #475569;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            font-size: 0.75rem;
+            line-height: 1.4;
+            pointer-events: none;
+        }
+
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1e293b transparent transparent transparent;
+        }
+
+        .tooltip-wrapper:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Mobile adjustment for tooltips - FIXED VISIBILITY */
+        @media (max-width: 768px) {
+            .tooltip-text {
+                width: 200px;
+                margin-left: -100px;
+                bottom: auto;
+                top: 100%; /* Position BELOW on mobile to avoid cutoff */
+                margin-top: 10px;
+            }
+            .tooltip-text::after {
+                top: auto;
+                bottom: 100%;
+                border-color: transparent transparent #1e293b transparent;
+            }
+        }
+
+        /* Header Specific Styles */
+        .donate-btn {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            transition: all 0.3s ease;
+        }
+        .donate-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px -5px rgba(239,68,68,0.4);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <!-- HEADER 1: MAIN ZYLOTECH NAVIGATION -->
+    <header class="border-b border-white/10 bg-black/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
+                    <i class="fas fa-crown text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-white">ZyloTech Creators Studio</h1>
+                    <p class="text-xs text-gray-400">Free Tools for Everyone</p>
+                </div>
+            </a>
+
+            <div class="flex flex-wrap items-center gap-4 justify-center">
+                <div class="relative group">
+                    <button class="text-sm text-gray-300 hover:text-white transition flex items-center gap-1">
+                        Tools <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <div class="absolute top-full left-0 mt-2 w-64 bg-gray-900 rounded-lg shadow-xl border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <div class="p-3">
+                            <p class="text-xs font-semibold text-gray-400 mb-2 px-2">MEDIA TOOLS</p>
+                            <a href="image-converter.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">📸 Image Converter</a>
+                            <a href="audio-converter.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">🎵 Audio Studio</a>
+                            <a href="video-converter.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">🎬 Video Converter</a>
+                            <a href="video-to-audio.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">🎵 Video to Audio</a>
+                            <a href="video-to-gif.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">🎞️ Video to GIF</a>
+                            <a href="compressor.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">🗜️ File Compressor</a>
+                            <a href="document-converter.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">📄 Document Converter</a>
+
+                            <p class="text-xs font-semibold text-gray-400 mb-2 mt-3 px-2">COLOR & DESIGN</p>
+                            <a href="color-maker.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">🎨 Color Maker Studio</a>
+                            <a href="color-converter.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">🌈 Color Converter</a>
+                            <a href="font-converter.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">🔤 Font Converter</a>
+
+                            <p class="text-xs font-semibold text-gray-400 mb-2 mt-3 px-2">DATA & CODE</p>
+                            <a href="data-converter.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">📊 Data Converter</a>
+                            <a href="hash-tool.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">🔐 Hash & Encode</a>
+                            <a href="developer-tools.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">💻 Developer Tools</a>
+                            <a href="text-manipulator.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">📝 Text Manipulator</a>
+                            <a href="word-processor.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">📄 Word Processor</a>
+
+                            <p class="text-xs font-semibold text-gray-400 mb-2 mt-3 px-2">CALCULATORS</p>
+                            <a href="unit-converter.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">📏 Unit Converter</a>
+                            <a href="scientific-calc.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">🧮 Scientific Calculators</a>
+                            <a href="math-converter.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">🔢 Number & Math</a>
+                            <a href="date-converter.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">📅 Date & Time</a>
+                            <a href="geo-converter.html" class="block px-3 py-1.5 text-sm text-gray-300 hover:text-pink-400 hover:bg-gray-800 rounded transition">🌍 Geo Converters</a>
+                        </div>
+                    </div>
+                </div>
+                <a href="about.html" class="text-sm text-gray-300 hover:text-white transition">About</a>
+                <button id="donateBtn" class="donate-btn px-5 py-2 rounded-full text-white text-sm font-semibold flex items-center gap-2 shadow-lg hover:scale-105 transition">
+                    <i class="fas fa-heart"></i> Donate $1
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HEADER 2: APP SPECIFIC HEADER -->
+    <header id="main-header" class="flex items-center justify-between px-6 z-30 bg-slate-900/90 border-b border-white/10" style="height: 60px;">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-gradient-to-br from-pink-500 to-violet-600 rounded-lg flex items-center justify-center">
+                <i class="fas fa-microphone-alt text-white text-sm"></i>
+            </div>
+            <h1 class="text-lg font-bold tracking-wide">Free Karaoke Studio</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="openLibrary()" class="text-slate-300 hover:text-white font-medium text-sm flex items-center gap-2 transition">
+                <i class="fas fa-book-open"></i> Library
+            </button>
+            <button onclick="openSetupModal()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-1.5 rounded-lg text-sm font-bold border border-slate-600 transition">
+                <i class="fas fa-plus mr-1"></i> New Project
+            </button>
+        </div>
+    </header>
+
+    <!-- LIBRARY MODAL -->
+    <div id="library-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-white"><i class="fas fa-book-open text-blue-500 mr-2"></i>My Projects</h2>
+                <button onclick="closeLibrary()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6">
+                <div id="library-list" class="space-y-3 max-h-[60vh] overflow-y-auto">
+                    <p class="text-slate-500 text-center py-4">No saved projects yet.</p>
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-800 text-center bg-slate-800/50">
+                <button onclick="closeLibrary()" class="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-bold">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETUP MODAL - OPTIMIZED FOR MOBILE VISIBILITY -->
+    <div id="setup-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <!-- Added max-h-[90vh] and overflow-y-auto to fix zoom/cutoff issues on mobile -->
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100 flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-slate-800 shrink-0">
+                <h1 class="text-2xl font-black text-white"><i class="fas fa-microphone-alt text-pink-500 mr-2"></i>New Project</h1>
+                <p class="text-xs text-slate-400 mt-1">Create your karaoke video.</p>
+            </div>
+
+            <!-- Scrollable Content Area -->
+            <div class="p-6 space-y-4 overflow-y-auto">
+
+                <!-- Song Title -->
+                <div class="tooltip-wrapper w-full block">
+                    <span class="tooltip-text"><b>Song Title:</b> Name your project. This text will be used as the filename when you download your videos.</span>
+                    <label class="block text-sm font-bold text-slate-300 mb-2">1. Song Title</label>
+                    <input type="text" id="song-title" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white" placeholder="My Song">
+                </div>
+
+                <!-- Upload Audio -->
+                <div class="tooltip-wrapper w-full block">
+                    <span class="tooltip-text"><b>Upload Audio:</b> Select an MP3 or Video file from your device. The system will use this file to generate both the Original and Karaoke versions.</span>
+                    <label class="block text-sm font-bold text-slate-300 mb-2">2. Upload Audio</label>
+                    <input type="file" id="audio-input" accept="audio/*,video/*" class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 bg-slate-800 rounded-lg border border-slate-700">
+                </div>
+
+                <!-- Paste Lyrics -->
+                <div class="tooltip-wrapper w-full block">
+                    <span class="tooltip-text"><b>Paste Lyrics:</b> Copy and paste your song lyrics here. Each new line in the text box will become a new line in the karaoke video.</span>
+                    <label class="block text-sm font-bold text-slate-300 mb-2">3. Paste Lyrics</label>
+                    <textarea id="lyric-text-area" rows="4" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-white focus:ring-2 focus:ring-pink-500 focus:outline-none" placeholder="Paste lyrics here..."></textarea>
+                </div>
+
+                <!-- SYNC MODE SELECTOR -->
+                <div class="tooltip-wrapper w-full block">
+                    <span class="tooltip-text">
+                        <b>Sync Mode:</b><br>
+                        • <b>Line:</b> Highlights entire lines at once.<br>
+                        • <b>Word:</b> Highlights word-by-word (Standard).<br>
+                        • <b>Letter:</b> Highlights letter-by-letter (Pro Fill).
+                    </span>
+                    <label class="block text-sm font-bold text-slate-300 mb-2">Sync Mode</label>
+                    <select id="sync-mode-select" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white">
+                        <option value="line">Line Sync (Standard)</option>
+                        <option value="word">Word Sync (Karaoke Style)</option>
+                        <option value="letter">Letter Sync (Pro Fill)</option>
+                    </select>
+                </div>
+
+                <!-- Sensitivity -->
+                <div class="tooltip-wrapper w-full block">
+                    <span class="tooltip-text"><b>Beat Sensitivity:</b> Adjusts how aggressively the auto-sync detects beats. Increase if sync is lagging behind, decrease if it's jumping too fast.</span>
+                    <label class="block text-sm font-bold text-slate-300 mb-2">Beat Detection Sensitivity</label>
+                    <input type="range" id="sensitivity-slider" min="10" max="100" value="40" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                    <div class="flex justify-between text-xs text-slate-400 mt-1">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Actions (Sticky) -->
+            <div class="p-6 border-t border-slate-800 flex justify-between items-center shrink-0 bg-slate-900">
+
+                <!-- Reset Button -->
+                <div class="tooltip-wrapper">
+                    <span class="tooltip-text"><b>Reset:</b> Clears all current data (lyrics, audio, settings) and returns to the start screen.</span>
+                    <button onclick="resetProject()" class="text-slate-400 hover:text-white text-sm font-bold"><i class="fas fa-trash mr-1"></i> Reset</button>
+                </div>
+
+                <!-- Load Project Button -->
+                <div class="tooltip-wrapper">
+                    <span class="tooltip-text"><b>Load Project:</b> Starts the session with your uploaded audio and lyrics. Takes you to the recording interface.</span>
+                    <button onclick="startSession()" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg shadow-lg transition">
+                        Load Project <i class="fas fa-play ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOWNLOAD OPTIONS MODAL -->
+    <div id="download-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="p-6 border-b border-slate-800">
+                <h2 class="text-xl font-bold text-white"><i class="fas fa-check-circle text-green-500 mr-2"></i>Recording Complete!</h2>
+                <p class="text-xs text-slate-400 mt-1">Both versions are ready.</p>
+            </div>
+            <div class="p-6 space-y-3">
+
+                <!-- Download Original -->
+                <div class="tooltip-wrapper w-full block">
+                    <span class="tooltip-text"><b>Original Version:</b> Downloads the video with the full original audio (vocals + instruments) exactly as recorded.</span>
+                    <button onclick="checkLimitAndDownload('original')" class="w-full p-4 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-xl flex items-center gap-4 transition group">
+                        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="text-left">
+                            <div class="font-bold text-white group-hover:text-blue-400">With Original Vocals</div>
+                            <div class="text-xs text-slate-400">Download original version.</div>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Download Karaoke -->
+                <div class="tooltip-wrapper w-full block">
+                    <span class="tooltip-text"><b>Karaoke Version:</b> Downloads the video with vocals removed using phase cancellation. Instruments are preserved for singing along.</span>
+                    <button onclick="checkLimitAndDownload('karaoke')" class="w-full p-4 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-xl flex items-center gap-4 transition group">
+                        <div class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center text-white">
+                            <i class="fas fa-user-slash"></i>
+                        </div>
+                        <div class="text-left">
+                            <div class="font-bold text-white group-hover:text-pink-400">Karaoke (Enhanced Removal)</div>
+                            <div class="text-xs text-slate-400">Download instrumental version.</div>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="h-px bg-slate-700 my-2"></div>
+
+                <!-- Download ZIP -->
+                <div class="tooltip-wrapper w-full block">
+                    <span class="tooltip-text"><b>Download ALL (ZIP):</b> Bundles both the Original and Karaoke video files into a single ZIP archive for easy sharing.</span>
+                    <button onclick="checkLimitAndDownload('zip')" class="w-full p-4 bg-gradient-to-r from-blue-600 to-pink-600 hover:from-blue-500 hover:to-pink-500 border border-transparent rounded-xl flex items-center gap-4 transition group shadow-lg">
+                        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white">
+                            <i class="fas fa-file-archive"></i>
+                        </div>
+                        <div class="text-left">
+                            <div class="font-bold text-white">Download ALL (ZIP)</div>
+                            <div class="text-xs text-white/80">Get both files in one archive.</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-800 text-center">
+                <button onclick="closeDownloadModal()" class="text-slate-400 hover:text-white text-sm">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYWALL MODAL -->
+    <div id="paywall-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-pink-500/50 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden text-center p-8">
+            <div class="w-20 h-20 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-pink-500/30">
+                <i class="fas fa-crown text-3xl text-white"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">Download Limit Reached</h2>
+            <p class="text-slate-400 mb-6">You've enjoyed 10 free downloads! Support ZyloTech to keep creating.</p>
+
+            <div class="bg-slate-800/50 rounded-lg p-4 mb-6 border border-slate-700">
+                <div class="text-sm text-slate-400 uppercase tracking-wider font-bold mb-1">Unlock 10 More Downloads</div>
+                <div class="text-3xl font-black text-white">$1.00 <span class="text-sm font-normal text-slate-400">USD</span></div>
+            </div>
+
+            <button onclick="initiatePaystackPayment()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg transition transform hover:scale-105 flex items-center justify-center gap-2">
+                <i class="fas fa-lock"></i> Pay $1.00 Securely
+            </button>
+            <p class="text-xs text-slate-500 mt-4">Secure payment via Paystack. Instant unlock.</p>
+        </div>
+    </div>
+
+    <!-- CANVAS & BACKGROUND -->
+    <div class="bg-gradient-animate"></div>
+    <canvas id="karaoke-canvas"></canvas>
+    <div id="rec-badge" class="recording-indicator"><i class="fas fa-circle mr-1"></i> REC</div>
+
+    <!-- CONTROLS -->
+    <div id="controls-bar" class="relative z-20 p-4 pb-6">
+        <div class="max-w-6xl mx-auto h-full flex flex-col justify-center">
+            <div class="flex items-center gap-4 mb-2">
+                <span id="current-time" class="text-xs font-mono text-slate-400 w-10 text-right">0:00</span>
+                <div class="flex-grow h-1.5 bg-slate-700 rounded-full cursor-pointer" id="progress-container">
+                    <div id="progress-bar" class="h-full bg-blue-500 rounded-full w-0"></div>
+                </div>
+                <span id="duration" class="text-xs font-mono text-slate-400 w-10">0:00</span>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+
+                <!-- Row 1: Audio & Sync Toggle -->
+                <div class="flex items-center gap-4 w-full md:w-auto justify-center md:justify-start">
+
+                    <!-- Play/Pause -->
+                    <div class="tooltip-wrapper">
+                        <span class="tooltip-text"><b>Play / Pause:</b> Controls audio playback. The visualizer and lyrics respond in real-time to the music.</span>
+                        <button id="play-btn" class="w-10 h-10 bg-white text-slate-900 rounded-full flex items-center justify-center hover:scale-110 transition shadow-lg">
+                            <i class="fas fa-play ml-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Stop -->
+                    <div class="tooltip-wrapper">
+                        <span class="tooltip-text"><b>Stop:</b> Stops playback and resets the playhead to the beginning (0:00).</span>
+                        <button id="stop-btn" class="w-8 h-8 bg-slate-700 text-white rounded-full flex items-center justify-center hover:bg-slate-600 transition">
+                            <i class="fas fa-stop"></i>
+                        </button>
+                    </div>
+
+                    <div class="h-6 w-px bg-slate-700 mx-2 hidden md:block"></div>
+
+                    <!-- Sync Toggle -->
+                    <div class="tooltip-wrapper">
+                        <span class="tooltip-text">
+                            <b>Auto-Sync Toggle:</b><br>
+                            • <b>Start Sync:</b> Activates automatic beat detection but may not be perfect.<br>
+                            • <b>Start Sync:</b> Use together with speed tool to improve performance.<br>
+                            • <b>Pause Auto:</b> Pauses auto-detection so you can tap manually if auto sync fails.
+                        </span>
+                        <button id="sync-toggle-btn" class="hidden px-4 py-2 bg-slate-700 border border-slate-600 text-white font-bold rounded-lg shadow-lg transition flex items-center gap-2 sync-paused min-w-[140px] justify-center text-sm">
+                            <i class="fas fa-play"></i> START SYNC
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Row 2: Manual Tap -->
+                <div class="flex items-center gap-4 w-full md:w-auto justify-center">
+                     <div class="tooltip-wrapper">
+                        <span class="tooltip-text">
+                            <b>Manual Tap:</b><br>
+                            Click this (or press Spacebar) exactly when a word/line is sung to correct the timing if Auto-Sync misses a beat.
+                        </span>
+                        <button id="manual-tap-btn" class="hidden px-6 py-2 bg-slate-700 border border-slate-600 text-white font-bold rounded-lg shadow-lg transition flex items-center gap-2 tap-sync-btn min-w-[120px] justify-center text-sm">
+                            <i class="fas fa-hand-pointer"></i> TAP
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Row 3: Real-Time Speed Control -->
+                <div class="tooltip-wrapper w-full md:w-1/3">
+                    <span class="tooltip-text">
+                        <b>Speed Control:</b><br>
+                        This is the speed at which the lyrics run. Adjusts the expected time between lyrics (in milliseconds).<br>
+                        • <b>Lower:</b> For faster singers.<br>
+                        • <b>Higher:</b> For slower ballads.
+                    </span>
+                    <div class="flex items-center gap-4 bg-slate-800/50 p-2 rounded-lg border border-slate-700">
+                        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider whitespace-nowrap">
+                            <i class="fas fa-tachometer-alt mr-1"></i> Speed
+                        </div>
+                        <input type="range" id="speed-slider" min="50" max="800" value="400" class="speed-slider">
+                        <div class="text-xs font-mono text-white w-10 text-right" id="speed-value">400ms</div>
+                    </div>
+                </div>
+
+                <!-- Row 4: Export -->
+                <div class="flex items-center gap-2 w-full md:w-auto justify-center md:justify-end">
+
+                     <!-- Record Video -->
+                     <div class="tooltip-wrapper">
+                        <span class="tooltip-text">
+                            <b>Record Video:</b><br>
+                            Starts recording BOTH Original and Karaoke versions simultaneously. Click again to stop and open the download menu.
+                        </span>
+                        <button id="export-video-btn" onclick="toggleRecording()" class="hidden w-10 h-10 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-500 text-white shadow-lg shadow-red-500/30" title="Record Video">
+                            <i class="fas fa-video"></i>
+                        </button>
+                    </div>
+
+                    <!-- Settings -->
+                    <div class="tooltip-wrapper">
+                        <span class="tooltip-text"><b>Settings:</b> Returns to the setup screen to change lyrics, audio, or sync mode.</span>
+                        <button onclick="openSetupModal()" class="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center hover:bg-slate-700 text-slate-300" title="New Project / Settings">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-1">
+                 <p id="instruction-text" class="text-xs text-blue-400 hidden">
+                    <i class="fas fa-info-circle"></i> Audio playing. Click "START SYNC" when vocals begin.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Scripts -->
+    <script>
+        // Donation function
+        const DONATION_LINK = 'https://paystack.com/pay/zylotech-support';
+        function donate() { window.open(DONATION_LINK, '_blank'); }
+
+        // Attach donate button when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const donateBtn = document.getElementById('donateBtn');
+            if (donateBtn) donateBtn.addEventListener('click', donate);
+        });
+    </script>
+
+    <!-- App Logic -->
+    <script>
+        // --- State Variables ---
+        let audioCtx, source, analyser, gainNode;
+        let audioElement = new Audio();
+        let lyrics = [];
+        let currentLineIndex = -1;
+        let currentItemIndex = -1;
+        let isPlaying = false;
+        let animationFrameId;
+        let syncMode = 'line';
+        let projectLibrary = []; // Simple in-memory library
+
+        // Auto-Sync Engine State
+        let isSyncActive = false;
+        let lastBeatTime = 0;
+        let averageBeatInterval = 400;
+        let sensitivity = 40;
+
+        // Recording State
+        let originalRecorder, karaokeRecorder;
+        let originalChunks = [], karaokeChunks = [];
+        let isRecording = false;
+        let originalBlob = null;
+        let karaokeBlob = null;
+
+        // PAYWALL STATE
+        const DOWNLOAD_LIMIT = 10;
+        let downloadCount = parseInt(localStorage.getItem('zylo_karaoke_downloads')) || 0;
+        const PAYSTACK_KEY = 'pk_live_39e56c13242c01788403d8c474d2c230bd4573f4'; // Your Live Key
+
+        // DOM Elements
+        const canvas = document.getElementById('karaoke-canvas');
+        const ctx = canvas.getContext('2d');
+        const playBtn = document.getElementById('play-btn');
+        const syncToggleBtn = document.getElementById('sync-toggle-btn');
+        const manualTapBtn = document.getElementById('manual-tap-btn');
+        const speedSlider = document.getElementById('speed-slider');
+        const speedValueDisplay = document.getElementById('speed-value');
+        const exportBtn = document.getElementById('export-video-btn');
+        const recBadge = document.getElementById('rec-badge');
+        const instructionText = document.getElementById('instruction-text');
+        const setupModal = document.getElementById('setup-modal');
+        const downloadModal = document.getElementById('download-modal');
+        const paywallModal = document.getElementById('paywall-modal');
+        const libraryModal = document.getElementById('library-modal');
+        const libraryList = document.getElementById('library-list');
+
+        // --- Initialization & Resizing ---
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        // --- Library Logic ---
+        function openLibrary() {
+            renderLibrary();
+            libraryModal.classList.remove('hidden');
+        }
+
+        function closeLibrary() {
+            libraryModal.classList.add('hidden');
+        }
+
+        function saveToLibrary() {
+            const title = document.getElementById('song-title').value || 'Untitled Project';
+            const text = document.getElementById('lyric-text-area').value;
+            if (!text) return;
+
+            const project = {
+                id: Date.now(),
+                title: title,
+                lyrics: text,
+                date: new Date().toLocaleDateString()
+            };
+            projectLibrary.push(project);
+            showToast('Project saved to Library!');
+        }
+
+        function renderLibrary() {
+            if (projectLibrary.length === 0) {
+                libraryList.innerHTML = '<p class="text-slate-500 text-center py-4">No saved projects yet.</p>';
+                return;
+            }
+            libraryList.innerHTML = '';
+            projectLibrary.forEach(proj => {
+                const div = document.createElement('div');
+                div.className = 'bg-slate-800 p-4 rounded-lg border border-slate-700 flex justify-between items-center hover:bg-slate-750 transition';
+                div.innerHTML = `
+                    <div>
+                        <div class="font-bold text-white">${proj.title}</div>
+                        <div class="text-xs text-slate-400">${proj.date} • ${proj.lyrics.split('\n').length} lines</div>
+                    </div>
+                    <button onclick="loadFromLibrary(${proj.id})" class="text-blue-400 hover:text-blue-300 text-sm font-bold">Load</button>
+                `;
+                libraryList.appendChild(div);
+            });
+        }
+
+        function loadFromLibrary(id) {
+            const proj = projectLibrary.find(p => p.id === id);
+            if (proj) {
+                document.getElementById('song-title').value = proj.title;
+                document.getElementById('lyric-text-area').value = proj.lyrics;
+                closeLibrary();
+                setupModal.classList.remove('hidden');
+                showToast('Project loaded! Press "Load Project" to start.');
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-4 py-2 rounded-lg shadow-lg text-sm z-50 border border-slate-600';
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // --- Reset Project ---
+        function resetProject() {
+            audioElement.pause();
+            audioElement.currentTime = 0;
+            if (isRecording) stopRecording();
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            lyrics = [];
+            currentLineIndex = -1;
+            currentItemIndex = -1;
+            isPlaying = false;
+            isSyncActive = false;
+            isRecording = false;
+            originalChunks = [];
+            karaokeChunks = [];
+            originalBlob = null;
+            karaokeBlob = null;
+            lastBeatTime = 0;
+            averageBeatInterval = 400;
+
+            playBtn.innerHTML = '<i class="fas fa-play ml-1"></i>';
+
+            syncToggleBtn.classList.add('hidden');
+            manualTapBtn.classList.add('hidden');
+            syncToggleBtn.classList.remove('sync-active');
+            syncToggleBtn.classList.add('sync-paused');
+            syncToggleBtn.innerHTML = '<i class="fas fa-play"></i> START SYNC';
+
+            exportBtn.classList.add('hidden');
+            recBadge.style.display = 'none';
+            instructionText.classList.add('hidden');
+            document.getElementById('progress-bar').style.width = '0%';
+            document.getElementById('current-time').innerText = '0:00';
+            document.getElementById('duration').innerText = '0:00';
+
+            setupModal.classList.remove('hidden');
+            document.getElementById('audio-input').value = '';
+        }
+
+        function openSetupModal() {
+            setupModal.classList.remove('hidden');
+        }
+
+        function closeDownloadModal() {
+            downloadModal.classList.add('hidden');
+        }
+
+        // --- Start Session ---
+        async function startSession() {
+            const file = document.getElementById('audio-input').files[0];
+            const text = document.getElementById('lyric-text-area').value;
+            syncMode = document.getElementById('sync-mode-select').value;
+            sensitivity = parseInt(document.getElementById('sensitivity-slider').value);
+
+            if (!file) { alert("Please upload audio."); return; }
+            if (!text) { alert("Please paste lyrics."); return; }
+
+            // Save to library automatically on start
+            saveToLibrary();
+
+            initAudioContext();
+
+            if (!analyser) {
+                analyser = audioCtx.createAnalyser();
+                gainNode = audioCtx.createGain();
+                source = audioCtx.createMediaElementSource(audioElement);
+                source.connect(gainNode);
+                gainNode.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                analyser.fftSize = 256;
+                analyser.smoothingTimeConstant = 0.8;
+            }
+
+            audioElement.src = URL.createObjectURL(file);
+
+            // Parse Lyrics based on Mode
+            lyrics = text.split('\n').filter(l => l.trim() !== '').map(line => {
+                const cleanLine = line.trim();
+
+                if (syncMode === 'letter') {
+                    return {
+                        type: 'letter',
+                        originalText: cleanLine,
+                        items: cleanLine.split('').map(char => ({ text: char, start: null, end: null }))
+                    };
+                } else if (syncMode === 'word') {
+                    return {
+                        type: 'word',
+                        originalText: cleanLine,
+                        items: cleanLine.split(/\s+/).map(word => ({ text: word, start: null, end: null }))
+                    };
+                } else {
+                    // Line Mode
+                    return {
+                        type: 'line',
+                        originalText: cleanLine,
+                        items: [{ text: cleanLine, start: null, end: null }]
+                    };
+                }
+            });
+
+            setupModal.classList.add('hidden');
+
+            syncToggleBtn.classList.remove('hidden');
+            manualTapBtn.classList.remove('hidden');
+            exportBtn.classList.remove('hidden');
+            instructionText.classList.remove('hidden');
+
+            currentLineIndex = -1;
+            currentItemIndex = -1;
+            isSyncActive = false;
+            lastBeatTime = 0;
+
+            averageBeatInterval = parseInt(speedSlider.value);
+            updateSyncButtonUI();
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            try {
+                await audioElement.play();
+                isPlaying = true;
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                drawFrame();
+            } catch(e) {
+                console.error("Playback failed:", e);
+                alert("Click Play button to start audio.");
+            }
+        }
+
+        // --- Sync UI Logic ---
+        syncToggleBtn.addEventListener('click', () => {
+            isSyncActive = !isSyncActive;
+            updateSyncButtonUI();
+        });
+
+        manualTapBtn.addEventListener('click', () => {
+            advanceItem(audioElement.currentTime);
+            manualTapBtn.classList.add('scale-95');
+            setTimeout(() => manualTapBtn.classList.remove('scale-95'), 50);
+        });
+
+        speedSlider.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            averageBeatInterval = val;
+            speedValueDisplay.innerText = val + 'ms';
+        });
+
+        function updateSyncButtonUI() {
+            if (isSyncActive) {
+                syncToggleBtn.innerHTML = '<i class="fas fa-pause"></i> PAUSE AUTO';
+                syncToggleBtn.classList.remove('sync-paused');
+                syncToggleBtn.classList.add('sync-active');
+                instructionText.innerHTML = `<i class="fas fa-check-circle"></i> Auto-Sync Active (${syncMode.toUpperCase()}).`;
+                instructionText.className = "text-xs text-green-400 block";
+            } else {
+                syncToggleBtn.innerHTML = '<i class="fas fa-play"></i> START AUTO';
+                syncToggleBtn.classList.remove('sync-active');
+                syncToggleBtn.classList.add('sync-paused');
+                instructionText.innerHTML = '<i class="fas fa-hand-pointer"></i> Auto-Sync Paused. Use "TAP" button.';
+                instructionText.className = "text-xs text-yellow-400 block";
+            }
+        }
+
+        // --- Auto-Sync Engine ---
+        function detectBeatAndAdvance(currentTime) {
+            if (!isSyncActive || currentLineIndex >= lyrics.length) return;
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(dataArray);
+
+            let bassEnergy = 0;
+            for(let i = 0; i < 10; i++) bassEnergy += dataArray[i];
+            bassEnergy /= 10;
+
+            const now = Date.now();
+            if (bassEnergy > sensitivity && (now - lastBeatTime) > (averageBeatInterval * 0.5)) {
+                lastBeatTime = now;
+                advanceItem(currentTime);
+            }
+        }
+
+        function advanceItem(currentTime) {
+            if (currentLineIndex >= lyrics.length) return;
+
+            // End previous item
+            if (currentLineIndex >= 0 && currentLineIndex < lyrics.length) {
+                const currentLine = lyrics[currentLineIndex];
+                if (currentItemIndex >= 0 && currentItemIndex < currentLine.items.length) {
+                    currentLine.items[currentItemIndex].end = currentTime;
+                }
+            }
+
+            currentItemIndex++;
+
+            // Check line boundaries
+            if (currentLineIndex >= 0 && currentLineIndex < lyrics.length) {
+                if (currentItemIndex >= lyrics[currentLineIndex].items.length) {
+                    currentLineIndex++;
+                    currentItemIndex = 0;
+                }
+            } else {
+                currentLineIndex = 0;
+                currentItemIndex = 0;
+            }
+
+            // Start new item
+            if (currentLineIndex < lyrics.length && currentLineIndex >= 0) {
+                const line = lyrics[currentLineIndex];
+                if (line && currentItemIndex < line.items.length) {
+                    const item = line.items[currentItemIndex];
+                    // Skip spaces automatically
+                    if (item.text === ' ' && syncMode !== 'line') {
+                        item.start = currentTime;
+                        item.end = currentTime;
+                        advanceItem(currentTime);
+                        return;
+                    }
+                    item.start = currentTime;
+                } else {
+                     advanceItem(currentTime);
+                }
+            }
+        }
+
+        // Keyboard Support
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && setupModal.classList.contains('hidden')) {
+                e.preventDefault();
+                advanceItem(audioElement.currentTime);
+                if(!manualTapBtn.classList.contains('hidden')) {
+                    manualTapBtn.classList.add('scale-95');
+                    setTimeout(() => manualTapBtn.classList.remove('scale-95'), 50);
+                }
+            }
+        });
+
+        // Play/Pause
+        playBtn.addEventListener('click', async () => {
+            initAudioContext();
+            if (audioElement.paused) {
+                await audioElement.play();
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                isPlaying = true;
+                drawFrame();
+            } else {
+                audioElement.pause();
+                playBtn.innerHTML = '<i class="fas fa-play ml-1"></i>';
+                isPlaying = false;
+            }
+        });
+
+        // Stop
+        document.getElementById('stop-btn').addEventListener('click', () => {
+            audioElement.pause();
+            audioElement.currentTime = 0;
+            playBtn.innerHTML = '<i class="fas fa-play ml-1"></i>';
+            currentLineIndex = -1;
+            currentItemIndex = -1;
+            isSyncActive = false;
+            updateSyncButtonUI();
+            lyrics.forEach(line => line.items.forEach(i => { i.start = null; i.end = null; }));
+            lastBeatTime = 0;
+        });
+
+        // --- Render Engine (Canvas) ---
+        function drawFrame() {
+            if (!isPlaying && !isRecording) return;
+            animationFrameId = requestAnimationFrame(drawFrame);
+
+            const width = canvas.width;
+            const height = canvas.height;
+            const currentTime = audioElement.currentTime;
+
+            if (isPlaying) detectBeatAndAdvance(currentTime);
+
+            // Background
+            ctx.clearRect(0, 0, width, height);
+            const grad = ctx.createLinearGradient(0, 0, width, height);
+            grad.addColorStop(0, '#0f172a');
+            grad.addColorStop(1, '#312e81');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, width, height);
+
+            // Visualizer
+            if (analyser) {
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                analyser.getByteFrequencyData(dataArray);
+                const barWidth = (width / bufferLength) * 2.5;
+                let x = 0;
+                for(let i = 0; i < bufferLength; i++) {
+                    const barHeight = (dataArray[i] / 255) * (height * 0.3);
+                    ctx.fillStyle = `rgba(16, 185, 129, ${dataArray[i]/255})`;
+                    ctx.fillRect(x, height - barHeight, barWidth, barHeight);
+                    x += barWidth + 1;
+                }
+            }
+
+            // Lyrics Rendering
+            ctx.textBaseline = 'middle';
+            let activeLineIdx = -1;
+            let activeItemIdx = -1;
+
+            for (let i = 0; i < lyrics.length; i++) {
+                if (lyrics[i].items.some(item => item.start && currentTime >= item.start)) {
+                    activeLineIdx = i;
+                    for (let j = 0; j < lyrics[i].items.length; j++) {
+                        if (lyrics[i].items[j].start && currentTime >= lyrics[i].items[j].start) {
+                            activeItemIdx = j;
+                        }
+                    }
+                }
+            }
+
+            // Calculate positions for Current and Next Line
+            const centerY = height / 2;
+
+            if (activeLineIdx >= 0) {
+                const currentLineObj = lyrics[activeLineIdx];
+
+                // --- Draw CURRENT Line ---
+                ctx.font = syncMode === 'letter' ? '900 45px Montserrat' : 'bold 45px Montserrat';
+
+                if (syncMode === 'line') {
+                    const isSung = currentLineObj.items[0].start && currentLineObj.items[0].end;
+                    const isSingingNow = currentLineObj.items[0].start && !currentLineObj.items[0].end;
+
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#475569';
+                    ctx.fillText(currentLineObj.originalText, width/2, centerY);
+
+                    if (isSung || isSingingNow) {
+                        ctx.save();
+                        ctx.shadowColor = "#10b981";
+                        ctx.shadowBlur = 20;
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillText(currentLineObj.originalText, width/2, centerY);
+                        ctx.restore();
+                    }
+                } else {
+                    // Word/Letter Mode for Current Line
+                    let totalLineWidth = 0;
+                    const spacing = syncMode === 'letter' ? 2 : 15;
+                    const metrics = currentLineObj.items.map(item => {
+                        const m = ctx.measureText(item.text);
+                        totalLineWidth += m.width + spacing;
+                        return { text: item.text, width: m.width, start: item.start, end: item.end };
+                    });
+                    let currentX = (width - totalLineWidth) / 2;
+
+                    currentLineObj.items.forEach((item, idx) => {
+                        const xPos = currentX;
+                        const isSung = item.start && item.end;
+                        const isSingingNow = item.start && !item.end;
+                        const progress = isSingingNow && idx === activeItemIdx ? 0.8 : 0;
+
+                        ctx.shadowBlur = 0;
+                        ctx.fillStyle = '#475569';
+                        ctx.textAlign = 'left';
+                        ctx.fillText(item.text, xPos, centerY);
+
+                        if (isSung || isSingingNow) {
+                            ctx.save();
+                            ctx.shadowColor = "#10b981";
+                            ctx.shadowBlur = 15;
+                            ctx.fillStyle = '#ffffff';
+                            const clipWidth = metrics[idx].width * (isSung ? 1 : progress);
+                            ctx.beginPath();
+                            ctx.rect(xPos, centerY - 30, clipWidth, 60);
+                            ctx.clip();
+                            ctx.fillText(item.text, xPos, centerY);
+                            ctx.restore();
+                        }
+                        currentX += metrics[idx].width + spacing;
+                    });
+                }
+
+                // --- Draw NEXT Line (Preview) ---
+                if (activeLineIdx + 1 < lyrics.length) {
+                    const nextLineObj = lyrics[activeLineIdx + 1];
+                    ctx.font = 'bold 24px Montserrat';
+                    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(nextLineObj.originalText, width/2, centerY + 60);
+                }
+            } else {
+                 ctx.font = 'bold 30px Montserrat';
+                 ctx.textAlign = 'center';
+                 ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                 ctx.fillText(isSyncActive ? "Auto-Syncing..." : "ZYLO KARAOKE | WWW.ZYLOTECHSTUDIOS.SPACE", width/2, height/2);
+            }
+
+            // Progress Bar
+            const duration = audioElement.duration || 0;
+            if (duration > 0) {
+                document.getElementById('progress-bar').style.width = `${(currentTime / duration) * 100}%`;
+                document.getElementById('current-time').innerText = formatTime(currentTime);
+                document.getElementById('duration').innerText = formatTime(duration);
+            }
+        }
+
+        // --- DUAL RECORDING LOGIC (EXACTLY AS REQUESTED) ---
+        function toggleRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startDualRecording();
+            }
+        }
+
+        function startDualRecording() {
+            audioElement.currentTime = 0;
+            currentLineIndex = -1;
+            currentItemIndex = -1;
+            isSyncActive = false;
+            updateSyncButtonUI();
+            lyrics.forEach(line => line.items.forEach(i => { i.start = null; i.end = null; }));
+            lastBeatTime = 0;
+
+            // 1. Setup Canvas Stream
+            const canvasStream = canvas.captureStream(30);
+
+            // 2. Setup ORIGINAL Audio Stream (Direct from GainNode)
+            const originalAudioDest = audioCtx.createMediaStreamDestination();
+            gainNode.connect(originalAudioDest);
+            const originalCombined = new MediaStream([...canvasStream.getTracks(), ...originalAudioDest.stream.getTracks()]);
+
+            // 3. Setup ENHANCED KARAOKE Audio Stream
+            // Chain: Source -> Splitter -> [Left + (Inverted Right)] -> Merger -> Notch Filters -> Dest
+
+            const kSplitter = audioCtx.createChannelSplitter(2);
+            const kMerger = audioCtx.createChannelMerger(2);
+            const kInverter = audioCtx.createGain();
+            kInverter.gain.value = -1.0; // Invert Phase
+
+            // Create Notch Filters for Vocal Frequencies (Approximate)
+            const notch1 = audioCtx.createBiquadFilter();
+            notch1.type = 'notch';
+            notch1.frequency.value = 1000; // Center of vocal range
+            notch1.Q.value = 1.0;
+
+            const notch2 = audioCtx.createBiquadFilter();
+            notch2.type = 'notch';
+            notch2.frequency.value = 2500; // Upper vocal presence
+            notch2.Q.value = 1.0;
+
+            // High/Low Pass to clean up mud/hiss after cancellation
+            const highPass = audioCtx.createBiquadFilter();
+            highPass.type = 'highpass';
+            highPass.frequency.value = 100;
+
+            const lowPass = audioCtx.createBiquadFilter();
+            lowPass.type = 'lowpass';
+            lowPass.frequency.value = 12000;
+
+            const karaokeAudioDest = audioCtx.createMediaStreamDestination();
+
+            // Connect Graph
+            source.connect(kSplitter);
+
+            // Left Channel Path
+            kSplitter.connect(kMerger, 0, 0); // Left to Left
+
+            // Right Channel Path (Inverted)
+            kSplitter.connect(kInverter, 1); // Right to Inverter
+            kInverter.connect(kMerger, 0, 0); // Inverted Right to Left (Cancels Center)
+
+            // Stereo Output (Mirror L to R for compatibility)
+            kSplitter.connect(kMerger, 0, 1); // Left to Right
+            kInverter.connect(kMerger, 0, 1); // Inverted Right to Right
+
+            // Apply Filters
+            kMerger.connect(highPass);
+            highPass.connect(lowPass);
+            lowPass.connect(notch1);
+            notch1.connect(notch2);
+            notch2.connect(karaokeAudioDest);
+
+            const karaokeCombined = new MediaStream([...canvasStream.getTracks(), ...karaokeAudioDest.stream.getTracks()]);
+
+            // Initialize Recorders
+            try {
+                originalRecorder = new MediaRecorder(originalCombined, { mimeType: 'video/webm;codecs=vp9' });
+                karaokeRecorder = new MediaRecorder(karaokeCombined, { mimeType: 'video/webm;codecs=vp9' });
+            } catch (e) {
+                originalRecorder = new MediaRecorder(originalCombined);
+                karaokeRecorder = new MediaRecorder(karaokeCombined);
+            }
+
+            originalChunks = [];
+            karaokeChunks = [];
+
+            originalRecorder.ondataavailable = e => { if(e.data.size > 0) originalChunks.push(e.data); };
+            karaokeRecorder.ondataavailable = e => { if(e.data.size > 0) karaokeChunks.push(e.data); };
+
+            originalRecorder.onstop = () => {
+                originalBlob = new Blob(originalChunks, { type: 'video/webm' });
+                checkBothStopped();
+            };
+
+            karaokeRecorder.onstop = () => {
+                karaokeBlob = new Blob(karaokeChunks, { type: 'video/webm' });
+                checkBothStopped();
+            };
+
+            // Start Everything
+            originalRecorder.start();
+            karaokeRecorder.start();
+
+            audioElement.play();
+            isPlaying = true;
+            isRecording = true;
+            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            recBadge.style.display = 'block';
+            exportBtn.classList.replace('bg-red-600', 'bg-gray-600');
+            exportBtn.innerHTML = '<i class="fas fa-stop"></i>';
+            drawFrame();
+        }
+
+        function stopRecording() {
+            if(originalRecorder && originalRecorder.state !== 'inactive') originalRecorder.stop();
+            if(karaokeRecorder && karaokeRecorder.state !== 'inactive') karaokeRecorder.stop();
+            audioElement.pause();
+            isPlaying = false;
+            isRecording = false;
+        }
+
+        function checkBothStopped() {
+            if (originalBlob && karaokeBlob) {
+                recBadge.style.display = 'none';
+                exportBtn.classList.replace('bg-gray-600', 'bg-red-600');
+                exportBtn.innerHTML = '<i class="fas fa-video"></i>';
+                downloadModal.classList.remove('hidden');
+            }
+        }
+
+        // --- PAYWALL & DOWNLOAD LOGIC ---
+
+        function checkLimitAndDownload(type) {
+            if (downloadCount >= DOWNLOAD_LIMIT) {
+                // Show Paywall
+                paywallModal.classList.remove('hidden');
+            } else {
+                // Allow Download
+                incrementDownloadCount();
+                if (type === 'original') triggerBlobDownload(originalBlob, 'Original');
+                if (type === 'karaoke') triggerBlobDownload(karaokeBlob, 'Karaoke_Enhanced');
+                if (type === 'zip') downloadBothAsZip();
+            }
+        }
+
+        function incrementDownloadCount() {
+            downloadCount++;
+            localStorage.setItem('zylo_karaoke_downloads', downloadCount);
+            showToast(`Download ${downloadCount}/${DOWNLOAD_LIMIT} used.`);
+        }
+
+        function initiatePaystackPayment() {
+            const handler = PaystackPop.setup({
+                key: PAYSTACK_KEY,
+                email: 'customer@example.com',
+                amount: 1.00 * 100 * 100, // $1.00 USD in kobo/cents
+                currency: 'USD',
+                ref: ''+Math.floor((Math.random() * 1000000000) + 1),
+                callback: function(response) {
+                    // Payment Success
+                    alert('Payment Successful! You now have 10 more free downloads.');
+
+                    // Reset Counter
+                    downloadCount = 0;
+                    localStorage.setItem('zylo_karaoke_downloads', 0);
+
+                    // Close Paywall
+                    paywallModal.classList.add('hidden');
+                },
+                onClose: function() {
+                    alert('Transaction cancelled.');
+                }
+            });
+            handler.openIframe();
+        }
+
+        // --- DOWNLOAD LOGIC ---
+        function triggerBlobDownload(blob, suffix) {
+            if (!blob) return;
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${document.getElementById('song-title').value || 'Karaoke'}_${suffix}.webm`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+        }
+
+        async function downloadBothAsZip() {
+            if (!originalBlob || !karaokeBlob) return;
+
+            const zip = new JSZip();
+            const title = document.getElementById('song-title').value || 'Karaoke';
+
+            zip.file(`${title}_Original.webm`, originalBlob);
+            zip.file(`${title}_Karaoke_Enhanced.webm`, karaokeBlob);
+
+            const content = await zip.generateAsync({ type: "blob" });
+            const url = URL.createObjectURL(content);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${title}_Dual_Pack.zip`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+        }
+
+        function formatTime(s) {
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            return `${m}:${sec.toString().padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html>

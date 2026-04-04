@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Unit Converter - Length, Weight, Temperature, Volume, Area, Speed, Time, Data | ZyloTech</title>
+    <meta name="description" content="Free online unit converter. Convert between all major units: Length (km, miles, meters, feet), Weight (kg, lbs, grams, ounces), Temperature (Celsius, Fahrenheit, Kelvin), Volume, Area, Speed, Time, Data Size. 100% browser-based.">
+    <meta name="keywords" content="free unit converter, length converter, weight converter, temperature converter, volume converter, area converter, speed converter, time converter, data size converter">
+    <meta name="author" content="ZyloTech Creators Studio">
+    meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Unit Converter - Length, Weight, Temperature, Volume, Area | ZyloTech">
+    <meta property="og:description" content="Free online unit converter. Convert length, weight, temperature, volume, area, speed, time, data size. Instant conversion.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/unit-converter.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Unit Converter - ZyloTech">
+    <meta name="twitter:description" content="Convert all major units: length, weight, temperature, volume, area, speed, time, data size.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/unit-converter.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/include.js"></script>
+
+    <style>
+        :root { --primary: #06b6d4; --primary-hover: #0891b2; --accent: #22d3ee; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #164e63 100%); color: #f1f5f9; min-height: 100vh; }
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: #1f2937; }
+        .glass-dark { background: rgba(15,23,42,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        .category-btn { transition: all 0.2s; border: 2px solid #e5e7eb; cursor: pointer; }
+        .category-btn.active { border-color: var(--primary); background: #cffafe; color: var(--primary); font-weight: 600; }
+        .convert-card { transition: all 0.2s ease; }
+        .convert-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px -4px rgba(0,0,0,0.2); }
+        .swap-btn { transition: all 0.2s; cursor: pointer; }
+        .swap-btn:hover { transform: scale(1.1); background: var(--primary); color: white; }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { opacity: 0.5; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .hidden { display: none !important; }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #06b6d4;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #0891b2; transform: scale(1.1); }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-4">
+                <i class="fas fa-ruler-combined text-cyan-400"></i>
+                <span class="text-sm text-gray-200">Free • Browser-Based • Instant Conversion</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-2">
+                <i class="fas fa-arrows-alt-h mr-2 text-cyan-400"></i>Free Unit Converter
+            </h1>
+            <p class="text-gray-300 max-w-2xl mx-auto">Convert Length, Weight, Temperature, Volume, Area, Speed, Time, Data Size. 100% Free.</p>
+            <div class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-cyan-600 to-teal-600 text-white rounded-full shadow-lg">
+                <i class="fas fa-chart-simple"></i>
+                <span id="view-counter" class="font-bold">0</span>
+                <span class="text-sm">conversions done</span>
+            </div>
+        </div>
+
+        <!-- Category Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+            <button data-category="length" class="category-btn glass p-3 rounded-xl text-center category-active">
+                <i class="fas fa-ruler text-cyan-500 text-xl mb-1"></i>
+                <p class="font-semibold text-sm">Length</p>
+            </button>
+            <button data-category="weight" class="category-btn glass p-3 rounded-xl text-center">
+                <i class="fas fa-weight-hanging text-blue-500 text-xl mb-1"></i>
+                <p class="font-semibold text-sm">Weight</p>
+            </button>
+            <button data-category="temperature" class="category-btn glass p-3 rounded-xl text-center">
+                <i class="fas fa-temperature-high text-red-500 text-xl mb-1"></i>
+                <p class="font-semibold text-sm">Temperature</p>
+            </button>
+            <button data-category="volume" class="category-btn glass p-3 rounded-xl text-center">
+                <i class="fas fa-tint text-blue-400 text-xl mb-1"></i>
+                <p class="font-semibold text-sm">Volume</p>
+            </button>
+            <button data-category="area" class="category-btn glass p-3 rounded-xl text-center">
+                <i class="fas fa-draw-polygon text-green-500 text-xl mb-1"></i>
+                <p class="font-semibold text-sm">Area</p>
+            </button>
+            <button data-category="speed" class="category-btn glass p-3 rounded-xl text-center">
+                <i class="fas fa-tachometer-alt text-yellow-500 text-xl mb-1"></i>
+                <p class="font-semibold text-sm">Speed</p>
+            </button>
+            <button data-category="time" class="category-btn glass p-3 rounded-xl text-center">
+                <i class="fas fa-clock text-purple-500 text-xl mb-1"></i>
+                <p class="font-semibold text-sm">Time</p>
+            </button>
+            <button data-category="data" class="category-btn glass p-3 rounded-xl text-center">
+                <i class="fas fa-database text-indigo-500 text-xl mb-1"></i>
+                <p class="font-semibold text-sm">Data Size</p>
+            </button>
+        </div>
+
+        <!-- ==================== LENGTH CONVERTER ==================== -->
+        <div id="length-converter" class="converter-panel">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-ruler text-cyan-500"></i>Length Converter</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">From</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="length-from-value" value="1" class="flex-1 p-3 border rounded-lg font-mono">
+                            <select id="length-from-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="km">Kilometers (km)</option>
+                                <option value="m" selected>Meters (m)</option>
+                                <option value="cm">Centimeters (cm)</option>
+                                <option value="mm">Millimeters (mm)</option>
+                                <option value="mile">Miles</option>
+                                <option value="yard">Yards</option>
+                                <option value="foot">Feet (ft)</option>
+                                <option value="inch">Inches (in)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">To</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="length-to-value" value="3.28084" class="flex-1 p-3 border rounded-lg bg-gray-50" readonly>
+                            <select id="length-to-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="km">Kilometers (km)</option>
+                                <option value="m">Meters (m)</option>
+                                <option value="cm">Centimeters (cm)</option>
+                                <option value="mm">Millimeters (mm)</option>
+                                <option value="mile">Miles</option>
+                                <option value="yard">Yards</option>
+                                <option value="foot" selected>Feet (ft)</option>
+                                <option value="inch">Inches (in)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-4">
+                    <button class="swap-btn bg-gray-100 p-2 rounded-full w-10 h-10 flex items-center justify-center" onclick="swapLengthUnits()">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== WEIGHT CONVERTER ==================== -->
+        <div id="weight-converter" class="converter-panel hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-weight-hanging text-blue-500"></i>Weight Converter</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">From</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="weight-from-value" value="1" class="flex-1 p-3 border rounded-lg font-mono">
+                            <select id="weight-from-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="kg">Kilograms (kg)</option>
+                                <option value="g">Grams (g)</option>
+                                <option value="mg">Milligrams (mg)</option>
+                                <option value="lb" selected>Pounds (lb)</option>
+                                <option value="oz">Ounces (oz)</option>
+                                <option value="ton">Metric Tonnes</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">To</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="weight-to-value" value="0.453592" class="flex-1 p-3 border rounded-lg bg-gray-50" readonly>
+                            <select id="weight-to-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="kg" selected>Kilograms (kg)</option>
+                                <option value="g">Grams (g)</option>
+                                <option value="mg">Milligrams (mg)</option>
+                                <option value="lb">Pounds (lb)</option>
+                                <option value="oz">Ounces (oz)</option>
+                                <option value="ton">Metric Tonnes</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-4">
+                    <button class="swap-btn bg-gray-100 p-2 rounded-full w-10 h-10 flex items-center justify-center" onclick="swapWeightUnits()">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMPERATURE CONVERTER ==================== -->
+        <div id="temperature-converter" class="converter-panel hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-temperature-high text-red-500"></i>Temperature Converter</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">From</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="temp-from-value" value="0" class="flex-1 p-3 border rounded-lg font-mono">
+                            <select id="temp-from-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="c" selected>Celsius (°C)</option>
+                                <option value="f">Fahrenheit (°F)</option>
+                                <option value="k">Kelvin (K)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">To</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="temp-to-value" value="32" class="flex-1 p-3 border rounded-lg bg-gray-50" readonly>
+                            <select id="temp-to-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="c">Celsius (°C)</option>
+                                <option value="f" selected>Fahrenheit (°F)</option>
+                                <option value="k">Kelvin (K)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-4">
+                    <button class="swap-btn bg-gray-100 p-2 rounded-full w-10 h-10 flex items-center justify-center" onclick="swapTempUnits()">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VOLUME CONVERTER ==================== -->
+        <div id="volume-converter" class="converter-panel hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-tint text-blue-400"></i>Volume Converter</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">From</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="volume-from-value" value="1" class="flex-1 p-3 border rounded-lg font-mono">
+                            <select id="volume-from-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="l">Liters (L)</option>
+                                <option value="ml">Milliliters (mL)</option>
+                                <option value="gal" selected>Gallons (gal)</option>
+                                <option value="qt">Quarts (qt)</option>
+                                <option value="pt">Pints (pt)</option>
+                                <option value="cup">Cups</option>
+                                <option value="oz_fl">Fluid Ounces (fl oz)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">To</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="volume-to-value" value="3.78541" class="flex-1 p-3 border rounded-lg bg-gray-50" readonly>
+                            <select id="volume-to-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="l" selected>Liters (L)</option>
+                                <option value="ml">Milliliters (mL)</option>
+                                <option value="gal">Gallons (gal)</option>
+                                <option value="qt">Quarts (qt)</option>
+                                <option value="pt">Pints (pt)</option>
+                                <option value="cup">Cups</option>
+                                <option value="oz_fl">Fluid Ounces (fl oz)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-4">
+                    <button class="swap-btn bg-gray-100 p-2 rounded-full w-10 h-10 flex items-center justify-center" onclick="swapVolumeUnits()">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== AREA CONVERTER ==================== -->
+        <div id="area-converter" class="converter-panel hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-draw-polygon text-green-500"></i>Area Converter</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">From</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="area-from-value" value="1" class="flex-1 p-3 border rounded-lg font-mono">
+                            <select id="area-from-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="sqm">Square Meters (m²)</option>
+                                <option value="sqkm">Square Kilometers (km²)</option>
+                                <option value="sqft" selected>Square Feet (ft²)</option>
+                                <option value="sqyd">Square Yards (yd²)</option>
+                                <option value="acre">Acres</option>
+                                <option value="hectare">Hectares</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">To</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="area-to-value" value="0.092903" class="flex-1 p-3 border rounded-lg bg-gray-50" readonly>
+                            <select id="area-to-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="sqm" selected>Square Meters (m²)</option>
+                                <option value="sqkm">Square Kilometers (km²)</option>
+                                <option value="sqft">Square Feet (ft²)</option>
+                                <option value="sqyd">Square Yards (yd²)</option>
+                                <option value="acre">Acres</option>
+                                <option value="hectare">Hectares</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-4">
+                    <button class="swap-btn bg-gray-100 p-2 rounded-full w-10 h-10 flex items-center justify-center" onclick="swapAreaUnits()">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SPEED CONVERTER ==================== -->
+        <div id="speed-converter" class="converter-panel hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-tachometer-alt text-yellow-500"></i>Speed Converter</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">From</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="speed-from-value" value="100" class="flex-1 p-3 border rounded-lg font-mono">
+                            <select id="speed-from-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="kmh" selected>km/h</option>
+                                <option value="mph">mph</option>
+                                <option value="ms">m/s</option>
+                                <option value="knot">Knots</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">To</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="speed-to-value" value="62.1371" class="flex-1 p-3 border rounded-lg bg-gray-50" readonly>
+                            <select id="speed-to-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="kmh">km/h</option>
+                                <option value="mph" selected>mph</option>
+                                <option value="ms">m/s</option>
+                                <option value="knot">Knots</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-4">
+                    <button class="swap-btn bg-gray-100 p-2 rounded-full w-10 h-10 flex items-center justify-center" onclick="swapSpeedUnits()">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TIME CONVERTER ==================== -->
+        <div id="time-converter" class="converter-panel hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-clock text-purple-500"></i>Time Converter</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">From</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="time-from-value" value="1" class="flex-1 p-3 border rounded-lg font-mono">
+                            <select id="time-from-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="sec">Seconds</option>
+                                <option value="min">Minutes</option>
+                                <option value="hour" selected>Hours</option>
+                                <option value="day">Days</option>
+                                <option value="week">Weeks</option>
+                                <option value="month">Months</option>
+                                <option value="year">Years</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">To</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="time-to-value" value="60" class="flex-1 p-3 border rounded-lg bg-gray-50" readonly>
+                            <select id="time-to-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="sec" selected>Seconds</option>
+                                <option value="min">Minutes</option>
+                                <option value="hour">Hours</option>
+                                <option value="day">Days</option>
+                                <option value="week">Weeks</option>
+                                <option value="month">Months</option>
+                                <option value="year">Years</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-4">
+                    <button class="swap-btn bg-gray-100 p-2 rounded-full w-10 h-10 flex items-center justify-center" onclick="swapTimeUnits()">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== DATA SIZE CONVERTER ==================== -->
+        <div id="data-converter" class="converter-panel hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-database text-indigo-500"></i>Data Size Converter</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">From</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="data-from-value" value="1" class="flex-1 p-3 border rounded-lg font-mono">
+                            <select id="data-from-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="b">Bytes (B)</option>
+                                <option value="kb">Kilobytes (KB)</option>
+                                <option value="mb" selected>Megabytes (MB)</option>
+                                <option value="gb">Gigabytes (GB)</option>
+                                <option value="tb">Terabytes (TB)</option>
+                                <option value="pb">Petabytes (PB)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">To</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="data-to-value" value="1024" class="flex-1 p-3 border rounded-lg bg-gray-50" readonly>
+                            <select id="data-to-unit" class="p-3 border rounded-lg bg-white">
+                                <option value="b">Bytes (B)</option>
+                                <option value="kb" selected>Kilobytes (KB)</option>
+                                <option value="mb">Megabytes (MB)</option>
+                                <option value="gb">Gigabytes (GB)</option>
+                                <option value="tb">Terabytes (TB)</option>
+                                <option value="pb">Petabytes (PB)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-4">
+                    <button class="swap-btn bg-gray-100 p-2 rounded-full w-10 h-10 flex items-center justify-center" onclick="swapDataUnits()">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Section for SEO -->
+        <div class="mt-8 p-6 bg-white/5 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-3 text-center">Free Unit Converter Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div><i class="fas fa-ruler text-cyan-400 mr-2"></i> <strong>Length</strong> - km, miles, meters, feet, inches</div>
+                <div><i class="fas fa-weight-hanging text-cyan-400 mr-2"></i> <strong>Weight</strong> - kg, lbs, grams, ounces</div>
+                <div><i class="fas fa-temperature-high text-cyan-400 mr-2"></i> <strong>Temperature</strong> - Celsius, Fahrenheit, Kelvin</div>
+                <div><i class="fas fa-tint text-cyan-400 mr-2"></i> <strong>Volume</strong> - Liters, gallons, cups, fl oz</div>
+                <div><i class="fas fa-draw-polygon text-cyan-400 mr-2"></i> <strong>Area</strong> - Square meters, feet, acres</div>
+                <div><i class="fas fa-tachometer-alt text-cyan-400 mr-2"></i> <strong>Speed</strong> - km/h, mph, m/s, knots</div>
+                <div><i class="fas fa-clock text-cyan-400 mr-2"></i> <strong>Time</strong> - Seconds, minutes, hours, days</div>
+                <div><i class="fas fa-database text-cyan-400 mr-2"></i> <strong>Data Size</strong> - B, KB, MB, GB, TB, PB</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Counter
+        let conversionCount = localStorage.getItem('unitConverterCount') || 0;
+        document.getElementById('view-counter').textContent = conversionCount;
+        function incrementCounter() { conversionCount++; localStorage.setItem('unitConverterCount', conversionCount); document.getElementById('view-counter').textContent = conversionCount; }
+
+        // Toast
+        let toastTimeout;
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas fa-check-circle mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        // Category switching
+        const categories = ['length', 'weight', 'temperature', 'volume', 'area', 'speed', 'time', 'data'];
+        let activeCategory = 'length';
+
+        function switchCategory(category) {
+            activeCategory = category;
+            document.querySelectorAll('.converter-panel').forEach(panel => panel.classList.add('hidden'));
+            document.getElementById(`${category}-converter`).classList.remove('hidden');
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+        }
+
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchCategory(btn.dataset.category));
+        });
+
+        // ==================== CONVERSION FACTORS ====================
+        // Length conversions (to meters)
+        const lengthToMeter = {
+            km: 1000, m: 1, cm: 0.01, mm: 0.001,
+            mile: 1609.344, yard: 0.9144, foot: 0.3048, inch: 0.0254
+        };
+
+        function convertLength() {
+            const fromVal = parseFloat(document.getElementById('length-from-value').value) || 0;
+            const fromUnit = document.getElementById('length-from-unit').value;
+            const toUnit = document.getElementById('length-to-unit').value;
+            const meters = fromVal * lengthToMeter[fromUnit];
+            const result = meters / lengthToMeter[toUnit];
+            document.getElementById('length-to-value').value = result.toFixed(6);
+            incrementCounter();
+        }
+
+        function swapLengthUnits() {
+            const fromUnit = document.getElementById('length-from-unit').value;
+            const toUnit = document.getElementById('length-to-unit').value;
+            const fromVal = document.getElementById('length-from-value').value;
+            document.getElementById('length-from-unit').value = toUnit;
+            document.getElementById('length-to-unit').value = fromUnit;
+            document.getElementById('length-from-value').value = document.getElementById('length-to-value').value;
+            convertLength();
+            showToast('Units swapped');
+        }
+
+        // Weight conversions (to kg)
+        const weightToKg = {
+            kg: 1, g: 0.001, mg: 0.000001, lb: 0.45359237, oz: 0.0283495, ton: 1000
+        };
+
+        function convertWeight() {
+            const fromVal = parseFloat(document.getElementById('weight-from-value').value) || 0;
+            const fromUnit = document.getElementById('weight-from-unit').value;
+            const toUnit = document.getElementById('weight-to-unit').value;
+            const kg = fromVal * weightToKg[fromUnit];
+            const result = kg / weightToKg[toUnit];
+            document.getElementById('weight-to-value').value = result.toFixed(6);
+            incrementCounter();
+        }
+
+        function swapWeightUnits() {
+            const fromUnit = document.getElementById('weight-from-unit').value;
+            const toUnit = document.getElementById('weight-to-unit').value;
+            const fromVal = document.getElementById('weight-from-value').value;
+            document.getElementById('weight-from-unit').value = toUnit;
+            document.getElementById('weight-to-unit').value = fromUnit;
+            document.getElementById('weight-from-value').value = document.getElementById('weight-to-value').value;
+            convertWeight();
+            showToast('Units swapped');
+        }
+
+        // Temperature conversion
+        function convertTemperature() {
+            let fromVal = parseFloat(document.getElementById('temp-from-value').value) || 0;
+            const fromUnit = document.getElementById('temp-from-unit').value;
+            const toUnit = document.getElementById('temp-to-unit').value;
+            let celsius;
+            if (fromUnit === 'c') celsius = fromVal;
+            else if (fromUnit === 'f') celsius = (fromVal - 32) * 5/9;
+            else celsius = fromVal - 273.15;
+            let result;
+            if (toUnit === 'c') result = celsius;
+            else if (toUnit === 'f') result = celsius * 9/5 + 32;
+            else result = celsius + 273.15;
+            document.getElementById('temp-to-value').value = result.toFixed(2);
+            incrementCounter();
+        }
+
+        function swapTempUnits() {
+            const fromUnit = document.getElementById('temp-from-unit').value;
+            const toUnit = document.getElementById('temp-to-unit').value;
+            const fromVal = document.getElementById('temp-from-value').value;
+            document.getElementById('temp-from-unit').value = toUnit;
+            document.getElementById('temp-to-unit').value = fromUnit;
+            document.getElementById('temp-from-value').value = document.getElementById('temp-to-value').value;
+            convertTemperature();
+            showToast('Units swapped');
+        }
+
+        // Volume conversions (to liters)
+        const volumeToLiter = {
+            l: 1, ml: 0.001, gal: 3.78541, qt: 0.946353, pt: 0.473176, cup: 0.236588, oz_fl: 0.0295735
+        };
+
+        function convertVolume() {
+            const fromVal = parseFloat(document.getElementById('volume-from-value').value) || 0;
+            const fromUnit = document.getElementById('volume-from-unit').value;
+            const toUnit = document.getElementById('volume-to-unit').value;
+            const liters = fromVal * volumeToLiter[fromUnit];
+            const result = liters / volumeToLiter[toUnit];
+            document.getElementById('volume-to-value').value = result.toFixed(6);
+            incrementCounter();
+        }
+
+        function swapVolumeUnits() {
+            const fromUnit = document.getElementById('volume-from-unit').value;
+            const toUnit = document.getElementById('volume-to-unit').value;
+            const fromVal = document.getElementById('volume-from-value').value;
+            document.getElementById('volume-from-unit').value = toUnit;
+            document.getElementById('volume-to-unit').value = fromUnit;
+            document.getElementById('volume-from-value').value = document.getElementById('volume-to-value').value;
+            convertVolume();
+            showToast('Units swapped');
+        }
+
+        // Area conversions (to sq meters)
+        const areaToSqm = {
+            sqm: 1, sqkm: 1000000, sqft: 0.092903, sqyd: 0.836127, acre: 4046.86, hectare: 10000
+        };
+
+        function convertArea() {
+            const fromVal = parseFloat(document.getElementById('area-from-value').value) || 0;
+            const fromUnit = document.getElementById('area-from-unit').value;
+            const toUnit = document.getElementById('area-to-unit').value;
+            const sqm = fromVal * areaToSqm[fromUnit];
+            const result = sqm / areaToSqm[toUnit];
+            document.getElementById('area-to-value').value = result.toFixed(6);
+            incrementCounter();
+        }
+
+        function swapAreaUnits() {
+            const fromUnit = document.getElementById('area-from-unit').value;
+            const toUnit = document.getElementById('area-to-unit').value;
+            const fromVal = document.getElementById('area-from-value').value;
+            document.getElementById('area-from-unit').value = toUnit;
+            document.getElementById('area-to-unit').value = fromUnit;
+            document.getElementById('area-from-value').value = document.getElementById('area-to-value').value;
+            convertArea();
+            showToast('Units swapped');
+        }
+
+        // Speed conversions (to km/h)
+        const speedToKmh = {
+            kmh: 1, mph: 1.60934, ms: 3.6, knot: 1.852
+        };
+
+        function convertSpeed() {
+            const fromVal = parseFloat(document.getElementById('speed-from-value').value) || 0;
+            const fromUnit = document.getElementById('speed-from-unit').value;
+            const toUnit = document.getElementById('speed-to-unit').value;
+            const kmh = fromVal * speedToKmh[fromUnit];
+            const result = kmh / speedToKmh[toUnit];
+            document.getElementById('speed-to-value').value = result.toFixed(4);
+            incrementCounter();
+        }
+
+        function swapSpeedUnits() {
+            const fromUnit = document.getElementById('speed-from-unit').value;
+            const toUnit = document.getElementById('speed-to-unit').value;
+            const fromVal = document.getElementById('speed-from-value').value;
+            document.getElementById('speed-from-unit').value = toUnit;
+            document.getElementById('speed-to-unit').value = fromUnit;
+            document.getElementById('speed-from-value').value = document.getElementById('speed-to-value').value;
+            convertSpeed();
+            showToast('Units swapped');
+        }
+
+        // Time conversions (to seconds)
+        const timeToSec = {
+            sec: 1, min: 60, hour: 3600, day: 86400, week: 604800, month: 2628000, year: 31536000
+        };
+
+        function convertTime() {
+            const fromVal = parseFloat(document.getElementById('time-from-value').value) || 0;
+            const fromUnit = document.getElementById('time-from-unit').value;
+            const toUnit = document.getElementById('time-to-unit').value;
+            const seconds = fromVal * timeToSec[fromUnit];
+            const result = seconds / timeToSec[toUnit];
+            document.getElementById('time-to-value').value = result.toFixed(6);
+            incrementCounter();
+        }
+
+        function swapTimeUnits() {
+            const fromUnit = document.getElementById('time-from-unit').value;
+            const toUnit = document.getElementById('time-to-unit').value;
+            const fromVal = document.getElementById('time-from-value').value;
+            document.getElementById('time-from-unit').value = toUnit;
+            document.getElementById('time-to-unit').value = fromUnit;
+            document.getElementById('time-from-value').value = document.getElementById('time-to-value').value;
+            convertTime();
+            showToast('Units swapped');
+        }
+
+        // Data size conversions (to bytes)
+        const dataToBytes = {
+            b: 1, kb: 1024, mb: 1048576, gb: 1073741824, tb: 1099511627776, pb: 1125899906842624
+        };
+
+        function convertData() {
+            const fromVal = parseFloat(document.getElementById('data-from-value').value) || 0;
+            const fromUnit = document.getElementById('data-from-unit').value;
+            const toUnit = document.getElementById('data-to-unit').value;
+            const bytes = fromVal * dataToBytes[fromUnit];
+            const result = bytes / dataToBytes[toUnit];
+            document.getElementById('data-to-value').value = result.toExponential(6);
+            incrementCounter();
+        }
+
+        function swapDataUnits() {
+            const fromUnit = document.getElementById('data-from-unit').value;
+            const toUnit = document.getElementById('data-to-unit').value;
+            const fromVal = document.getElementById('data-from-value').value;
+            document.getElementById('data-from-unit').value = toUnit;
+            document.getElementById('data-to-unit').value = fromUnit;
+            document.getElementById('data-from-value').value = document.getElementById('data-to-value').value;
+            convertData();
+            showToast('Units swapped');
+        }
+
+        // Event listeners for all converters
+        document.getElementById('length-from-value').addEventListener('input', convertLength);
+        document.getElementById('length-from-unit').addEventListener('change', convertLength);
+        document.getElementById('length-to-unit').addEventListener('change', convertLength);
+
+        document.getElementById('weight-from-value').addEventListener('input', convertWeight);
+        document.getElementById('weight-from-unit').addEventListener('change', convertWeight);
+        document.getElementById('weight-to-unit').addEventListener('change', convertWeight);
+
+        document.getElementById('temp-from-value').addEventListener('input', convertTemperature);
+        document.getElementById('temp-from-unit').addEventListener('change', convertTemperature);
+        document.getElementById('temp-to-unit').addEventListener('change', convertTemperature);
+
+        document.getElementById('volume-from-value').addEventListener('input', convertVolume);
+        document.getElementById('volume-from-unit').addEventListener('change', convertVolume);
+        document.getElementById('volume-to-unit').addEventListener('change', convertVolume);
+
+        document.getElementById('area-from-value').addEventListener('input', convertArea);
+        document.getElementById('area-from-unit').addEventListener('change', convertArea);
+        document.getElementById('area-to-unit').addEventListener('change', convertArea);
+
+        document.getElementById('speed-from-value').addEventListener('input', convertSpeed);
+        document.getElementById('speed-from-unit').addEventListener('change', convertSpeed);
+        document.getElementById('speed-to-unit').addEventListener('change', convertSpeed);
+
+        document.getElementById('time-from-value').addEventListener('input', convertTime);
+        document.getElementById('time-from-unit').addEventListener('change', convertTime);
+        document.getElementById('time-to-unit').addEventListener('change', convertTime);
+
+        document.getElementById('data-from-value').addEventListener('input', convertData);
+        document.getElementById('data-from-unit').addEventListener('change', convertData);
+        document.getElementById('data-to-unit').addEventListener('change', convertData);
+
+        // Initial conversions
+        convertLength();
+        convertWeight();
+        convertTemperature();
+        convertVolume();
+        convertArea();
+        convertSpeed();
+        convertTime();
+        convertData();
+    </script>
+</body>
+</html>

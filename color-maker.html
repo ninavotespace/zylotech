@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Color Maker Studio - Create Custom Colors & Palettes | ZyloTech</title>
+    <meta name="description" content="Free color maker studio. Create custom colors, get paint mixing recipes (Home & Pro), build palettes, export as image or PDF. Perfect for artists and designers.">
+    <meta name="keywords" content="free color maker, color palette creator, paint mixing calculator, custom color generator, RYB color mixer, CMYK color converter">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Color Maker Studio - Create Custom Colors | ZyloTech">
+    <meta property="og:description" content="Free color maker studio. Create custom colors, get paint mixing recipes, build and export palettes. Perfect for artists.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/color-maker.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Color Maker Studio - ZyloTech">
+    <meta name="twitter:description" content="Create custom colors and palettes for free. Get paint mixing recipes.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/color-maker.html">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/include.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #2e1065 100%);
+            min-height: 100vh;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+        /* Custom scrollbar */
+        .palette-area::-webkit-scrollbar { width: 6px; }
+        .palette-area::-webkit-scrollbar-track { background: #1e293b; border-radius: 3px; }
+        .palette-area::-webkit-scrollbar-thumb { background: #ec4899; border-radius: 3px; }
+
+        /* Color card styles */
+        .color-card {
+            background: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            display: flex;
+        }
+        .color-card:hover {
+            transform: translateX(5px);
+            border-color: #ec4899;
+        }
+        .color-swatch {
+            width: 80px;
+            min-height: 80px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .delete-btn {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .color-card:hover .delete-btn {
+            opacity: 1;
+        }
+
+        /* Slider styles */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #334155;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 0 4px rgba(0,0,0,0.3);
+        }
+        .slider-red { background: linear-gradient(to right, #000, #ff0000); }
+        .slider-green { background: linear-gradient(to right, #000, #00ff00); }
+        .slider-blue { background: linear-gradient(to right, #000, #0000ff); }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        button {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:active { transform: scale(0.98); }
+
+        /* Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #ec4899;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #ec4899;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ec4899;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #db2777; transform: scale(1.1); }
+
+        /* Feature section text colors - FIXED */
+        .feature-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-2px);
+        }
+        .feature-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .feature-title {
+            font-weight: 600;
+            color: #ec4899;
+            margin-bottom: 0.25rem;
+        }
+        .feature-desc {
+            font-size: 0.75rem;
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-4">
+                <i class="fas fa-palette text-pink-400"></i>
+                <span class="text-sm text-gray-200">Free • Create • Save • Mix</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">
+                <i class="fas fa-fill-drip text-pink-500 mr-2"></i>Free Color Maker Studio
+            </h1>
+            <p class="text-gray-300">Create custom colors, get paint mixing recipes (Home & Pro), build and export palettes.</p>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <!-- LEFT COLUMN: Color Creator -->
+            <div class="bg-white/95 backdrop-blur rounded-2xl p-6 shadow-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fas fa-magic text-pink-500"></i> Color Creator
+                    </h2>
+
+                    <!-- MODE TOGGLE -->
+                    <div class="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
+                        <button id="modeRegular" class="px-3 py-1 text-xs font-bold rounded-md bg-white shadow text-pink-600 transition">
+                            <i class="fas fa-home mr-1"></i> Home
+                        </button>
+                        <button id="modePro" class="px-3 py-1 text-xs font-bold rounded-md text-gray-500 hover:text-gray-700 transition">
+                            <i class="fas fa-industry mr-1"></i> Pro
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Color Preview -->
+                <div id="colorPreview" class="w-full h-56 rounded-xl mb-6 transition-all duration-200 shadow-lg" style="background-color: #ec4899;">
+                    <div class="h-full flex items-center justify-center">
+                        <div class="text-center">
+                            <p id="previewHex" class="text-3xl md:text-4xl font-bold text-white drop-shadow-lg font-mono">#ec4899</p>
+                            <div class="flex items-center justify-center gap-2 mt-1">
+                                <span id="previewName" class="text-white/90 font-medium bg-black/20 px-2 py-1 rounded">Pink</span>
+                                <span id="previewId" class="hidden custom-id-badge">#C-0000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RGB Sliders -->
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-bold text-red-600">Red</span>
+                            <span id="redValue" class="font-mono text-gray-600">236</span>
+                        </div>
+                        <input type="range" id="redSlider" min="0" max="255" value="236" class="slider-red w-full">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-bold text-green-600">Green</span>
+                            <span id="greenValue" class="font-mono text-gray-600">72</span>
+                        </div>
+                        <input type="range" id="greenSlider" min="0" max="255" value="72" class="slider-green w-full">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-bold text-blue-600">Blue</span>
+                            <span id="blueValue" class="font-mono text-gray-600">153</span>
+                        </div>
+                        <input type="range" id="blueSlider" min="0" max="255" value="153" class="slider-blue w-full">
+                    </div>
+                </div>
+
+                <!-- HEX Input -->
+                <div class="flex gap-2 mb-6">
+                    <input type="text" id="hexInput" value="#ec4899" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm">
+                    <button id="applyBtn" class="px-6 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition">
+                        <i class="fas fa-check mr-1"></i> Apply
+                    </button>
+                    <button id="randomBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                        <i class="fas fa-random"></i>
+                    </button>
+                </div>
+
+                <!-- Paint Mixing Formula (Dynamic) -->
+                <div id="recipeContainer" class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-5 mb-6 border border-pink-100">
+                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <i class="fas fa-flask text-pink-600"></i> <span id="recipeTitle">1-Liter Home Recipe</span>
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-4" id="recipeDesc">Approximate mix for 1 Liter of White Base:</p>
+
+                    <div id="recipeContent" class="space-y-3">
+                        <!-- Content injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Color Info -->
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="bg-gray-100 p-2 rounded-lg">
+                        <p class="text-xs text-gray-500">RGB</p>
+                        <p id="rgbDisplay" class="font-mono text-sm font-bold">236,72,153</p>
+                    </div>
+                    <div class="bg-gray-100 p-2 rounded-lg">
+                        <p class="text-xs text-gray-500">HSL</p>
+                        <p id="hslDisplay" class="font-mono text-sm font-bold">330°,81%,60%</p>
+                    </div>
+                    <div class="bg-gray-100 p-2 rounded-lg">
+                        <p class="text-xs text-gray-500">Type</p>
+                        <p id="typeDisplay" class="font-mono text-sm font-bold text-pink-600">Standard</p>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <button id="saveBtn" class="w-full mt-6 bg-gradient-to-r from-pink-600 to-rose-600 text-white py-3 rounded-xl font-bold hover:from-pink-700 hover:to-rose-700 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i> Save Color to Palette
+                </button>
+            </div>
+
+            <!-- RIGHT COLUMN: Color Palette -->
+            <div class="bg-white/95 backdrop-blur rounded-2xl p-6 shadow-xl flex flex-col h-[700px]">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fas fa-swatchbook text-pink-500"></i> My Color Palette
+                        <span id="paletteCount" class="text-sm text-gray-400">(0 colors)</span>
+                    </h2>
+                    <button id="clearAllBtn" class="text-sm text-red-500 hover:text-red-700 px-3 py-1 border border-red-200 rounded-lg hover:bg-red-50 transition">
+                        <i class="fas fa-trash mr-1"></i> Clear All
+                    </button>
+                </div>
+
+                <!-- Palette Cards Container -->
+                <div id="paletteContainer" class="palette-area flex-1 overflow-y-auto space-y-3 pr-2">
+                    <!-- Empty State -->
+                    <div id="emptyState" class="text-center py-16 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
+                        <i class="fas fa-palette text-5xl mb-3 opacity-30"></i>
+                        <p>No colors saved yet</p>
+                        <p class="text-sm mt-1">Create a color and click "Save Color to Palette"</p>
+                    </div>
+                </div>
+
+                <!-- Export Buttons -->
+                <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-gray-200">
+                    <button id="exportImageBtn" class="py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm flex items-center justify-center gap-2">
+                        <i class="fas fa-image"></i> Download Strip
+                    </button>
+                    <button id="exportPdfBtn" class="py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm flex items-center justify-center gap-2">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Section for SEO - FIXED TEXT COLORS -->
+        <div class="mt-12">
+            <h2 class="text-2xl font-bold text-white mb-6 text-center">Free Color Maker Studio Features</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="feature-card">
+                    <i class="fas fa-palette feature-icon text-pink-400"></i>
+                    <div class="feature-title">Create Colors</div>
+                    <div class="feature-desc">RGB sliders, HEX input, random generator</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-flask feature-icon text-pink-400"></i>
+                    <div class="feature-title">Paint Recipes</div>
+                    <div class="feature-desc">Home (RYB) & Pro (CMYK) formulas</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-layer-group feature-icon text-pink-400"></i>
+                    <div class="feature-title">Build Palettes</div>
+                    <div class="feature-desc">Save unlimited colors</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-image feature-icon text-pink-400"></i>
+                    <div class="feature-title">Export</div>
+                    <div class="feature-desc">Download as image strip or PDF</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-tint feature-icon text-pink-400"></i>
+                    <div class="feature-title">Smart Naming</div>
+                    <div class="feature-desc">Auto-detects color names</div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-chart-simple feature-icon text-pink-400"></i>
+                    <div class="feature-title">Conversion Counter</div>
+                    <div class="feature-desc">Track your creations</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // ========== STATE ==========
+        let currentColor = { r: 236, g: 72, b: 153 };
+        let savedColors = [];
+        let userMode = 'regular'; // 'regular' or 'pro'
+
+        // ========== LOAD SAVED COLORS ==========
+        function loadSavedColors() {
+            const saved = localStorage.getItem('colorMakerPalette');
+            if (saved) {
+                try {
+                    savedColors = JSON.parse(saved);
+                    renderPalette();
+                } catch(e) { console.error('Failed to load'); }
+            }
+        }
+
+        function saveColorsToStorage() {
+            localStorage.setItem('colorMakerPalette', JSON.stringify(savedColors));
+        }
+
+        // ========== COLOR CONVERSIONS ==========
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) h = s = 0;
+            else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function rgbToCmyk(r, g, b) {
+            let c = 1 - (r / 255);
+            let m = 1 - (g / 255);
+            let y = 1 - (b / 255);
+            let k = Math.min(c, Math.min(m, y));
+            if (k === 1) return { c: 0, m: 0, y: 0, k: 100 };
+            c = (c - k) / (1 - k);
+            m = (m - k) / (1 - k);
+            y = (y - k) / (1 - k);
+            return { c: Math.round(c * 100), m: Math.round(m * 100), y: Math.round(y * 100), k: Math.round(k * 100) };
+        }
+
+        // ========== SMART NAMING ==========
+        function getSmartColorName(rgb) {
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            if (hsl.s < 10) {
+                if (hsl.l < 10) return { name: "Black", type: "standard" };
+                if (hsl.l > 90) return { name: "White", type: "standard" };
+                return { name: "Gray", type: "standard" };
+            }
+            const isVivid = hsl.s > 60 && hsl.l > 20 && hsl.l < 80;
+            if (isVivid) {
+                const h = hsl.h;
+                if (h < 10 || h >= 350) return { name: "Red", type: "standard" };
+                if (h < 40) return { name: "Orange", type: "standard" };
+                if (h < 65) return { name: "Yellow", type: "standard" };
+                if (h < 160) return { name: "Green", type: "standard" };
+                if (h < 200) return { name: "Cyan", type: "standard" };
+                if (h < 260) return { name: "Blue", type: "standard" };
+                if (h < 290) return { name: "Purple", type: "standard" };
+                if (h < 330) return { name: "Magenta", type: "standard" };
+                return { name: "Pink", type: "standard" };
+            }
+            const hex = rgbToHex(rgb.r, rgb.g, rgb.b).replace('#', '');
+            const code = hex.substring(0, 2).toUpperCase() + hex.substring(4, 6).toUpperCase();
+            return { name: "Custom", id: `#${code}`, type: "custom" };
+        }
+
+        // ========== RECIPE GENERATORS ==========
+
+        // PRO: CMYK
+        function getProRecipe(r, g, b) {
+            const cmyk = rgbToCmyk(r, g, b);
+            const factor = 10;
+            return {
+                type: 'pro',
+                title: '1-Liter Pro Recipe (CMYK)',
+                desc: 'Precise formulation for professional tinting:',
+                ingredients: [
+                    { name: 'Cyan Tint', val: Math.round(cmyk.c * factor), color: 'text-cyan-600', bar: 'bg-cyan-500', pct: cmyk.c },
+                    { name: 'Magenta Tint', val: Math.round(cmyk.m * factor), color: 'text-fuchsia-600', bar: 'bg-fuchsia-500', pct: cmyk.m },
+                    { name: 'Yellow Tint', val: Math.round(cmyk.y * factor), color: 'text-yellow-600', bar: 'bg-yellow-500', pct: cmyk.y },
+                    { name: 'Black Tint', val: Math.round(cmyk.k * factor), color: 'text-gray-600', bar: 'bg-gray-600', pct: cmyk.k }
+                ]
+            };
+        }
+
+        // REGULAR: RYB + White/Black Approximation
+        function getRegularRecipe(r, g, b) {
+            let red = r / 255;
+            let green = g / 255;
+            let blue = b / 255;
+
+            let white = Math.min(Math.min(red, green), blue);
+            red -= white;
+            green -= white;
+            blue -= white;
+
+            let magenta = Math.min(red, blue);
+            let yellow = Math.min(red, green);
+            let cyan = Math.min(green, blue);
+
+            let r_ryb = red - magenta;
+            let y_ryb = green - cyan;
+            let b_ryb = blue - magenta;
+
+            let finalRed = Math.round((r_ryb + magenta) * 100);
+            let finalYellow = Math.round((y_ryb + cyan) * 100);
+            let finalBlue = Math.round((b_ryb + cyan) * 100);
+
+            finalRed = Math.min(100, finalRed);
+            finalYellow = Math.min(100, finalYellow);
+            finalBlue = Math.min(100, finalBlue);
+
+            const hsl = rgbToHsl(r,g,b);
+            let blackAdd = 0;
+
+            if (hsl.l < 50) {
+                blackAdd = Math.round((50 - hsl.l) * 20);
+            }
+
+            return {
+                type: 'regular',
+                title: '1-Liter Home Recipe (RYB)',
+                desc: 'Add these amounts to 1 Liter of WHITE paint:',
+                ingredients: [
+                    { name: 'Red Paint', val: Math.round(finalRed * 10), color: 'text-red-600', bar: 'bg-red-500', pct: finalRed },
+                    { name: 'Yellow Paint', val: Math.round(finalYellow * 10), color: 'text-yellow-600', bar: 'bg-yellow-500', pct: finalYellow },
+                    { name: 'Blue Paint', val: Math.round(finalBlue * 10), color: 'text-blue-600', bar: 'bg-blue-500', pct: finalBlue },
+                    { name: 'Black Paint', val: blackAdd, color: 'text-gray-800', bar: 'bg-gray-800', pct: blackAdd/10 }
+                ]
+            };
+        }
+
+        // ========== UI UPDATES ==========
+        function updateUI() {
+            const { r, g, b } = currentColor;
+            const hex = rgbToHex(r, g, b);
+            const hsl = rgbToHsl(r, g, b);
+            const colorInfo = getSmartColorName(currentColor);
+
+            document.getElementById('colorPreview').style.backgroundColor = `rgb(${r},${g},${b})`;
+            document.getElementById('previewHex').textContent = hex;
+
+            const nameEl = document.getElementById('previewName');
+            const idEl = document.getElementById('previewId');
+            const typeEl = document.getElementById('typeDisplay');
+
+            nameEl.textContent = colorInfo.name;
+            typeEl.textContent = colorInfo.type === 'standard' ? 'Standard' : 'Custom Mix';
+            typeEl.className = `font-mono text-sm font-bold ${colorInfo.type === 'standard' ? 'text-pink-600' : 'text-indigo-500'}`;
+
+            if (colorInfo.type === 'custom') {
+                idEl.textContent = colorInfo.id;
+                idEl.classList.remove('hidden');
+                nameEl.classList.add('bg-indigo-500/20', 'text-indigo-200');
+                nameEl.classList.remove('bg-black/20', 'text-white/90');
+            } else {
+                idEl.classList.add('hidden');
+                nameEl.classList.remove('bg-indigo-500/20', 'text-indigo-200');
+                nameEl.classList.add('bg-black/20', 'text-white/90');
+            }
+
+            document.getElementById('redSlider').value = r;
+            document.getElementById('greenSlider').value = g;
+            document.getElementById('blueSlider').value = b;
+            document.getElementById('redValue').textContent = r;
+            document.getElementById('greenValue').textContent = g;
+            document.getElementById('blueValue').textContent = b;
+            document.getElementById('hexInput').value = hex;
+
+            document.getElementById('rgbDisplay').textContent = `${r},${g},${b}`;
+            document.getElementById('hslDisplay').textContent = `${hsl.h}°,${hsl.s}%,${hsl.l}%`;
+
+            updateRecipeDisplay();
+        }
+
+        function updateRecipeDisplay() {
+            const { r, g, b } = currentColor;
+            const recipe = userMode === 'pro' ? getProRecipe(r, g, b) : getRegularRecipe(r, g, b);
+
+            document.getElementById('recipeTitle').textContent = recipe.title;
+            document.getElementById('recipeDesc').textContent = recipe.desc;
+
+            const container = document.getElementById('recipeContent');
+            container.innerHTML = '';
+
+            recipe.ingredients.forEach(ing => {
+                if (ing.val > 0) {
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <div class="flex justify-between text-sm mb-1">
+                            <span><i class="fas fa-tint ${ing.color}"></i> ${ing.name}:</span>
+                            <span class="font-mono font-bold">${ing.val} ml</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="${ing.bar} h-2 rounded-full transition-all" style="width: ${Math.min(100, ing.pct)}%"></div>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                }
+            });
+
+            if (container.innerHTML === '') {
+                container.innerHTML = '<p class="text-sm text-gray-500 italic">Pure White Base (No tints needed)</p>';
+            }
+        }
+
+        function updateFromSliders() {
+            currentColor.r = parseInt(document.getElementById('redSlider').value);
+            currentColor.g = parseInt(document.getElementById('greenSlider').value);
+            currentColor.b = parseInt(document.getElementById('blueSlider').value);
+            updateUI();
+        }
+
+        // ========== MODE TOGGLE LOGIC ==========
+        function setMode(mode) {
+            userMode = mode;
+            const btnReg = document.getElementById('modeRegular');
+            const btnPro = document.getElementById('modePro');
+
+            if (mode === 'regular') {
+                btnReg.className = "px-3 py-1 text-xs font-bold rounded-md bg-white shadow text-pink-600 transition";
+                btnPro.className = "px-3 py-1 text-xs font-bold rounded-md text-gray-500 hover:text-gray-700 transition";
+            } else {
+                btnPro.className = "px-3 py-1 text-xs font-bold rounded-md bg-white shadow text-pink-600 transition";
+                btnReg.className = "px-3 py-1 text-xs font-bold rounded-md text-gray-500 hover:text-gray-700 transition";
+            }
+            updateRecipeDisplay();
+            renderPalette();
+        }
+
+        document.getElementById('modeRegular').addEventListener('click', () => setMode('regular'));
+        document.getElementById('modePro').addEventListener('click', () => setMode('pro'));
+
+        // ========== PALETTE FUNCTIONS ==========
+        function saveCurrentColorToPalette() {
+            const { r, g, b } = currentColor;
+            const hex = rgbToHex(r, g, b);
+            const colorInfo = getSmartColorName({ r, g, b });
+
+            const proRecipe = getProRecipe(r, g, b);
+            const regRecipe = getRegularRecipe(r, g, b);
+
+            const exists = savedColors.some(color => color.hex === hex);
+            if (exists) {
+                showToast(`Color ${hex} already in palette!`, 'warning');
+                return;
+            }
+
+            const newColor = {
+                id: Date.now(),
+                r, g, b, hex,
+                name: colorInfo.name,
+                customId: colorInfo.id || null,
+                type: colorInfo.type,
+                recipes: {
+                    pro: proRecipe.ingredients,
+                    regular: regRecipe.ingredients
+                }
+            };
+
+            savedColors.push(newColor);
+            saveColorsToStorage();
+            renderPalette();
+            showToast(`"${newColor.name}" added to palette!`);
+        }
+
+        function removeColor(id) {
+            savedColors = savedColors.filter(color => color.id !== id);
+            saveColorsToStorage();
+            renderPalette();
+            showToast(`Color removed`);
+        }
+
+        function loadColorToMixer(r, g, b) {
+            currentColor = { r, g, b };
+            updateUI();
+            showToast(`Loaded ${getSmartColorName({r,g,b}).name}`);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function clearAllColors() {
+            if (savedColors.length > 0 && confirm(`Delete all ${savedColors.length} colors?`)) {
+                savedColors = [];
+                saveColorsToStorage();
+                renderPalette();
+                showToast('Palette cleared');
+            }
+        }
+
+        function renderPalette() {
+            const container = document.getElementById('paletteContainer');
+            const emptyState = document.getElementById('emptyState');
+            document.getElementById('paletteCount').textContent = `(${savedColors.length} colors)`;
+
+            if (savedColors.length === 0) {
+                container.innerHTML = '';
+                container.appendChild(emptyState);
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            container.innerHTML = '';
+            container.appendChild(emptyState);
+
+            [...savedColors].reverse().forEach(color => {
+                const card = document.createElement('div');
+                card.className = 'color-card';
+
+                const ingredients = color.recipes[userMode];
+
+                let nameHtml = `<p class="font-mono font-bold text-white text-sm">${color.hex}</p>`;
+                nameHtml += color.type === 'custom'
+                    ? `<p class="text-xs text-indigo-300 font-bold">${color.name} <span class="opacity-70">${color.customId}</span></p>`
+                    : `<p class="text-xs text-gray-400">${color.name}</p>`;
+
+                let recipeHtml = ingredients.map(ing =>
+                    `<span class="${ing.color}">${ing.name.split(' ')[0]}:${ing.val}ml</span>`
+                ).join(' ');
+
+                card.innerHTML = `
+                    <div class="color-swatch" style="background-color: ${color.hex};"></div>
+                    <div class="p-3 flex-grow">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>${nameHtml}</div>
+                            <button class="delete-btn w-6 h-6 bg-red-500 rounded-full text-white text-xs hover:bg-red-600 transition flex items-center justify-center" data-id="${color.id}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="text-[10px] text-gray-400 mb-2 leading-tight">
+                            ${recipeHtml}
+                        </div>
+                        <button class="load-btn w-full py-1 bg-gray-700 rounded text-xs text-white hover:bg-gray-600 transition flex items-center justify-center gap-1" data-r="${color.r}" data-g="${color.g}" data-b="${color.b}">
+                            <i class="fas fa-chevron-left"></i> Load Color
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeColor(parseInt(btn.dataset.id));
+                });
+            });
+            document.querySelectorAll('.load-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    loadColorToMixer(parseInt(btn.dataset.r), parseInt(btn.dataset.g), parseInt(btn.dataset.b));
+                });
+            });
+        }
+
+        // ========== EXPORTS ==========
+        async function exportAsImage() {
+            if (savedColors.length === 0) return showToast('No colors!', 'error');
+            showToast('Generating strip...');
+
+            const exportDiv = document.createElement('div');
+            exportDiv.style.background = 'white';
+            exportDiv.style.padding = '20px';
+            exportDiv.style.width = (savedColors.length * 150 + 40) + 'px';
+            exportDiv.style.position = 'absolute';
+            exportDiv.style.left = '-9999px';
+
+            let html = '<h2 style="text-align:center; margin-bottom:20px; color:#333; font-family:sans-serif;">My Color Palette</h2><div style="display:flex; gap:10px;">';
+
+            savedColors.forEach(color => {
+                const ingredients = color.recipes[userMode];
+                let nameDisplay = color.type === 'custom' ? `${color.name} ${color.customId}` : color.name;
+
+                html += `<div style="width:150px; border:1px solid #ddd; border-radius:8px; overflow:hidden; background:white; font-family:sans-serif;">
+                    <div style="height:100px; background-color:${color.hex};"></div>
+                    <div style="padding:8px; text-align:center;">
+                        <p style="font-family:monospace; font-size:12px; font-weight:bold;">${color.hex}</p>
+                        <p style="font-size:10px; color:#666; font-weight:bold;">${nameDisplay}</p>
+                        <div style="font-size:9px; color:#888; margin-top:4px; text-align:left;">`;
+
+                ingredients.forEach(ing => {
+                    html += `<div>${ing.name}: ${ing.val}ml</div>`;
+                });
+
+                html += `</div></div></div>`;
+            });
+            html += '</div>';
+            exportDiv.innerHTML = html;
+            document.body.appendChild(exportDiv);
+
+            try {
+                const canvas = await html2canvas(exportDiv, { scale: 2 });
+                const link = document.createElement('a');
+                link.download = `palette-${userMode}-${Date.now()}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+                showToast('Downloaded!');
+            } catch(e) { showToast('Export failed', 'error'); }
+            document.body.removeChild(exportDiv);
+        }
+
+        async function exportAsPdf() {
+            if (savedColors.length === 0) {
+                showToast('No colors to export!', 'error');
+                return;
+            }
+            showToast('Generating PDF...');
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let y = 30;
+
+            doc.setFontSize(18);
+            doc.text('My Color Palette', 20, y);
+            y += 15;
+
+            for (let i = 0; i < savedColors.length; i++) {
+                const color = savedColors[i];
+                const ingredients = color.recipes[userMode];
+                let nameDisplay = color.type === 'custom' ? `${color.name} ${color.customId}` : color.name;
+
+                doc.setFillColor(color.r, color.g, color.b);
+                doc.rect(20, y, 40, 40, 'F');
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.text(color.hex, 70, y + 10);
+                doc.text(nameDisplay, 70, y + 20);
+
+                let recipeText = ingredients.map(ing => `${ing.name.split(' ')[0]}:${ing.val}ml`).join(' ');
+                doc.text(recipeText, 70, y + 30);
+                y += 50;
+
+                if (y > 250 && i < savedColors.length - 1) {
+                    doc.addPage();
+                    y = 20;
+                }
+            }
+            doc.save(`color-palette-${Date.now()}.pdf`);
+            showToast('PDF exported!');
+        }
+
+        function showToast(message, type = 'success') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.background = type === 'error' ? '#ef4444' : '#1f2937';
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ========== INIT ==========
+        document.getElementById('redSlider').addEventListener('input', updateFromSliders);
+        document.getElementById('greenSlider').addEventListener('input', updateFromSliders);
+        document.getElementById('blueSlider').addEventListener('input', updateFromSliders);
+        document.getElementById('applyBtn').addEventListener('click', () => {
+            const rgb = hexToRgb(document.getElementById('hexInput').value);
+            if (rgb) { currentColor = rgb; updateUI(); saveCurrentColorToPalette(); }
+        });
+        document.getElementById('randomBtn').addEventListener('click', () => {
+            currentColor = { r: Math.floor(Math.random()*256), g: Math.floor(Math.random()*256), b: Math.floor(Math.random()*256) };
+            updateUI();
+        });
+        document.getElementById('saveBtn').addEventListener('click', saveCurrentColorToPalette);
+        document.getElementById('clearAllBtn').addEventListener('click', clearAllColors);
+        document.getElementById('exportImageBtn').addEventListener('click', exportAsImage);
+        document.getElementById('exportPdfBtn').addEventListener('click', exportAsPdf);
+
+        loadSavedColors();
+        updateUI();
+    </script>
+</body>
+</html>

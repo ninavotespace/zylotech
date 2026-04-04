@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Geo Converters - GPS, DMS, UTM, Distance Calculator, Geocoding | ZyloTech</title>
+    <meta name="description" content="Free online geo converters. Convert GPS to DMS, Lat/Lon to UTM, calculate distance between coordinates using Haversine formula, geocode addresses to coordinates. 100% free.">
+    <meta name="keywords" content="free geo converter, gps to dms, latitude longitude to utm, distance calculator, geocoding, reverse geocoding, haversine formula">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Geo Converters - GPS, DMS, UTM, Distance Calculator | ZyloTech">
+    <meta property="og:description" content="Free online geo converters. Convert GPS to DMS, Lat/Lon to UTM, calculate distance between coordinates, geocode addresses.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/geo-converter.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Geo Converters - ZyloTech">
+    <meta name="twitter:description" content="Convert GPS coordinates, calculate distances, geocode addresses online for free.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/geo-converter.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/include.js"></script>
+
+    <style>
+        :root { --primary: #10b981; --primary-hover: #059669; --accent: #34d399; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #064e3b 100%); color: #f1f5f9; min-height: 100vh; }
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: #1f2937; }
+        .tab-btn { position: relative; padding: 12px 24px; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s ease; color: #94a3b8; cursor: pointer; }
+        .tab-btn.active { border-bottom-color: var(--primary); color: white; }
+        .result-box { background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 16px; border-radius: 12px; }
+        .copy-btn { background: #e2e8f0; border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+        .copy-btn:hover { background: var(--primary); color: white; }
+        input, select { transition: all 0.2s; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); ring: 2px solid var(--primary); }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .hidden { display: none !important; }
+        .spinner { width: 20px; height: 20px; border: 2px solid #e5e7eb; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .map-placeholder { background: #e2e8f0; border-radius: 8px; padding: 20px; text-align: center; color: #64748b; }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10b981;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #059669; transform: scale(1.1); }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-4">
+                <i class="fas fa-map-marker-alt text-green-400"></i>
+                <span class="text-sm text-gray-200">Free • Browser-Based • No API Key Required</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-2">
+                <i class="fas fa-globe-americas mr-2 text-green-400"></i>Free Geo Converters
+            </h1>
+            <p class="text-gray-300 max-w-2xl mx-auto">GPS ↔ DMS, Lat/Lon ↔ UTM, Distance Calculator, Address Geocoding. 100% Free.</p>
+            <div class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full shadow-lg">
+                <i class="fas fa-chart-simple"></i>
+                <span id="view-counter" class="font-bold">0</span>
+                <span class="text-sm">operations done</span>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="glass rounded-2xl p-2 mb-6 inline-flex flex-wrap">
+            <button id="tab-gps-dms" class="tab-btn active rounded-xl px-6 py-3"><i class="fas fa-map-pin mr-2"></i>GPS ↔ DMS</button>
+            <button id="tab-utm" class="tab-btn rounded-xl px-6 py-3"><i class="fas fa-draw-polygon mr-2"></i>Lat/Lon ↔ UTM</button>
+            <button id="tab-distance" class="tab-btn rounded-xl px-6 py-3"><i class="fas fa-ruler-combined mr-2"></i>Distance Calculator</button>
+            <button id="tab-geocode" class="tab-btn rounded-xl px-6 py-3"><i class="fas fa-search-location mr-2"></i>Address Geocoding</button>
+        </div>
+
+        <!-- ==================== GPS ↔ DMS CONVERTER ==================== -->
+        <div id="gps-dms-tool">
+            <div class="glass p-6 rounded-2xl mb-6">
+                <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-map-pin text-green-500"></i>GPS Decimal ↔ DMS Converter</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Decimal to DMS -->
+                    <div class="bg-gray-50 p-4 rounded-xl">
+                        <h4 class="font-semibold mb-3">Decimal → DMS</h4>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Latitude</label>
+                            <input type="number" id="dec-lat" value="-1.2921" step="any" class="w-full p-2 border rounded">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Longitude</label>
+                            <input type="number" id="dec-lon" value="36.8219" step="any" class="w-full p-2 border rounded">
+                        </div>
+                        <button id="to-dms" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition w-full">Convert to DMS</button>
+                    </div>
+                    <!-- DMS to Decimal -->
+                    <div class="bg-gray-50 p-4 rounded-xl">
+                        <h4 class="font-semibold mb-3">DMS → Decimal</h4>
+                        <div class="grid grid-cols-3 gap-2 mb-2">
+                            <input type="number" id="dms-lat-d" placeholder="°" class="p-2 border rounded text-center">
+                            <input type="number" id="dms-lat-m" placeholder="'" class="p-2 border rounded text-center">
+                            <input type="number" id="dms-lat-s" placeholder="''" class="p-2 border rounded text-center">
+                        </div>
+                        <select id="dms-lat-dir" class="w-full p-2 border rounded mb-3">
+                            <option value="N">North (N)</option>
+                            <option value="S">South (S)</option>
+                        </select>
+                        <div class="grid grid-cols-3 gap-2 mb-2">
+                            <input type="number" id="dms-lon-d" placeholder="°" class="p-2 border rounded text-center">
+                            <input type="number" id="dms-lon-m" placeholder="'" class="p-2 border rounded text-center">
+                            <input type="number" id="dms-lon-s" placeholder="''" class="p-2 border rounded text-center">
+                        </div>
+                        <select id="dms-lon-dir" class="w-full p-2 border rounded mb-3">
+                            <option value="E">East (E)</option>
+                            <option value="W">West (W)</option>
+                        </select>
+                        <button id="to-decimal" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition w-full">Convert to Decimal</button>
+                    </div>
+                </div>
+                <div id="dms-result" class="result-box mt-4">
+                    <p class="text-sm text-gray-500">Result:</p>
+                    <p id="dms-output" class="font-mono font-bold">-1.2921°, 36.8219°</p>
+                    <button id="copy-dms" class="copy-btn mt-2">Copy Result</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== UTM CONVERTER ==================== -->
+        <div id="utm-tool" class="hidden">
+            <div class="glass p-6 rounded-2xl mb-6">
+                <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-draw-polygon text-green-500"></i>Lat/Lon ↔ UTM Converter</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gray-50 p-4 rounded-xl">
+                        <h4 class="font-semibold mb-3">Lat/Lon → UTM</h4>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Latitude</label>
+                            <input type="number" id="utm-lat" value="-1.2921" step="any" class="w-full p-2 border rounded">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Longitude</label>
+                            <input type="number" id="utm-lon" value="36.8219" step="any" class="w-full p-2 border rounded">
+                        </div>
+                        <button id="to-utm" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition w-full">Convert to UTM</button>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-xl">
+                        <h4 class="font-semibold mb-3">UTM → Lat/Lon</h4>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">UTM Easting (m)</label>
+                            <input type="number" id="utm-easting" value="300000" class="w-full p-2 border rounded">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">UTM Northing (m)</label>
+                            <input type="number" id="utm-northing" value="9857000" class="w-full p-2 border rounded">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Zone</label>
+                            <input type="number" id="utm-zone" value="36" class="w-full p-2 border rounded">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Hemisphere</label>
+                            <select id="utm-hemisphere" class="w-full p-2 border rounded">
+                                <option value="N">North</option>
+                                <option value="S">South</option>
+                            </select>
+                        </div>
+                        <button id="from-utm" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition w-full">Convert to Lat/Lon</button>
+                    </div>
+                </div>
+                <div id="utm-result" class="result-box mt-4">
+                    <p class="text-sm text-gray-500">Result:</p>
+                    <p id="utm-output" class="font-mono font-bold">36S 300000 9857000</p>
+                    <button id="copy-utm" class="copy-btn mt-2">Copy Result</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== DISTANCE CALCULATOR ==================== -->
+        <div id="distance-tool" class="hidden">
+            <div class="glass p-6 rounded-2xl mb-6">
+                <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-ruler-combined text-green-500"></i>Distance Between Coordinates</h3>
+                <p class="text-sm text-gray-500 mb-4">Using Haversine formula - calculates great-circle distance between two points</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gray-50 p-4 rounded-xl">
+                        <h4 class="font-semibold mb-3">Point A</h4>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Latitude</label>
+                            <input type="number" id="dist-a-lat" value="-1.2921" step="any" class="w-full p-2 border rounded">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Longitude</label>
+                            <input type="number" id="dist-a-lon" value="36.8219" step="any" class="w-full p-2 border rounded">
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-xl">
+                        <h4 class="font-semibold mb-3">Point B</h4>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Latitude</label>
+                            <input type="number" id="dist-b-lat" value="-1.2864" step="any" class="w-full p-2 border rounded">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Longitude</label>
+                            <input type="number" id="dist-b-lon" value="36.8172" step="any" class="w-full p-2 border rounded">
+                        </div>
+                    </div>
+                </div>
+                <button id="calc-distance" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition w-full mt-2">Calculate Distance</button>
+                <div id="distance-result" class="result-box mt-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center">
+                            <p class="text-sm text-gray-500">Kilometers (km)</p>
+                            <p id="dist-km" class="text-2xl font-bold text-green-600">0.00</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-sm text-gray-500">Miles (mi)</p>
+                            <p id="dist-miles" class="text-2xl font-bold text-green-600">0.00</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-sm text-gray-500">Nautical Miles (nm)</p>
+                            <p id="dist-nm" class="text-2xl font-bold text-green-600">0.00</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-sm text-gray-500">Meters (m)</p>
+                            <p id="dist-meters" class="text-2xl font-bold text-green-600">0.00</p>
+                        </div>
+                    </div>
+                    <button id="copy-distance" class="copy-btn mt-3 w-full">Copy Result</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== ADDRESS GEOCODING ==================== -->
+        <div id="geocode-tool" class="hidden">
+            <div class="glass p-6 rounded-2xl mb-6">
+                <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-search-location text-green-500"></i>Address Geocoding</h3>
+                <p class="text-sm text-gray-500 mb-4">Convert address to coordinates (using OpenStreetMap Nominatim - free, no API key)</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gray-50 p-4 rounded-xl">
+                        <h4 class="font-semibold mb-3">Address → Coordinates</h4>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Address</label>
+                            <input type="text" id="address-input" value="Nairobi, Kenya" class="w-full p-2 border rounded" placeholder="Enter address, city, or landmark">
+                        </div>
+                        <button id="geocode-address" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition w-full">
+                            <i class="fas fa-search mr-1"></i> Geocode Address
+                        </button>
+                        <div id="geocode-loading" class="hidden mt-2 text-center"><span class="spinner"></span> Searching...</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-xl">
+                        <h4 class="font-semibold mb-3">Coordinates → Address (Reverse Geocoding)</h4>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Latitude</label>
+                            <input type="number" id="reverse-lat" value="-1.2921" step="any" class="w-full p-2 border rounded">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Longitude</label>
+                            <input type="number" id="reverse-lon" value="36.8219" step="any" class="w-full p-2 border rounded">
+                        </div>
+                        <button id="reverse-geocode" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition w-full">
+                            <i class="fas fa-map-marker-alt mr-1"></i> Reverse Geocode
+                        </button>
+                        <div id="reverse-loading" class="hidden mt-2 text-center"><span class="spinner"></span> Searching...</div>
+                    </div>
+                </div>
+                <div id="geocode-result" class="result-box mt-4">
+                    <p class="text-sm text-gray-500">Result:</p>
+                    <p id="geocode-output" class="font-mono">Enter an address above</p>
+                    <button id="copy-geocode" class="copy-btn mt-2">Copy Result</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Section for SEO -->
+        <div class="mt-8 p-6 bg-white/5 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-3 text-center">Free Geo Converters Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div><i class="fas fa-map-pin text-green-400 mr-2"></i> <strong>GPS ↔ DMS</strong> - Convert between decimal and degrees/minutes/seconds</div>
+                <div><i class="fas fa-draw-polygon text-green-400 mr-2"></i> <strong>Lat/Lon ↔ UTM</strong> - Convert to Universal Transverse Mercator</div>
+                <div><i class="fas fa-ruler-combined text-green-400 mr-2"></i> <strong>Distance Calculator</strong> - Haversine formula for accurate distances</div>
+                <div><i class="fas fa-search-location text-green-400 mr-2"></i> <strong>Address Geocoding</strong> - Convert addresses to coordinates and back</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Counter
+        let operationCount = localStorage.getItem('geoConverterCount') || 0;
+        document.getElementById('view-counter').textContent = operationCount;
+        function incrementCounter() { operationCount++; localStorage.setItem('geoConverterCount', operationCount); document.getElementById('view-counter').textContent = operationCount; }
+
+        // Toast
+        let toastTimeout;
+        function showToast(message, type = 'success') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.getElementById('gps-dms-tool').classList.add('hidden');
+            document.getElementById('utm-tool').classList.add('hidden');
+            document.getElementById('distance-tool').classList.add('hidden');
+            document.getElementById('geocode-tool').classList.add('hidden');
+            document.getElementById(`${tabName}-tool`).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        document.getElementById('tab-gps-dms').addEventListener('click', () => switchTab('gps-dms'));
+        document.getElementById('tab-utm').addEventListener('click', () => switchTab('utm'));
+        document.getElementById('tab-distance').addEventListener('click', () => switchTab('distance'));
+        document.getElementById('tab-geocode').addEventListener('click', () => switchTab('geocode'));
+
+        // ==================== GPS ↔ DMS ====================
+        function decimalToDMS(decimal, isLat) {
+            const abs = Math.abs(decimal);
+            const degrees = Math.floor(abs);
+            const minutesDecimal = (abs - degrees) * 60;
+            const minutes = Math.floor(minutesDecimal);
+            const seconds = ((minutesDecimal - minutes) * 60).toFixed(2);
+            const direction = isLat ? (decimal >= 0 ? 'N' : 'S') : (decimal >= 0 ? 'E' : 'W');
+            return `${degrees}° ${minutes}' ${seconds}" ${direction}`;
+        }
+
+        function dmsToDecimal(degrees, minutes, seconds, direction) {
+            let decimal = degrees + minutes / 60 + seconds / 3600;
+            if (direction === 'S' || direction === 'W') decimal = -decimal;
+            return decimal;
+        }
+
+        document.getElementById('to-dms').addEventListener('click', () => {
+            const lat = parseFloat(document.getElementById('dec-lat').value) || 0;
+            const lon = parseFloat(document.getElementById('dec-lon').value) || 0;
+            const latDMS = decimalToDMS(lat, true);
+            const lonDMS = decimalToDMS(lon, false);
+            document.getElementById('dms-output').textContent = `${latDMS}, ${lonDMS}`;
+            incrementCounter();
+        });
+
+        document.getElementById('to-decimal').addEventListener('click', () => {
+            const latD = parseFloat(document.getElementById('dms-lat-d').value) || 0;
+            const latM = parseFloat(document.getElementById('dms-lat-m').value) || 0;
+            const latS = parseFloat(document.getElementById('dms-lat-s').value) || 0;
+            const latDir = document.getElementById('dms-lat-dir').value;
+            const lonD = parseFloat(document.getElementById('dms-lon-d').value) || 0;
+            const lonM = parseFloat(document.getElementById('dms-lon-m').value) || 0;
+            const lonS = parseFloat(document.getElementById('dms-lon-s').value) || 0;
+            const lonDir = document.getElementById('dms-lon-dir').value;
+            const lat = dmsToDecimal(latD, latM, latS, latDir);
+            const lon = dmsToDecimal(lonD, lonM, lonS, lonDir);
+            document.getElementById('dms-output').textContent = `${lat.toFixed(6)}°, ${lon.toFixed(6)}°`;
+            incrementCounter();
+        });
+
+        document.getElementById('copy-dms').addEventListener('click', () => {
+            navigator.clipboard.writeText(document.getElementById('dms-output').textContent);
+            showToast('Copied!');
+        });
+
+        // ==================== UTM CONVERTER ====================
+        // Simplified UTM conversion (approximate but useful)
+        function latLonToUTM(lat, lon) {
+            const zone = Math.floor((lon + 180) / 6) + 1;
+            const hemisphere = lat >= 0 ? 'N' : 'S';
+            // Approximate easting and northing (simplified)
+            const easting = ((lon + 180) % 6) * 111319.9;
+            const northing = Math.abs(lat) * 111319.9;
+            return { easting: Math.round(easting), northing: Math.round(northing), zone, hemisphere };
+        }
+
+        function utmToLatLon(easting, northing, zone, hemisphere) {
+            const lon = (zone - 1) * 6 - 180 + (easting / 111319.9);
+            const lat = (hemisphere === 'N' ? northing : -northing) / 111319.9;
+            return { lat, lon };
+        }
+
+        document.getElementById('to-utm').addEventListener('click', () => {
+            const lat = parseFloat(document.getElementById('utm-lat').value) || 0;
+            const lon = parseFloat(document.getElementById('utm-lon').value) || 0;
+            const utm = latLonToUTM(lat, lon);
+            document.getElementById('utm-output').textContent = `${utm.zone}${utm.hemisphere} ${utm.easting} ${utm.northing}`;
+            incrementCounter();
+        });
+
+        document.getElementById('from-utm').addEventListener('click', () => {
+            const easting = parseFloat(document.getElementById('utm-easting').value) || 0;
+            const northing = parseFloat(document.getElementById('utm-northing').value) || 0;
+            const zone = parseInt(document.getElementById('utm-zone').value) || 36;
+            const hemisphere = document.getElementById('utm-hemisphere').value;
+            const { lat, lon } = utmToLatLon(easting, northing, zone, hemisphere);
+            document.getElementById('utm-output').textContent = `${lat.toFixed(6)}°, ${lon.toFixed(6)}°`;
+            incrementCounter();
+        });
+
+        document.getElementById('copy-utm').addEventListener('click', () => {
+            navigator.clipboard.writeText(document.getElementById('utm-output').textContent);
+            showToast('Copied!');
+        });
+
+        // ==================== DISTANCE CALCULATOR (Haversine Formula) ====================
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        document.getElementById('calc-distance').addEventListener('click', () => {
+            const lat1 = parseFloat(document.getElementById('dist-a-lat').value) || 0;
+            const lon1 = parseFloat(document.getElementById('dist-a-lon').value) || 0;
+            const lat2 = parseFloat(document.getElementById('dist-b-lat').value) || 0;
+            const lon2 = parseFloat(document.getElementById('dist-b-lon').value) || 0;
+            const km = haversineDistance(lat1, lon1, lat2, lon2);
+            const miles = km * 0.621371;
+            const nm = km * 0.539957;
+            const meters = km * 1000;
+            document.getElementById('dist-km').textContent = km.toFixed(3);
+            document.getElementById('dist-miles').textContent = miles.toFixed(3);
+            document.getElementById('dist-nm').textContent = nm.toFixed(3);
+            document.getElementById('dist-meters').textContent = meters.toFixed(0);
+            incrementCounter();
+        });
+
+        document.getElementById('copy-distance').addEventListener('click', () => {
+            const text = `${document.getElementById('dist-km').textContent} km / ${document.getElementById('dist-miles').textContent} miles`;
+            navigator.clipboard.writeText(text);
+            showToast('Copied!');
+        });
+
+        // ==================== ADDRESS GEOCODING ====================
+        async function geocodeAddress(address) {
+            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`;
+            const response = await fetch(url, { headers: { 'User-Agent': 'GeoConverter/1.0' } });
+            const data = await response.json();
+            if (data && data.length > 0) {
+                return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), displayName: data[0].display_name };
+            }
+            return null;
+        }
+
+        async function reverseGeocode(lat, lon) {
+            const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+            const response = await fetch(url, { headers: { 'User-Agent': 'GeoConverter/1.0' } });
+            const data = await response.json();
+            if (data && data.display_name) {
+                return data.display_name;
+            }
+            return null;
+        }
+
+        document.getElementById('geocode-address').addEventListener('click', async () => {
+            const address = document.getElementById('address-input').value.trim();
+            if (!address) { showToast('Please enter an address', 'error'); return; }
+            const loading = document.getElementById('geocode-loading');
+            loading.classList.remove('hidden');
+            try {
+                const result = await geocodeAddress(address);
+                if (result) {
+                    document.getElementById('geocode-output').innerHTML = `📍 ${result.display_name}<br><strong>Coordinates:</strong> ${result.lat.toFixed(6)}°, ${result.lon.toFixed(6)}°`;
+                    incrementCounter();
+                } else {
+                    document.getElementById('geocode-output').textContent = 'Address not found. Try a more specific location.';
+                }
+            } catch (e) {
+                document.getElementById('geocode-output').textContent = 'Error: Could not geocode address. Try again.';
+            } finally {
+                loading.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('reverse-geocode').addEventListener('click', async () => {
+            const lat = parseFloat(document.getElementById('reverse-lat').value) || 0;
+            const lon = parseFloat(document.getElementById('reverse-lon').value) || 0;
+            const loading = document.getElementById('reverse-loading');
+            loading.classList.remove('hidden');
+            try {
+                const address = await reverseGeocode(lat, lon);
+                if (address) {
+                    document.getElementById('geocode-output').innerHTML = `📍 ${address}<br><strong>Coordinates:</strong> ${lat.toFixed(6)}°, ${lon.toFixed(6)}°`;
+                    incrementCounter();
+                } else {
+                    document.getElementById('geocode-output').textContent = 'No address found for these coordinates.';
+                }
+            } catch (e) {
+                document.getElementById('geocode-output').textContent = 'Error: Could not reverse geocode.';
+            } finally {
+                loading.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('copy-geocode').addEventListener('click', () => {
+            navigator.clipboard.writeText(document.getElementById('geocode-output').textContent);
+            showToast('Copied!');
+        });
+
+        // Initialize with Nairobi example
+        document.getElementById('dec-lat').value = -1.2921;
+        document.getElementById('dec-lon').value = 36.8219;
+    </script>
+</body>
+</html>

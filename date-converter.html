@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Date & Time Converter - Unix Timestamp, Timezone, Age Calculator | ZyloTech</title>
+    <meta name="description" content="Free online date and time converter. Convert Unix timestamps, timezone conversion, age calculator, days between dates. 100% browser-based.">
+    <meta name="keywords" content="free date converter, unix timestamp converter, timezone converter, age calculator, days between dates, date difference calculator">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Date & Time Converter - Unix Timestamp, Timezone, Age Calculator | ZyloTech">
+    <meta property="og:description" content="Free online date and time converter. Unix timestamp conversion, timezone converter, age calculator, days between dates.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/date-converter.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+   <meta name="twitter:title" content="Free Date & Time Converter - ZyloTech">
+    <meta name="twitter:description" content="Convert Unix timestamps, timezones, calculate age and date differences online for free.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/date-converter.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/include.js"></script>
+
+    <style>
+        :root { --primary: #8b5cf6; --primary-hover: #7c3aed; --accent: #a78bfa; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #2e1065 100%); color: #f1f5f9; min-height: 100vh; }
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: #1f2937; }
+        .glass-dark { background: rgba(15,23,42,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        .tab-btn { position: relative; padding: 12px 24px; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s ease; color: #94a3b8; cursor: pointer; }
+        .tab-btn.active { border-bottom-color: var(--primary); color: white; }
+        .result-card { transition: all 0.2s ease; }
+        .result-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px -4px rgba(0,0,0,0.2); }
+        .copy-btn { background: #e2e8f0; border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+        .copy-btn:hover { background: var(--primary); color: white; }
+        input, select { transition: all 0.2s; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); ring: 2px solid var(--primary); }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .hidden { display: none !important; }
+        .age-result { font-size: 2rem; font-weight: bold; background: linear-gradient(135deg, #8b5cf6, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #8b5cf6;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #7c3aed; transform: scale(1.1); }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-4">
+                <i class="fas fa-calendar-alt text-purple-400"></i>
+                <span class="text-sm text-gray-200">Free • Browser-Based • Instant</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-2">
+                <i class="fas fa-clock mr-2 text-purple-400"></i>Free Date & Time Converter
+            </h1>
+            <p class="text-gray-300 max-w-2xl mx-auto">Unix Timestamp, Timezone Conversion, Age Calculator, Days Between Dates. 100% Free.</p>
+            <div class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full shadow-lg">
+                <i class="fas fa-chart-simple"></i>
+                <span id="view-counter" class="font-bold">0</span>
+                <span class="text-sm">calculations done</span>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="glass rounded-2xl p-2 mb-6 inline-flex flex-wrap">
+            <button id="tab-timestamp" class="tab-btn active rounded-xl px-6 py-3"><i class="fas fa-database mr-2"></i>Unix Timestamp</button>
+            <button id="tab-timezone" class="tab-btn rounded-xl px-6 py-3"><i class="fas fa-globe mr-2"></i>Timezone</button>
+            <button id="tab-age" class="tab-btn rounded-xl px-6 py-3"><i class="fas fa-birthday-cake mr-2"></i>Age Calculator</button>
+            <button id="tab-days" class="tab-btn rounded-xl px-6 py-3"><i class="fas fa-calendar-week mr-2"></i>Days Between</button>
+        </div>
+
+        <!-- ==================== UNIX TIMESTAMP CONVERTER ==================== -->
+        <div id="timestamp-tool">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-database text-purple-500"></i>Unix Timestamp Converter</h2>
+                <p class="text-sm text-gray-500 mb-6">Convert between Unix timestamps (seconds since 1970-01-01) and human-readable dates</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Timestamp to Date -->
+                    <div class="bg-gray-50 p-5 rounded-xl">
+                        <h3 class="font-bold text-gray-700 mb-3 flex items-center gap-2"><i class="fas fa-arrow-right text-purple-500"></i>Timestamp → Date</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-600 mb-1">Unix Timestamp (seconds)</label>
+                                <div class="flex gap-2">
+                                    <input type="number" id="timestamp-input" value="1704067200" class="flex-1 p-3 border rounded-lg font-mono">
+                                    <button id="use-current-timestamp" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm whitespace-nowrap">Use Current</button>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-1">Enter timestamp in seconds (e.g., 1704067200)</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-600 mb-1">Human Readable Date</label>
+                                <div class="relative">
+                                    <input type="text" id="timestamp-to-date" readonly class="w-full p-3 border rounded-lg bg-gray-100 font-mono text-sm">
+                                    <button id="copy-timestamp-date" class="copy-btn absolute right-2 top-2">Copy</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-600 mb-1">Local Time</label>
+                                <input type="text" id="timestamp-local" readonly class="w-full p-3 border rounded-lg bg-gray-100 font-mono text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-600 mb-1">UTC Time</label>
+                                <input type="text" id="timestamp-utc" readonly class="w-full p-3 border rounded-lg bg-gray-100 font-mono text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Date to Timestamp -->
+                    <div class="bg-gray-50 p-5 rounded-xl">
+                        <h3 class="font-bold text-gray-700 mb-3 flex items-center gap-2"><i class="fas fa-arrow-left text-purple-500"></i>Date → Timestamp</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-600 mb-1">Select Date & Time</label>
+                                <input type="datetime-local" id="date-input" class="w-full p-3 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-600 mb-1">Unix Timestamp (seconds)</label>
+                                <div class="relative">
+                                    <input type="text" id="date-to-timestamp" readonly class="w-full p-3 border rounded-lg bg-gray-100 font-mono text-sm">
+                                    <button id="copy-date-timestamp" class="copy-btn absolute right-2 top-2">Copy</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-600 mb-1">Unix Timestamp (milliseconds)</label>
+                                <input type="text" id="date-to-timestamp-ms" readonly class="w-full p-3 border rounded-lg bg-gray-100 font-mono text-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TIMEZONE CONVERTER ==================== -->
+        <div id="timezone-tool" class="hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-globe text-purple-500"></i>Timezone Converter</h2>
+                <p class="text-sm text-gray-500 mb-6">Convert dates and times between different timezones</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Source Date & Time</label>
+                        <input type="datetime-local" id="source-datetime" class="w-full p-3 border rounded-lg mb-4">
+
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Source Timezone</label>
+                        <select id="source-timezone" class="w-full p-3 border rounded-lg mb-4">
+                            <option value="UTC">UTC (Coordinated Universal Time)</option>
+                            <option value="America/New_York">America/New_York (EST/EDT)</option>
+                            <option value="America/Los_Angeles">America/Los_Angeles (PST/PDT)</option>
+                            <option value="America/Chicago">America/Chicago (CST/CDT)</option>
+                            <option value="Europe/London">Europe/London (GMT/BST)</option>
+                            <option value="Europe/Paris">Europe/Paris (CET/CEST)</option>
+                            <option value="Asia/Dubai">Asia/Dubai (GST)</option>
+                            <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+                            <option value="Asia/Shanghai">Asia/Shanghai (CST)</option>
+                            <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                            <option value="Australia/Sydney">Australia/Sydney (AEDT/AEST)</option>
+                            <option value="Africa/Nairobi">Africa/Nairobi (EAT)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Target Timezone</label>
+                        <select id="target-timezone" class="w-full p-3 border rounded-lg mb-4">
+                            <option value="UTC">UTC (Coordinated Universal Time)</option>
+                            <option value="America/New_York" selected>America/New_York (EST/EDT)</option>
+                            <option value="America/Los_Angeles">America/Los_Angeles (PST/PDT)</option>
+                            <option value="America/Chicago">America/Chicago (CST/CDT)</option>
+                            <option value="Europe/London">Europe/London (GMT/BST)</option>
+                            <option value="Europe/Paris">Europe/Paris (CET/CEST)</option>
+                            <option value="Asia/Dubai">Asia/Dubai (GST)</option>
+                            <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+                            <option value="Asia/Shanghai">Asia/Shanghai (CST)</option>
+                            <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                            <option value="Australia/Sydney">Australia/Sydney (AEDT/AEST)</option>
+                            <option value="Africa/Nairobi">Africa/Nairobi (EAT)</option>
+                        </select>
+
+                        <label class="block text-sm font-bold text-gray-600 mb-2 mt-4">Converted Date & Time</label>
+                        <div class="relative">
+                            <input type="text" id="converted-datetime" readonly class="w-full p-3 border rounded-lg bg-gray-100 font-mono text-sm">
+                            <button id="copy-converted" class="copy-btn absolute right-2 top-2">Copy</button>
+                        </div>
+
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg">
+                            <p class="text-sm text-gray-600"><i class="fas fa-info-circle mr-1"></i> Timezone difference: <span id="tz-diff" class="font-bold">--</span> hours</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== AGE CALCULATOR ==================== -->
+        <div id="age-tool" class="hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-birthday-cake text-pink-500"></i>Age Calculator</h2>
+                <p class="text-sm text-gray-500 mb-6">Calculate exact age from birthdate to today or any custom date</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Birth Date</label>
+                        <input type="date" id="birth-date" class="w-full p-3 border rounded-lg mb-4">
+
+                        <label class="block text-sm font-bold text-gray-600 mb-2">As of Date (optional)</label>
+                        <input type="date" id="as-of-date" class="w-full p-3 border rounded-lg mb-4">
+                        <p class="text-xs text-gray-400 mb-4">Leave empty to use today's date</p>
+
+                        <button id="calculate-age" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 transition">
+                            Calculate Age
+                        </button>
+                    </div>
+
+                    <div id="age-result-container" class="bg-gradient-to-r from-purple-50 to-pink-50 p-5 rounded-xl text-center">
+                        <div class="age-result" id="age-years">--</div>
+                        <p class="text-gray-500 text-sm">Years</p>
+                        <div class="grid grid-cols-3 gap-3 mt-4">
+                            <div>
+                                <div class="text-2xl font-bold text-purple-600" id="age-months">--</div>
+                                <p class="text-xs text-gray-500">Months</p>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold text-pink-600" id="age-days">--</div>
+                                <p class="text-xs text-gray-500">Days</p>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold text-indigo-600" id="age-weeks">--</div>
+                                <p class="text-xs text-gray-500">Weeks</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-gray-200">
+                            <p class="text-sm text-gray-600">Total days lived: <span id="total-days" class="font-bold text-purple-600">--</span></p>
+                            <p class="text-sm text-gray-600">Next birthday in: <span id="next-birthday" class="font-bold text-pink-600">--</span> days</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== DAYS BETWEEN DATES ==================== -->
+        <div id="days-tool" class="hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-calendar-week text-purple-500"></i>Days Between Dates</h2>
+                <p class="text-sm text-gray-500 mb-6">Calculate the number of days, weeks, months between two dates</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Start Date</label>
+                        <input type="date" id="start-date" class="w-full p-3 border rounded-lg mb-4">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">End Date</label>
+                        <input type="date" id="end-date" class="w-full p-3 border rounded-lg mb-4">
+                    </div>
+                </div>
+
+                <button id="calculate-days" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-indigo-700 transition mb-6">
+                    Calculate Difference
+                </button>
+
+                <div id="days-result" class="bg-gradient-to-r from-purple-50 to-indigo-50 p-5 rounded-xl">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div>
+                            <div class="text-3xl font-bold text-purple-600" id="days-total">--</div>
+                            <p class="text-xs text-gray-500">Total Days</p>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold text-pink-600" id="weeks-total">--</div>
+                            <p class="text-xs text-gray-500">Weeks</p>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold text-indigo-600" id="months-total">--</div>
+                            <p class="text-xs text-gray-500">Months</p>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold text-blue-600" id="years-total">--</div>
+                            <p class="text-xs text-gray-500">Years</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-gray-200 text-center">
+                        <p class="text-sm text-gray-600" id="date-range-info"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Section for SEO -->
+        <div class="mt-12 p-6 bg-white/5 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-3">Free Date & Time Converter Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div><i class="fas fa-database text-purple-400 mr-2"></i> <strong>Unix Timestamp</strong> - Convert to/from human dates</div>
+                <div><i class="fas fa-globe text-purple-400 mr-2"></i> <strong>Timezone Converter</strong> - Convert between 12+ timezones</div>
+                <div><i class="fas fa-birthday-cake text-purple-400 mr-2"></i> <strong>Age Calculator</strong> - Exact age in years, months, days</div>
+                <div><i class="fas fa-calendar-week text-purple-400 mr-2"></i> <strong>Days Between Dates</strong> - Calculate date differences</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Counter
+        let calculationCount = localStorage.getItem('dateTimeCount') || 0;
+        document.getElementById('view-counter').textContent = calculationCount;
+        function incrementCounter() { calculationCount++; localStorage.setItem('dateTimeCount', calculationCount); document.getElementById('view-counter').textContent = calculationCount; }
+
+        // Toast
+        let toastTimeout;
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas fa-check-circle mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        // Tab switching
+        const tabs = {
+            timestamp: document.getElementById('timestamp-tool'),
+            timezone: document.getElementById('timezone-tool'),
+            age: document.getElementById('age-tool'),
+            days: document.getElementById('days-tool')
+        };
+
+        function switchTab(tabName) {
+            Object.keys(tabs).forEach(key => tabs[key].classList.add('hidden'));
+            tabs[tabName].classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        document.getElementById('tab-timestamp').addEventListener('click', () => switchTab('timestamp'));
+        document.getElementById('tab-timezone').addEventListener('click', () => switchTab('timezone'));
+        document.getElementById('tab-age').addEventListener('click', () => switchTab('age'));
+        document.getElementById('tab-days').addEventListener('click', () => switchTab('days'));
+
+        // ==================== UNIX TIMESTAMP CONVERTER ====================
+        function updateTimestampToDate() {
+            const timestamp = parseInt(document.getElementById('timestamp-input').value) || 0;
+            const date = new Date(timestamp * 1000);
+            document.getElementById('timestamp-to-date').value = date.toLocaleString();
+            document.getElementById('timestamp-local').value = date.toLocaleString();
+            document.getElementById('timestamp-utc').value = date.toUTCString();
+            incrementCounter();
+        }
+
+        function updateDateToTimestamp() {
+            const dateStr = document.getElementById('date-input').value;
+            if (dateStr) {
+                const date = new Date(dateStr);
+                const timestampSec = Math.floor(date.getTime() / 1000);
+                document.getElementById('date-to-timestamp').value = timestampSec;
+                document.getElementById('date-to-timestamp-ms').value = date.getTime();
+                incrementCounter();
+            }
+        }
+
+        document.getElementById('timestamp-input').addEventListener('input', updateTimestampToDate);
+        document.getElementById('date-input').addEventListener('change', updateDateToTimestamp);
+        document.getElementById('use-current-timestamp').addEventListener('click', () => {
+            const now = Math.floor(Date.now() / 1000);
+            document.getElementById('timestamp-input').value = now;
+            updateTimestampToDate();
+            showToast('Current timestamp inserted');
+        });
+
+        document.getElementById('copy-timestamp-date').addEventListener('click', () => {
+            navigator.clipboard.writeText(document.getElementById('timestamp-to-date').value);
+            showToast('Copied!');
+        });
+        document.getElementById('copy-date-timestamp').addEventListener('click', () => {
+            navigator.clipboard.writeText(document.getElementById('date-to-timestamp').value);
+            showToast('Copied!');
+        });
+
+        // Set default datetime-local value
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        document.getElementById('date-input').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        updateDateToTimestamp();
+        updateTimestampToDate();
+
+        // ==================== TIMEZONE CONVERTER ====================
+        function convertTimezone() {
+            const sourceDatetime = document.getElementById('source-datetime').value;
+            const sourceTz = document.getElementById('source-timezone').value;
+            const targetTz = document.getElementById('target-timezone').value;
+
+            if (!sourceDatetime) {
+                document.getElementById('converted-datetime').value = 'Please select a date/time';
+                return;
+            }
+
+            try {
+                const sourceDate = new Date(sourceDatetime);
+                const options = { timeZone: targetTz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+                const formatter = new Intl.DateTimeFormat('en-US', options);
+                const formatted = formatter.format(sourceDate);
+
+                // Calculate timezone difference
+                const sourceOffset = new Intl.DateTimeFormat('en-US', { timeZone: sourceTz, timeZoneName: 'short' }).format(sourceDate).match(/[+-]\d{4}/)?.[0] || '0';
+                const targetOffset = new Intl.DateTimeFormat('en-US', { timeZone: targetTz, timeZoneName: 'short' }).format(sourceDate).match(/[+-]\d{4}/)?.[0] || '0';
+
+                document.getElementById('converted-datetime').value = formatted;
+                const diff = (parseInt(targetOffset) - parseInt(sourceOffset)) / 100;
+                document.getElementById('tz-diff').textContent = diff >= 0 ? `+${diff}` : diff;
+                incrementCounter();
+            } catch(e) {
+                document.getElementById('converted-datetime').value = 'Error converting timezone';
+            }
+        }
+
+        document.getElementById('source-datetime').addEventListener('change', convertTimezone);
+        document.getElementById('source-timezone').addEventListener('change', convertTimezone);
+        document.getElementById('target-timezone').addEventListener('change', convertTimezone);
+        document.getElementById('copy-converted').addEventListener('click', () => {
+            navigator.clipboard.writeText(document.getElementById('converted-datetime').value);
+            showToast('Copied!');
+        });
+
+        // Set default datetime
+        document.getElementById('source-datetime').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        convertTimezone();
+
+        // ==================== AGE CALCULATOR ====================
+        function calculateAge() {
+            const birthDate = new Date(document.getElementById('birth-date').value);
+            let asOfDate = document.getElementById('as-of-date').value ? new Date(document.getElementById('as-of-date').value) : new Date();
+
+            if (!birthDate || isNaN(birthDate.getTime())) {
+                showToast('Please select a valid birth date', 'error');
+                return;
+            }
+
+            let years = asOfDate.getFullYear() - birthDate.getFullYear();
+            let months = asOfDate.getMonth() - birthDate.getMonth();
+            let days = asOfDate.getDate() - birthDate.getDate();
+
+            if (days < 0) {
+                months--;
+                const lastMonth = new Date(asOfDate.getFullYear(), asOfDate.getMonth(), 0);
+                days += lastMonth.getDate();
+            }
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            const totalDays = Math.floor((asOfDate - birthDate) / (1000 * 60 * 60 * 24));
+            const totalWeeks = Math.floor(totalDays / 7);
+
+            // Next birthday
+            let nextBirthday = new Date(asOfDate.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+            if (nextBirthday < asOfDate) nextBirthday.setFullYear(asOfDate.getFullYear() + 1);
+            const daysToBirthday = Math.ceil((nextBirthday - asOfDate) / (1000 * 60 * 60 * 24));
+
+            document.getElementById('age-years').textContent = years;
+            document.getElementById('age-months').textContent = months;
+            document.getElementById('age-days').textContent = days;
+            document.getElementById('age-weeks').textContent = totalWeeks;
+            document.getElementById('total-days').textContent = totalDays.toLocaleString();
+            document.getElementById('next-birthday').textContent = daysToBirthday;
+
+            incrementCounter();
+        }
+
+        document.getElementById('calculate-age').addEventListener('click', calculateAge);
+        document.getElementById('birth-date').value = '1990-01-01';
+        calculateAge();
+
+        // ==================== DAYS BETWEEN DATES ====================
+        function calculateDaysBetween() {
+            const startDate = new Date(document.getElementById('start-date').value);
+            const endDate = new Date(document.getElementById('end-date').value);
+
+            if (!startDate || !endDate || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                showToast('Please select valid dates', 'error');
+                return;
+            }
+
+            const diffTime = Math.abs(endDate - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const diffWeeks = Math.floor(diffDays / 7);
+            const diffMonths = Math.floor(diffDays / 30.44);
+            const diffYears = Math.floor(diffDays / 365.25);
+
+            document.getElementById('days-total').textContent = diffDays.toLocaleString();
+            document.getElementById('weeks-total').textContent = diffWeeks;
+            document.getElementById('months-total').textContent = diffMonths;
+            document.getElementById('years-total').textContent = diffYears;
+
+            const startStr = startDate.toLocaleDateString();
+            const endStr = endDate.toLocaleDateString();
+            document.getElementById('date-range-info').textContent = `${startStr} → ${endStr}`;
+
+            incrementCounter();
+        }
+
+        document.getElementById('calculate-days').addEventListener('click', calculateDaysBetween);
+
+        // Set default dates
+        const today = new Date();
+        const nextWeek = new Date();
+        nextWeek.setDate(today.getDate() + 7);
+        document.getElementById('start-date').value = today.toISOString().split('T')[0];
+        document.getElementById('end-date').value = nextWeek.toISOString().split('T')[0];
+        calculateDaysBetween();
+    </script>
+</body>
+</html>

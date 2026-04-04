@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Document Converter - Convert TXT, CSV, JSON, Markdown, XML | ZyloTech</title>
+    <meta name="description" content="Free online document converter. Convert between TXT, CSV, JSON, Markdown, HTML, and XML formats. 100% browser-based, no upload required.">
+    <meta name="keywords" content="free document converter, txt to csv, csv to json, json to xml, markdown to html, html to markdown">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Document Converter - Convert TXT, CSV, JSON, Markdown, XML | ZyloTech">
+    <meta property="og:description" content="Free online document converter. Convert between TXT, CSV, JSON, Markdown, HTML, XML. 100% browser-based.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/document-converter.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Document Converter - ZyloTech">
+    <meta name="twitter:description" content="Convert documents between TXT, CSV, JSON, Markdown, HTML, XML online for free.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/document-converter.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="js/include.js"></script>
+
+    <style>
+        .drop-zone { border: 2px dashed #cbd5e1; transition: all 0.3s ease; }
+        .drop-zone.drag-over { border-color: #10b981; background-color: #f0fdf4; }
+        .format-btn.active { border-color: #10b981; background-color: #f0fdf4; }
+        .preview-box { max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px; white-space: pre-wrap; }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10b981;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #059669; transform: scale(1.1); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-green-100 rounded-full mb-4">
+                <i class="fas fa-file-alt text-green-600"></i>
+                <span class="text-sm text-green-700">Free • Browser-Based • Private</span>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-file-alt text-green-600 mr-2"></i>
+                Free Document Converter
+            </h1>
+            <p class="text-gray-600">Convert between TXT, CSV, JSON, Markdown, HTML, and XML formats. 100% Free.</p>
+            <p class="text-sm text-gray-400 mt-2">⚡ All conversions happen in your browser - No upload required</p>
+
+            <div class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full shadow-lg">
+                <i class="fas fa-chart-simple"></i>
+                <span id="viewCounter" class="font-bold">0</span>
+                <span class="text-sm">documents converted</span>
+            </div>
+        </div>
+
+        <!-- Warning for complex formats -->
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+            <div class="flex gap-3">
+                <i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
+                <div class="text-sm text-yellow-700">
+                    <strong>Note:</strong> This converter works with text-based formats only. For DOCX, PDF, or ODT files, use dedicated software.
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Area -->
+        <div id="dropZone" class="drop-zone bg-white rounded-xl p-8 text-center cursor-pointer mb-6 shadow-sm">
+            <i class="fas fa-cloud-upload-alt text-5xl text-gray-400 mb-3"></i>
+            <p class="text-gray-600 mb-2 font-medium">Drag & drop your document or click to browse</p>
+            <p class="text-sm text-gray-400">Supports: TXT, CSV, JSON, Markdown (.md), XML, HTML</p>
+            <input type="file" id="fileInput" class="hidden" accept=".txt,.csv,.json,.md,.markdown,.xml,.html,.htm">
+        </div>
+
+        <!-- Preview Section -->
+        <div id="previewSection" class="hidden bg-white rounded-xl p-6 shadow-sm mb-6">
+            <div class="flex gap-6 flex-wrap lg:flex-nowrap">
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-700 mb-2 text-center">Original Content</h3>
+                    <div id="originalPreview" class="preview-box bg-gray-50 p-3 rounded-lg border text-xs"></div>
+                    <p id="originalInfo" class="text-xs text-gray-400 text-center mt-2"></p>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-700 mb-2 text-center">Converted Preview</h3>
+                    <div id="convertedPreview" class="preview-box bg-gray-50 p-3 rounded-lg border text-xs"></div>
+                    <p id="convertedInfo" class="text-xs text-gray-400 text-center mt-2"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Format Selection -->
+        <div id="downloadSection" class="hidden bg-white rounded-xl p-6 shadow-sm mb-6">
+            <div class="mb-6">
+                <label class="block text-gray-700 font-semibold mb-3">Convert to:</label>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <button data-format="txt" class="format-btn px-4 py-2 rounded-lg border-2 border-gray-200 hover:border-blue-500 transition">
+                        <i class="fas fa-file-alt text-gray-500 mr-1"></i> TXT
+                    </button>
+                    <button data-format="csv" class="format-btn px-4 py-2 rounded-lg border-2 border-gray-200 hover:border-blue-500 transition">
+                        <i class="fas fa-table text-green-500 mr-1"></i> CSV
+                    </button>
+                    <button data-format="json" class="format-btn px-4 py-2 rounded-lg border-2 border-gray-200 hover:border-blue-500 transition">
+                        <i class="fab fa-js text-yellow-500 mr-1"></i> JSON
+                    </button>
+                    <button data-format="xml" class="format-btn px-4 py-2 rounded-lg border-2 border-gray-200 hover:border-blue-500 transition">
+                        <i class="fas fa-code text-purple-500 mr-1"></i> XML
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+                    <button data-format="html" class="format-btn px-4 py-2 rounded-lg border-2 border-gray-200 hover:border-blue-500 transition">
+                        <i class="fab fa-html5 text-orange-500 mr-1"></i> HTML
+                    </button>
+                    <button data-format="md" class="format-btn px-4 py-2 rounded-lg border-2 border-gray-200 hover:border-blue-500 transition">
+                        <i class="fab fa-markdown text-gray-500 mr-1"></i> Markdown
+                    </button>
+                </div>
+            </div>
+
+            <!-- CSV Options -->
+            <div id="csvOptions" class="hidden mb-6 p-4 bg-gray-50 rounded-lg">
+                <label class="block text-gray-700 font-semibold mb-2">CSV Delimiter:</label>
+                <select id="csvDelimiter" class="px-3 py-2 border rounded-lg">
+                    <option value=",">Comma (,)</option>
+                    <option value=";">Semicolon (;)</option>
+                    <option value="\t">Tab</option>
+                    <option value="|">Pipe (|)</option>
+                </select>
+            </div>
+
+            <!-- JSON Options -->
+            <div id="jsonOptions" class="hidden mb-6 p-4 bg-gray-50 rounded-lg">
+                <label class="block text-gray-700 font-semibold mb-2">JSON Format:</label>
+                <select id="jsonFormat" class="px-3 py-2 border rounded-lg">
+                    <option value="pretty">Pretty (formatted)</option>
+                    <option value="min">Minified (compact)</option>
+                </select>
+            </div>
+
+            <button id="downloadBtn" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2">
+                <i class="fas fa-download"></i> Download Converted Document
+            </button>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="hidden text-center py-8">
+            <div class="loading-spinner mx-auto mb-3"></div>
+            <p class="text-gray-500">Converting...</p>
+        </div>
+
+        <style>
+            .loading-spinner {
+                width: 40px;
+                height: 40px;
+                border: 3px solid #e5e7eb;
+                border-top-color: #10b981;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin { to { transform: rotate(360deg); } }
+        </style>
+
+        <!-- Supported Conversions Info -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Supported Conversions</h2>
+            <div class="grid md:grid-cols-3 gap-4 text-sm">
+                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                    <i class="fas fa-arrow-right text-blue-500 mb-1"></i>
+                    <p class="font-semibold">TXT →</p>
+                    <p class="text-gray-500">CSV, JSON, XML, HTML, Markdown</p>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                    <i class="fas fa-table text-green-500 mb-1"></i>
+                    <p class="font-semibold">CSV →</p>
+                    <p class="text-gray-500">JSON, XML, HTML, TXT</p>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                    <i class="fab fa-js text-yellow-500 mb-1"></i>
+                    <p class="font-semibold">JSON →</p>
+                    <p class="text-gray-500">CSV, XML, HTML, TXT</p>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                    <i class="fas fa-code text-purple-500 mb-1"></i>
+                    <p class="font-semibold">XML →</p>
+                    <p class="text-gray-500">JSON, CSV, HTML, TXT</p>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                    <i class="fab fa-html5 text-orange-500 mb-1"></i>
+                    <p class="font-semibold">HTML →</p>
+                    <p class="text-gray-500">TXT, Markdown</p>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                    <i class="fab fa-markdown text-gray-500 mb-1"></i>
+                    <p class="font-semibold">Markdown →</p>
+                    <p class="text-gray-500">HTML, TXT</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Section for SEO -->
+        <div class="mt-8 p-6 bg-gray-100 rounded-xl">
+            <h2 class="text-xl font-bold text-gray-800 mb-3 text-center">Free Document Converter Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div><i class="fas fa-file-alt text-green-600 mr-2"></i> <strong>TXT Conversion</strong> - Convert to/from text files</div>
+                <div><i class="fas fa-table text-green-600 mr-2"></i> <strong>CSV Conversion</strong> - Spreadsheet data conversion</div>
+                <div><i class="fab fa-js text-green-600 mr-2"></i> <strong>JSON Conversion</strong> - Data interchange format</div>
+                <div><i class="fas fa-code text-green-600 mr-2"></i> <strong>XML Conversion</strong> - Markup language conversion</div>
+                <div><i class="fab fa-html5 text-green-600 mr-2"></i> <strong>HTML Conversion</strong> - Web page conversion</div>
+                <div><i class="fab fa-markdown text-green-600 mr-2"></i> <strong>Markdown Conversion</strong> - Documentation format</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Counter
+        let conversionCount = localStorage.getItem('docConverterCount') || 0;
+        document.getElementById('viewCounter').textContent = conversionCount;
+
+        function incrementCounter() {
+            conversionCount++;
+            localStorage.setItem('docConverterCount', conversionCount);
+            document.getElementById('viewCounter').textContent = conversionCount;
+        }
+
+        // Main variables
+        let originalFile = null;
+        let originalContent = null;
+        let currentConvertedContent = null;
+        let currentFormat = 'txt';
+        let fileType = 'txt';
+
+        // DOM Elements
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewSection = document.getElementById('previewSection');
+        const downloadSection = document.getElementById('downloadSection');
+        const originalPreview = document.getElementById('originalPreview');
+        const convertedPreview = document.getElementById('convertedPreview');
+        const originalInfo = document.getElementById('originalInfo');
+        const convertedInfo = document.getElementById('convertedInfo');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const loading = document.getElementById('loading');
+        const csvOptions = document.getElementById('csvOptions');
+        const jsonOptions = document.getElementById('jsonOptions');
+        const csvDelimiter = document.getElementById('csvDelimiter');
+        const jsonFormat = document.getElementById('jsonFormat');
+
+        // Format buttons
+        const formatBtns = document.querySelectorAll('.format-btn');
+        formatBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                formatBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFormat = btn.dataset.format;
+
+                csvOptions.classList.add('hidden');
+                jsonOptions.classList.add('hidden');
+
+                if (currentFormat === 'csv') csvOptions.classList.remove('hidden');
+                if (currentFormat === 'json') jsonOptions.classList.remove('hidden');
+
+                if (originalContent) {
+                    convertDocument();
+                }
+            });
+        });
+
+        csvDelimiter.addEventListener('change', () => {
+            if (originalContent && currentFormat === 'csv') convertDocument();
+        });
+
+        jsonFormat.addEventListener('change', () => {
+            if (originalContent && currentFormat === 'json') convertDocument();
+        });
+
+        // Upload handlers
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) handleFile(e.target.files[0]);
+        });
+
+        // Handle file
+        async function handleFile(file) {
+            originalFile = file;
+            loading.classList.remove('hidden');
+
+            try {
+                const extension = file.name.split('.').pop().toLowerCase();
+                fileType = extension;
+
+                const text = await file.text();
+                originalContent = text;
+
+                // Show preview
+                let previewText = text.substring(0, 500);
+                if (text.length > 500) previewText += '... (truncated)';
+                originalPreview.textContent = previewText;
+
+                const sizeKB = (file.size / 1024).toFixed(1);
+                originalInfo.textContent = `${file.name} (${sizeKB} KB)`;
+
+                previewSection.classList.remove('hidden');
+                await convertDocument();
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error reading file. Please try again.');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        // Convert document
+        async function convertDocument() {
+            if (!originalContent) return;
+
+            loading.classList.remove('hidden');
+            downloadSection.classList.add('hidden');
+
+            try {
+                let converted = '';
+
+                switch(currentFormat) {
+                    case 'txt':
+                        converted = convertToTxt(originalContent, fileType);
+                        break;
+                    case 'csv':
+                        converted = convertToCsv(originalContent, fileType);
+                        break;
+                    case 'json':
+                        converted = convertToJson(originalContent, fileType);
+                        break;
+                    case 'xml':
+                        converted = convertToXml(originalContent, fileType);
+                        break;
+                    case 'html':
+                        converted = convertToHtml(originalContent, fileType);
+                        break;
+                    case 'md':
+                        converted = convertToMarkdown(originalContent, fileType);
+                        break;
+                    default:
+                        converted = originalContent;
+                }
+
+                currentConvertedContent = converted;
+
+                // Show preview
+                let previewText = converted.substring(0, 500);
+                if (converted.length > 500) previewText += '... (truncated)';
+                convertedPreview.textContent = previewText;
+
+                const convertedSizeKB = (new Blob([converted]).size / 1024).toFixed(1);
+                convertedInfo.textContent = `${currentFormat.toUpperCase()} (${convertedSizeKB} KB)`;
+
+                downloadSection.classList.remove('hidden');
+                incrementCounter();
+
+            } catch (error) {
+                console.error('Conversion error:', error);
+                convertedPreview.textContent = 'Conversion failed. Check if the source format is compatible.';
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        // Conversion functions
+        function convertToTxt(content, sourceFormat) {
+            if (sourceFormat === 'csv') {
+                // CSV to TXT - simple table format
+                const parsed = Papa.parse(content, { header: false });
+                return parsed.data.map(row => row.join(' | ')).join('\n');
+            }
+            if (sourceFormat === 'json') {
+                try {
+                    const obj = JSON.parse(content);
+                    return JSON.stringify(obj, null, 2);
+                } catch(e) { return content; }
+            }
+            if (sourceFormat === 'xml') {
+                // Strip XML tags
+                return content.replace(/<[^>]*>/g, '').trim();
+            }
+            if (sourceFormat === 'html') {
+                // Strip HTML tags
+                const div = document.createElement('div');
+                div.innerHTML = content;
+                return div.textContent || div.innerText || '';
+            }
+            if (sourceFormat === 'md') {
+                // Markdown to plain text - strip markdown syntax
+                return content.replace(/[#*`_>\[\]()!]/g, '').trim();
+            }
+            return content;
+        }
+
+        function convertToCsv(content, sourceFormat) {
+            const delimiter = csvDelimiter.value;
+
+            if (sourceFormat === 'json') {
+                try {
+                    const data = JSON.parse(content);
+                    const items = Array.isArray(data) ? data : [data];
+                    if (items.length === 0) return '';
+
+                    const headers = Object.keys(items[0]);
+                    const rows = items.map(item => headers.map(h => JSON.stringify(item[h] || '').replace(/,/g, ';')).join(delimiter));
+                    return [headers.join(delimiter), ...rows].join('\n');
+                } catch(e) { return 'Error: Invalid JSON format'; }
+            }
+
+            if (sourceFormat === 'txt') {
+                // Assume tabular text
+                const lines = content.split('\n');
+                return lines.map(line => line.split(/\s+/).join(delimiter)).join('\n');
+            }
+
+            if (sourceFormat === 'xml') {
+                // Simple XML to CSV
+                const items = [];
+                const regex = /<(\w+)>([^<]+)<\/\1>/g;
+                let match;
+                const obj = {};
+                while ((match = regex.exec(content)) !== null) {
+                    obj[match[1]] = match[2];
+                }
+                if (Object.keys(obj).length > 0) {
+                    return [Object.keys(obj).join(delimiter), Object.values(obj).join(delimiter)].join('\n');
+                }
+            }
+
+            return 'CSV conversion only available from JSON, TXT, or XML sources';
+        }
+
+        function convertToJson(content, sourceFormat) {
+            const pretty = jsonFormat.value === 'pretty';
+            const spacer = pretty ? 2 : 0;
+
+            if (sourceFormat === 'csv') {
+                const parsed = Papa.parse(content, { header: true });
+                return JSON.stringify(parsed.data, null, spacer);
+            }
+
+            if (sourceFormat === 'xml') {
+                // Simple XML to JSON
+                const obj = {};
+                const regex = /<(\w+)>([^<]+)<\/\1>/g;
+                let match;
+                while ((match = regex.exec(content)) !== null) {
+                    obj[match[1]] = match[2];
+                }
+                return JSON.stringify(obj, null, spacer);
+            }
+
+            if (sourceFormat === 'txt') {
+                const lines = content.split('\n');
+                const obj = lines.reduce((acc, line, idx) => {
+                    acc[`line_${idx + 1}`] = line;
+                    return acc;
+                }, {});
+                return JSON.stringify(obj, null, spacer);
+            }
+
+            try {
+                // Try to parse and reformat
+                const parsed = JSON.parse(content);
+                return JSON.stringify(parsed, null, spacer);
+            } catch(e) {
+                return 'Error: Invalid source format for JSON conversion';
+            }
+        }
+
+        function convertToXml(content, sourceFormat) {
+            if (sourceFormat === 'json') {
+                try {
+                    const obj = JSON.parse(content);
+                    function buildXml(obj, rootName = 'root') {
+                        let xml = `<${rootName}>`;
+                        for (let key in obj) {
+                            if (typeof obj[key] === 'object') {
+                                xml += buildXml(obj[key], key);
+                            } else {
+                                xml += `<${key}>${escapeXml(obj[key])}</${key}>`;
+                            }
+                        }
+                        xml += `</${rootName}>`;
+                        return xml;
+                    }
+                    return buildXml(obj);
+                } catch(e) { return 'Error: Invalid JSON'; }
+            }
+
+            if (sourceFormat === 'csv') {
+                const parsed = Papa.parse(content, { header: true });
+                let xml = '<records>';
+                parsed.data.forEach(row => {
+                    xml += '<record>';
+                    for (let key in row) {
+                        xml += `<${key}>${escapeXml(row[key])}</${key}>`;
+                    }
+                    xml += '</record>';
+                });
+                xml += '</records>';
+                return xml;
+            }
+
+            if (sourceFormat === 'txt') {
+                const lines = content.split('\n');
+                let xml = '<document>';
+                lines.forEach((line, i) => {
+                    xml += `<line_${i + 1}>${escapeXml(line)}</line_${i + 1}>`;
+                });
+                xml += '</document>';
+                return xml;
+            }
+
+            return content;
+        }
+
+        function convertToHtml(content, sourceFormat) {
+            if (sourceFormat === 'md') {
+                return marked.parse(content);
+            }
+            if (sourceFormat === 'txt') {
+                return `<pre>${escapeHtml(content)}</pre>`;
+            }
+            if (sourceFormat === 'json') {
+                return `<pre>${escapeHtml(JSON.stringify(JSON.parse(content), null, 2))}</pre>`;
+            }
+            if (sourceFormat === 'csv') {
+                const parsed = Papa.parse(content, { header: true });
+                let html = '<table border="1"><thead><tr>';
+                if (parsed.data.length > 0) {
+                    Object.keys(parsed.data[0]).forEach(key => {
+                        html += `<th>${escapeHtml(key)}</th>`;
+                    });
+                    html += '</tr></thead><tbody>';
+                    parsed.data.forEach(row => {
+                        html += '<tr>';
+                        Object.values(row).forEach(val => {
+                            html += `<td>${escapeHtml(val)}</td>`;
+                        });
+                        html += '</tr>';
+                    });
+                    html += '</tbody></table>';
+                }
+                return html;
+            }
+            return `<pre>${escapeHtml(content)}</pre>`;
+        }
+
+        function convertToMarkdown(content, sourceFormat) {
+            if (sourceFormat === 'html') {
+                // Simple HTML to Markdown
+                let md = content
+                    .replace(/<h1>(.*?)<\/h1>/g, '# $1\n')
+                    .replace(/<h2>(.*?)<\/h2>/g, '## $1\n')
+                    .replace(/<h3>(.*?)<\/h3>/g, '### $1\n')
+                    .replace(/<p>(.*?)<\/p>/g, '$1\n\n')
+                    .replace(/<strong>(.*?)<\/strong>/g, '**$1**')
+                    .replace(/<em>(.*?)<\/em>/g, '*$1*')
+                    .replace(/<a href="(.*?)">(.*?)<\/a>/g, '[$2]($1)')
+                    .replace(/<[^>]*>/g, '');
+                return md.trim();
+            }
+            if (sourceFormat === 'txt') {
+                return content;
+            }
+            return `# Document\n\n${content.substring(0, 1000)}`;
+        }
+
+        function escapeXml(str) {
+            return str.replace(/[<>&]/g, function(m) {
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                if (m === '&') return '&amp;';
+                return m;
+            });
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Download button
+        downloadBtn.addEventListener('click', () => {
+            if (!currentConvertedContent) return;
+
+            const originalName = originalFile.name.split('.')[0];
+            const extension = currentFormat === 'md' ? 'md' : currentFormat;
+            const fileName = `${originalName}_converted.${extension}`;
+
+            const blob = new Blob([currentConvertedContent], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(link.href), 100);
+        });
+    </script>
+</body>
+</html>

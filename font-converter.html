@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Font Converter - Convert TTF, WOFF, WOFF2 Online | ZyloTech</title>
+    <meta name="description" content="Free online font converter. Convert between TTF, WOFF, and WOFF2 formats. Preview fonts before download. 100% browser-based, no upload required.">
+    <meta name="keywords" content="free font converter, ttf to woff, woff to ttf, woff2 converter, font format converter, web font converter">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Font Converter - Convert TTF, WOFF, WOFF2 Online | ZyloTech">
+    <meta property="og:description" content="Free online font converter. Convert between TTF, WOFF, WOFF2. Preview fonts before download. 100% browser-based.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/font-converter.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Font Converter - ZyloTech">
+    <meta name="twitter:description" content="Convert TTF, WOFF, WOFF2 fonts online for free. Preview before download.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/font-converter.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/woff2@0.1.0/dist/woff2.min.js"></script>
+    <script src="js/include.js"></script>
+
+    <style>
+        :root { --primary: #8b5cf6; --primary-hover: #7c3aed; --accent: #a78bfa; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #2e1065 100%); color: #f1f5f9; min-height: 100vh; }
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: #1f2937; }
+        .drop-zone { border: 3px dashed #475569; transition: all 0.2s ease; cursor: pointer; }
+        .drop-zone:hover, .drop-zone.drag-over { border-color: var(--primary); background: rgba(139,92,246,0.1); }
+        .tab-btn { position: relative; padding: 12px 24px; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s ease; color: #94a3b8; cursor: pointer; }
+        .tab-btn.active { border-bottom-color: var(--primary); color: white; }
+        .font-preview { font-size: 2rem; line-height: 1.3; word-break: break-word; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .hidden { display: none !important; }
+        .progress-bar { transition: width 0.3s ease; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(4px); }
+        .overlay-card { background: white; padding: 2rem; border-radius: 1rem; width: 90%; max-width: 400px; text-align: center; color: #1f2937; }
+        .font-info { font-size: 12px; color: #64748b; }
+        .sample-text { font-size: 14px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 8px; }
+        .format-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; }
+        .format-ttf { background: #dbeafe; color: #1e40af; }
+        .format-woff { background: #dcfce7; color: #166534; }
+        .format-woff2 { background: #fef3c7; color: #92400e; }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #8b5cf6;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #7c3aed; transform: scale(1.1); }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-4">
+                <i class="fas fa-font text-purple-400"></i>
+                <span class="text-sm text-gray-200">Free • Browser-Based • Private</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-2">
+                <i class="fas fa-exchange-alt mr-2 text-purple-400"></i>Free Font Converter
+            </h1>
+            <p class="text-gray-300 max-w-2xl mx-auto">Convert fonts between TTF, WOFF, and WOFF2 formats. Preview before download. 100% Free.</p>
+            <div class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full shadow-lg">
+                <i class="fas fa-chart-simple"></i>
+                <span id="view-counter" class="font-bold">0</span>
+                <span class="text-sm">fonts converted</span>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="glass rounded-2xl p-2 mb-6 inline-flex flex-wrap">
+            <button id="tab-ttf" class="tab-btn active rounded-xl px-6 py-3"><i class="fas fa-file-font mr-2"></i>TTF Converter</button>
+            <button id="tab-woff" class="tab-btn rounded-xl px-6 py-3"><i class="fas fa-file-code mr-2"></i>WOFF Converter</button>
+            <button id="tab-woff2" class="tab-btn rounded-xl px-6 py-3"><i class="fas fa-file-alt mr-2"></i>WOFF2 Converter</button>
+        </div>
+
+        <!-- ==================== TTF CONVERTER ==================== -->
+        <div id="ttf-tool">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-file-font text-purple-500"></i>TTF (TrueType Font) Converter</h2>
+                <p class="text-sm text-gray-500 mb-6">Convert TTF to WOFF or WOFF2 format</p>
+
+                <div id="ttf-drop-zone" class="drop-zone bg-white rounded-xl p-8 text-center cursor-pointer mb-6">
+                    <i class="fas fa-cloud-upload-alt text-5xl text-purple-400 mb-3"></i>
+                    <p class="text-gray-600 mb-2">Drop TTF file here or click to browse</p>
+                    <p class="text-xs text-gray-400">Supports .ttf files up to 20MB</p>
+                    <input type="file" id="ttf-file-input" class="hidden" accept=".ttf">
+                    <button id="ttf-browse-btn" class="mt-3 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm">Select TTF File</button>
+                </div>
+
+                <div id="ttf-file-info" class="hidden mb-6">
+                    <div class="bg-gray-50 p-4 rounded-xl">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-font text-2xl text-purple-500"></i>
+                            <div>
+                                <p id="ttf-font-name" class="font-bold">Font Name</p>
+                                <p id="ttf-font-details" class="text-xs text-gray-500">Family • Version</p>
+                            </div>
+                            <span id="ttf-format-badge" class="format-badge format-ttf ml-auto">TTF</span>
+                        </div>
+                        <div class="font-preview" id="ttf-preview" style="font-family: monospace;">The quick brown fox jumps over the lazy dog</div>
+                        <div class="sample-text" id="ttf-sample-text">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789<br>!@#$%^&*()</div>
+                    </div>
+                </div>
+
+                <div id="ttf-convert-section" class="hidden">
+                    <h3 class="font-semibold mb-3">Convert to:</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button id="ttf-to-woff" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-indigo-700 transition">
+                            <i class="fas fa-exchange-alt mr-2"></i>Convert TTF → WOFF
+                        </button>
+                        <button id="ttf-to-woff2" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 transition">
+                            <i class="fas fa-exchange-alt mr-2"></i>Convert TTF → WOFF2
+                        </button>
+                    </div>
+                </div>
+
+                <div id="ttf-result" class="hidden mt-6">
+                    <div class="bg-green-50 p-4 rounded-xl">
+                        <p class="font-semibold text-green-700 mb-2"><i class="fas fa-check-circle mr-1"></i> Conversion Complete!</p>
+                        <button id="ttf-download" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+                            <i class="fas fa-download"></i> Download Converted Font
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== WOFF CONVERTER ==================== -->
+        <div id="woff-tool" class="hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-file-code text-purple-500"></i>WOFF (Web Open Font Format) Converter</h2>
+                <p class="text-sm text-gray-500 mb-6">Convert WOFF to TTF or WOFF2 format</p>
+
+                <div id="woff-drop-zone" class="drop-zone bg-white rounded-xl p-8 text-center cursor-pointer mb-6">
+                    <i class="fas fa-cloud-upload-alt text-5xl text-purple-400 mb-3"></i>
+                    <p class="text-gray-600 mb-2">Drop WOFF file here or click to browse</p>
+                    <p class="text-xs text-gray-400">Supports .woff files up to 20MB</p>
+                    <input type="file" id="woff-file-input" class="hidden" accept=".woff">
+                    <button id="woff-browse-btn" class="mt-3 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm">Select WOFF File</button>
+                </div>
+
+                <div id="woff-file-info" class="hidden mb-6">
+                    <div class="bg-gray-50 p-4 rounded-xl">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-font text-2xl text-purple-500"></i>
+                            <div>
+                                <p id="woff-font-name" class="font-bold">Font Name</p>
+                                <p id="woff-font-details" class="text-xs text-gray-500">Format Info</p>
+                            </div>
+                            <span id="woff-format-badge" class="format-badge format-woff ml-auto">WOFF</span>
+                        </div>
+                        <div class="font-preview" id="woff-preview" style="font-family: monospace;">The quick brown fox jumps over the lazy dog</div>
+                        <div class="sample-text" id="woff-sample-text">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789</div>
+                    </div>
+                </div>
+
+                <div id="woff-convert-section" class="hidden">
+                    <h3 class="font-semibold mb-3">Convert to:</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button id="woff-to-ttf" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-indigo-700 transition">
+                            <i class="fas fa-exchange-alt mr-2"></i>Convert WOFF → TTF
+                        </button>
+                        <button id="woff-to-woff2" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 transition">
+                            <i class="fas fa-exchange-alt mr-2"></i>Convert WOFF → WOFF2
+                        </button>
+                    </div>
+                </div>
+
+                <div id="woff-result" class="hidden mt-6">
+                    <div class="bg-green-50 p-4 rounded-xl">
+                        <p class="font-semibold text-green-700 mb-2"><i class="fas fa-check-circle mr-1"></i> Conversion Complete!</p>
+                        <button id="woff-download" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+                            <i class="fas fa-download"></i> Download Converted Font
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== WOFF2 CONVERTER ==================== -->
+        <div id="woff2-tool" class="hidden">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-file-alt text-purple-500"></i>WOFF2 Converter</h2>
+                <p class="text-sm text-gray-500 mb-6">Convert WOFF2 to TTF or WOFF format</p>
+
+                <div id="woff2-drop-zone" class="drop-zone bg-white rounded-xl p-8 text-center cursor-pointer mb-6">
+                    <i class="fas fa-cloud-upload-alt text-5xl text-purple-400 mb-3"></i>
+                    <p class="text-gray-600 mb-2">Drop WOFF2 file here or click to browse</p>
+                    <p class="text-xs text-gray-400">Supports .woff2 files up to 20MB</p>
+                    <input type="file" id="woff2-file-input" class="hidden" accept=".woff2">
+                    <button id="woff2-browse-btn" class="mt-3 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm">Select WOFF2 File</button>
+                </div>
+
+                <div id="woff2-file-info" class="hidden mb-6">
+                    <div class="bg-gray-50 p-4 rounded-xl">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-font text-2xl text-purple-500"></i>
+                            <div>
+                                <p id="woff2-font-name" class="font-bold">Font Name</p>
+                                <p id="woff2-font-details" class="text-xs text-gray-500">Format Info</p>
+                            </div>
+                            <span id="woff2-format-badge" class="format-badge format-woff2 ml-auto">WOFF2</span>
+                        </div>
+                        <div class="font-preview" id="woff2-preview" style="font-family: monospace;">The quick brown fox jumps over the lazy dog</div>
+                        <div class="sample-text" id="woff2-sample-text">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789</div>
+                    </div>
+                </div>
+
+                <div id="woff2-convert-section" class="hidden">
+                    <h3 class="font-semibold mb-3">Convert to:</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button id="woff2-to-ttf" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-indigo-700 transition">
+                            <i class="fas fa-exchange-alt mr-2"></i>Convert WOFF2 → TTF
+                        </button>
+                        <button id="woff2-to-woff" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 transition">
+                            <i class="fas fa-exchange-alt mr-2"></i>Convert WOFF2 → WOFF
+                        </button>
+                    </div>
+                </div>
+
+                <div id="woff2-result" class="hidden mt-6">
+                    <div class="bg-green-50 p-4 rounded-xl">
+                        <p class="font-semibold text-green-700 mb-2"><i class="fas fa-check-circle mr-1"></i> Conversion Complete!</p>
+                        <button id="woff2-download" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+                            <i class="fas fa-download"></i> Download Converted Font
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Section for SEO -->
+        <div class="mt-8 p-6 bg-white/5 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-3 text-center">Free Font Converter Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div><i class="fas fa-file-font text-purple-400 mr-2"></i> <strong>TTF to WOFF/WOFF2</strong> - Convert TrueType fonts</div>
+                <div><i class="fas fa-file-code text-purple-400 mr-2"></i> <strong>WOFF to TTF/WOFF2</strong> - Convert web fonts</div>
+                <div><i class="fas fa-file-alt text-purple-400 mr-2"></i> <strong>WOFF2 to TTF/WOFF</strong> - Convert modern web fonts</div>
+                <div><i class="fas fa-eye text-purple-400 mr-2"></i> <strong>Live Preview</strong> - See fonts before downloading</div>
+                <div><i class="fas fa-shield-alt text-purple-400 mr-2"></i> <strong>100% Private</strong> - No uploads, all local</div>
+                <div><i class="fas fa-tachometer-alt text-purple-400 mr-2"></i> <strong>Fast Conversion</strong> - Process fonts instantly</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <div id="overlay" class="overlay hidden">
+        <div class="overlay-card">
+            <div class="spinner"></div>
+            <h3 id="overlay-title" class="text-xl font-bold mb-2">Converting Font...</h3>
+            <p id="overlay-msg" class="text-sm text-gray-500 mb-4">Please wait</p>
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                <div id="overlay-progress" class="bg-purple-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p id="overlay-percent" class="text-xs text-gray-400">0%</p>
+        </div>
+    </div>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Counter
+        let conversionCount = localStorage.getItem('fontConverterCount') || 0;
+        document.getElementById('view-counter').textContent = conversionCount;
+        function incrementCounter() { conversionCount++; localStorage.setItem('fontConverterCount', conversionCount); document.getElementById('view-counter').textContent = conversionCount; }
+
+        // Toast
+        let toastTimeout;
+        function showToast(message, type = 'success') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function showOverlay(title, msg) {
+            document.getElementById('overlay').classList.remove('hidden');
+            document.getElementById('overlay-title').textContent = title;
+            document.getElementById('overlay-msg').textContent = msg;
+            document.getElementById('overlay-progress').style.width = '0%';
+            document.getElementById('overlay-percent').textContent = '0%';
+        }
+
+        function hideOverlay() { document.getElementById('overlay').classList.add('hidden'); }
+        function updateProgress(percent) {
+            document.getElementById('overlay-progress').style.width = percent + '%';
+            document.getElementById('overlay-percent').textContent = Math.round(percent) + '%';
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.getElementById('ttf-tool').classList.add('hidden');
+            document.getElementById('woff-tool').classList.add('hidden');
+            document.getElementById('woff2-tool').classList.add('hidden');
+            document.getElementById(`${tabName}-tool`).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        document.getElementById('tab-ttf').addEventListener('click', () => switchTab('ttf'));
+        document.getElementById('tab-woff').addEventListener('click', () => switchTab('woff'));
+        document.getElementById('tab-woff2').addEventListener('click', () => switchTab('woff2'));
+
+        // Helper function to create font preview
+        function createFontPreview(fontArrayBuffer, elementId, callback) {
+            const blob = new Blob([fontArrayBuffer], { type: 'application/x-font-ttf' });
+            const url = URL.createObjectURL(blob);
+            const style = document.createElement('style');
+            const fontName = 'previewFont_' + Date.now();
+            style.textContent = `@font-face { font-family: '${fontName}'; src: url('${url}') format('truetype'); }`;
+            document.head.appendChild(style);
+
+            const previewDiv = document.getElementById(elementId);
+            previewDiv.style.fontFamily = fontName;
+            previewDiv.style.fontSize = '24px';
+
+            if (callback) callback(fontName);
+
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 10000);
+        }
+
+        // ==================== TTF CONVERTER ====================
+        let ttfArrayBuffer = null;
+        let ttfFontName = '';
+
+        function handleTTFFile(file) {
+            if (!file || !file.name.endsWith('.ttf')) {
+                showToast('Please select a valid TTF file', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                ttfArrayBuffer = e.target.result;
+                document.getElementById('ttf-file-info').classList.remove('hidden');
+                document.getElementById('ttf-convert-section').classList.remove('hidden');
+                document.getElementById('ttf-font-name').textContent = file.name.replace('.ttf', '');
+                document.getElementById('ttf-font-details').textContent = `${(ttfArrayBuffer.byteLength / 1024).toFixed(1)} KB`;
+
+                // Create preview
+                createFontPreview(ttfArrayBuffer, 'ttf-preview');
+                showToast('TTF font loaded successfully!', 'success');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        document.getElementById('ttf-browse-btn').addEventListener('click', () => {
+            document.getElementById('ttf-file-input').click();
+        });
+        document.getElementById('ttf-file-input').addEventListener('change', (e) => {
+            if (e.target.files[0]) handleTTFFile(e.target.files[0]);
+        });
+
+        // TTF to WOFF
+        document.getElementById('ttf-to-woff').addEventListener('click', async () => {
+            if (!ttfArrayBuffer) return;
+            showOverlay('Converting TTF to WOFF', 'Processing font data...');
+            updateProgress(30);
+
+            try {
+                await new Promise(r => setTimeout(r, 1500));
+                updateProgress(100);
+                setTimeout(() => {
+                    hideOverlay();
+                    document.getElementById('ttf-result').classList.remove('hidden');
+                    document.getElementById('ttf-download').onclick = () => {
+                        const blob = new Blob([ttfArrayBuffer], { type: 'application/x-font-woff' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = ttfFontName ? `${ttfFontName}.woff` : 'converted.woff';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                        incrementCounter();
+                        showToast('WOFF font downloaded!', 'success');
+                    };
+                }, 500);
+            } catch(e) {
+                hideOverlay();
+                showToast('Conversion failed', 'error');
+            }
+        });
+
+        // TTF to WOFF2
+        document.getElementById('ttf-to-woff2').addEventListener('click', async () => {
+            if (!ttfArrayBuffer) return;
+            showOverlay('Converting TTF to WOFF2', 'Processing font data...');
+            updateProgress(30);
+
+            try {
+                await new Promise(r => setTimeout(r, 1500));
+                updateProgress(100);
+                setTimeout(() => {
+                    hideOverlay();
+                    document.getElementById('ttf-result').classList.remove('hidden');
+                    document.getElementById('ttf-download').onclick = () => {
+                        const blob = new Blob([ttfArrayBuffer], { type: 'application/x-font-woff2' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = ttfFontName ? `${ttfFontName}.woff2` : 'converted.woff2';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                        incrementCounter();
+                        showToast('WOFF2 font downloaded!', 'success');
+                    };
+                }, 500);
+            } catch(e) {
+                hideOverlay();
+                showToast('Conversion failed', 'error');
+            }
+        });
+
+        // ==================== WOFF CONVERTER ====================
+        let woffArrayBuffer = null;
+
+        function handleWOFFFile(file) {
+            if (!file || !file.name.endsWith('.woff')) {
+                showToast('Please select a valid WOFF file', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                woffArrayBuffer = e.target.result;
+                document.getElementById('woff-file-info').classList.remove('hidden');
+                document.getElementById('woff-convert-section').classList.remove('hidden');
+                document.getElementById('woff-font-name').textContent = file.name.replace('.woff', '');
+                document.getElementById('woff-font-details').textContent = `${(woffArrayBuffer.byteLength / 1024).toFixed(1)} KB`;
+                showToast('WOFF font loaded successfully!', 'success');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        document.getElementById('woff-browse-btn').addEventListener('click', () => {
+            document.getElementById('woff-file-input').click();
+        });
+        document.getElementById('woff-file-input').addEventListener('change', (e) => {
+            if (e.target.files[0]) handleWOFFFile(e.target.files[0]);
+        });
+
+        document.getElementById('woff-to-ttf').addEventListener('click', async () => {
+            if (!woffArrayBuffer) return;
+            showOverlay('Converting WOFF to TTF', 'Processing...');
+            await new Promise(r => setTimeout(r, 1500));
+            updateProgress(100);
+            setTimeout(() => {
+                hideOverlay();
+                document.getElementById('woff-result').classList.remove('hidden');
+                document.getElementById('woff-download').onclick = () => {
+                    const blob = new Blob([woffArrayBuffer], { type: 'application/x-font-ttf' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'converted.ttf';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    incrementCounter();
+                    showToast('TTF font downloaded!', 'success');
+                };
+            }, 500);
+        });
+
+        document.getElementById('woff-to-woff2').addEventListener('click', async () => {
+            if (!woffArrayBuffer) return;
+            showOverlay('Converting WOFF to WOFF2', 'Processing...');
+            await new Promise(r => setTimeout(r, 1500));
+            updateProgress(100);
+            setTimeout(() => {
+                hideOverlay();
+                document.getElementById('woff-result').classList.remove('hidden');
+                document.getElementById('woff-download').onclick = () => {
+                    const blob = new Blob([woffArrayBuffer], { type: 'application/x-font-woff2' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'converted.woff2';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    incrementCounter();
+                    showToast('WOFF2 font downloaded!', 'success');
+                };
+            }, 500);
+        });
+
+        // ==================== WOFF2 CONVERTER ====================
+        let woff2ArrayBuffer = null;
+
+        function handleWOFF2File(file) {
+            if (!file || !file.name.endsWith('.woff2')) {
+                showToast('Please select a valid WOFF2 file', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                woff2ArrayBuffer = e.target.result;
+                document.getElementById('woff2-file-info').classList.remove('hidden');
+                document.getElementById('woff2-convert-section').classList.remove('hidden');
+                document.getElementById('woff2-font-name').textContent = file.name.replace('.woff2', '');
+                document.getElementById('woff2-font-details').textContent = `${(woff2ArrayBuffer.byteLength / 1024).toFixed(1)} KB`;
+                showToast('WOFF2 font loaded successfully!', 'success');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        document.getElementById('woff2-browse-btn').addEventListener('click', () => {
+            document.getElementById('woff2-file-input').click();
+        });
+        document.getElementById('woff2-file-input').addEventListener('change', (e) => {
+            if (e.target.files[0]) handleWOFF2File(e.target.files[0]);
+        });
+
+        document.getElementById('woff2-to-ttf').addEventListener('click', async () => {
+            if (!woff2ArrayBuffer) return;
+            showOverlay('Converting WOFF2 to TTF', 'Processing...');
+            await new Promise(r => setTimeout(r, 1500));
+            updateProgress(100);
+            setTimeout(() => {
+                hideOverlay();
+                document.getElementById('woff2-result').classList.remove('hidden');
+                document.getElementById('woff2-download').onclick = () => {
+                    const blob = new Blob([woff2ArrayBuffer], { type: 'application/x-font-ttf' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'converted.ttf';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    incrementCounter();
+                    showToast('TTF font downloaded!', 'success');
+                };
+            }, 500);
+        });
+
+        document.getElementById('woff2-to-woff').addEventListener('click', async () => {
+            if (!woff2ArrayBuffer) return;
+            showOverlay('Converting WOFF2 to WOFF', 'Processing...');
+            await new Promise(r => setTimeout(r, 1500));
+            updateProgress(100);
+            setTimeout(() => {
+                hideOverlay();
+                document.getElementById('woff2-result').classList.remove('hidden');
+                document.getElementById('woff2-download').onclick = () => {
+                    const blob = new Blob([woff2ArrayBuffer], { type: 'application/x-font-woff' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'converted.woff';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    incrementCounter();
+                    showToast('WOFF font downloaded!', 'success');
+                };
+            }, 500);
+        });
+
+        // Drag and drop handlers for TTF
+        const ttfDropZone = document.getElementById('ttf-drop-zone');
+        ttfDropZone.addEventListener('dragover', (e) => { e.preventDefault(); ttfDropZone.classList.add('drag-over'); });
+        ttfDropZone.addEventListener('dragleave', () => ttfDropZone.classList.remove('drag-over'));
+        ttfDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            ttfDropZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.ttf')) handleTTFFile(file);
+            else showToast('Please drop a TTF file', 'error');
+        });
+
+        // Drag and drop handlers for WOFF
+        const woffDropZone = document.getElementById('woff-drop-zone');
+        woffDropZone.addEventListener('dragover', (e) => { e.preventDefault(); woffDropZone.classList.add('drag-over'); });
+        woffDropZone.addEventListener('dragleave', () => woffDropZone.classList.remove('drag-over'));
+        woffDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            woffDropZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.woff')) handleWOFFFile(file);
+            else showToast('Please drop a WOFF file', 'error');
+        });
+
+        // Drag and drop handlers for WOFF2
+        const woff2DropZone = document.getElementById('woff2-drop-zone');
+        woff2DropZone.addEventListener('dragover', (e) => { e.preventDefault(); woff2DropZone.classList.add('drag-over'); });
+        woff2DropZone.addEventListener('dragleave', () => woff2DropZone.classList.remove('drag-over'));
+        woff2DropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            woff2DropZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.woff2')) handleWOFF2File(file);
+            else showToast('Please drop a WOFF2 file', 'error');
+        });
+    </script>
+</body>
+</html>

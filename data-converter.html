@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Data & Code Converter - JSON, YAML, TOML, INI, Base64, Hex | ZyloTech</title>
+    <meta name="description" content="Free online data converter. Convert between JSON, YAML, TOML, INI, Base64, Hex, Binary, URL, HTML Entities. Upload files, convert, download. 100% browser-based.">
+    <meta name="keywords" content="free data converter, json to yaml, yaml to json, json to toml, base64 converter, hex converter, binary converter, url encoder">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Data & Code Converter - Convert JSON, YAML, TOML, Base64 | ZyloTech">
+    <meta property="og:description" content="Free online data converter. Convert between JSON, YAML, TOML, INI, Base64, Hex, Binary, URL, HTML Entities. Upload files, convert, download.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/data-converter.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Data & Code Converter - ZyloTech">
+    <meta name="twitter:description" content="Convert data and code formats online for free. JSON, YAML, TOML, Base64, Hex, and more.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/data-converter.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/he@1.2.0/he.min.js"></script>
+    <script src="js/include.js"></script>
+
+    <style>
+        :root { --primary: #6366f1; --primary-hover: #4f46e5; --success: #10b981; --error: #ef4444; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: #f1f5f9; min-height: 100vh; }
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: #1f2937; }
+        .tab-btn { position: relative; padding: 10px 16px; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s ease; color: #94a3b8; cursor: pointer; white-space: nowrap; }
+        .tab-btn.active { border-bottom-color: var(--primary); color: var(--primary); }
+        .tab-btn:hover { color: white; }
+        textarea { font-family: 'Fira Code', 'Consolas', monospace; font-size: 13px; line-height: 1.5; tab-size: 2; }
+        .btn-action { transition: all 0.2s; }
+        .btn-action:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .drop-zone { border: 2px dashed #cbd5e1; transition: all 0.2s ease; cursor: pointer; }
+        .drop-zone:hover, .drop-zone.drag-over { border-color: var(--primary); background: #eef2ff; }
+        .status-msg { transition: all 0.3s ease; }
+        @media (max-width: 768px) { .grid-cols-2 { grid-template-columns: 1fr; } .tab-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; } }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #6366f1;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #4f46e5; transform: scale(1.1); }
+    </style>
+</head>
+<body>
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <div id="loader" class="fixed inset-0 bg-gray-900/90 backdrop-blur flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="animate-spin w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p class="text-lg font-medium text-white">Loading converters...</p>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-5 py-3 rounded-lg shadow-lg transform translate-y-20 transition-transform duration-300 z-50 flex items-center gap-3">
+        <i id="toast-icon" class="fas fa-check-circle text-green-400"></i>
+        <span id="toast-msg">Ready</span>
+    </div>
+
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-4">
+                <i class="fas fa-shield-alt text-green-400"></i>
+                <span class="text-sm text-gray-200">Free • Upload Files • Convert • Download • 100% Private</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-2">
+                <i class="fas fa-exchange-alt mr-2 text-indigo-400"></i>Free Data & Code Converter
+            </h1>
+            <p class="text-gray-300 max-w-2xl mx-auto">Convert between JSON, YAML, TOML, INI, Base64, Hex, Binary, URL, HTML Entities. Drop files or paste text.</p>
+        </div>
+
+        <div class="glass rounded-xl p-2 mb-6 tab-scroll flex gap-1 overflow-x-auto">
+            <button class="tab-btn active" data-tab="json"><i class="fas fa-code mr-2"></i>JSON ↔ YAML</button>
+            <button class="tab-btn" data-tab="toml"><i class="fas fa-file-alt mr-2"></i>JSON ↔ TOML</button>
+            <button class="tab-btn" data-tab="ini"><i class="fas fa-cog mr-2"></i>JSON ↔ INI</button>
+            <button class="tab-btn" data-tab="base64"><i class="fas fa-lock mr-2"></i>Text ↔ Base64</button>
+            <button class="tab-btn" data-tab="hex"><i class="fas fa-hashtag mr-2"></i>Text ↔ Hex</button>
+            <button class="tab-btn" data-tab="binary"><i class="fas fa-microchip mr-2"></i>Text ↔ Binary</button>
+            <button class="tab-btn" data-tab="url"><i class="fas fa-link mr-2"></i>URL Encode</button>
+            <button class="tab-btn" data-tab="html"><i class="fas fa-globe mr-2"></i>HTML Entities</button>
+        </div>
+
+        <div id="converter-area" class="space-y-4"></div>
+
+        <!-- Feature Section for SEO -->
+        <div class="mt-12 p-6 bg-white/5 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-3">Free Data & Code Converter Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div><i class="fas fa-code text-indigo-400 mr-2"></i> <strong>JSON ↔ YAML</strong> - Convert config files</div>
+                <div><i class="fas fa-file-alt text-indigo-400 mr-2"></i> <strong>JSON ↔ TOML</strong> - Modern config format</div>
+                <div><i class="fas fa-cog text-indigo-400 mr-2"></i> <strong>JSON ↔ INI</strong> - Legacy config files</div>
+                <div><i class="fas fa-lock text-indigo-400 mr-2"></i> <strong>Text ↔ Base64</strong> - Encode/decode Base64</div>
+                <div><i class="fas fa-hashtag text-indigo-400 mr-2"></i> <strong>Text ↔ Hex</strong> - Hexadecimal conversion</div>
+                <div><i class="fas fa-microchip text-indigo-400 mr-2"></i> <strong>Text ↔ Binary</strong> - Binary conversion</div>
+                <div><i class="fas fa-link text-indigo-400 mr-2"></i> <strong>URL Encode/Decode</strong> - Safe URL encoding</div>
+                <div><i class="fas fa-globe text-indigo-400 mr-2"></i> <strong>HTML Entities</strong> - Encode/decode HTML</div>
+                <div><i class="fas fa-upload text-indigo-400 mr-2"></i> <strong>File Upload</strong> - Process files directly</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // ==================== INLINE PARSERS ====================
+        const INI = {
+            parse(str) { const res={}, lines=str.split(/\r?\n/); let cur=res; lines.forEach(l=>{ l=l.trim(); if(!l||l[0]==='#'||l[0]===';') return; if(l[0]==='['&&l[l.length-1]===']'){cur=res[l.slice(1,-1)]={}} else{const i=l.indexOf('=');if(i>-1){const k=l.slice(0,i).trim(),v=l.slice(i+1).trim();if(k)cur[k]=v}} }); return res; },
+            stringify(o){let s='';for(const k in o){s+=`\n[${k}]\n`;for(const j in o[k])s+=`${j}=${o[k][j]}\n`}return s.trim()}
+        };
+        const TOML = {
+            parse(str){const res={}, lines=str.split(/\r?\n/); let cur=res; const pv=v=>{v=v.trim();if(v==='true')return true;if(v==='false')return false;if(/^-?\d+(\.\d+)?$/.test(v))return+v;if(v[0]==='['&&v[v.length-1]===']')return v.slice(1,-1).split(',').map(pv);if((v[0]==='"'||v[0]==="'")&&v[0]===v[v.length-1])return v.slice(1,-1);return v}; lines.forEach(l=>{l=l.trim();if(!l||l[0]==='#')return;if(l[0]==='['&&l[l.length-1]===']'){const p=l.slice(1,-1).split('.');cur=res;p.forEach(k=>cur=cur[k]={})}else{const i=l.indexOf('=');if(i>-1){const k=l.slice(0,i).trim(),v=pv(l.slice(i+1));if(k)cur[k]=v}}});return res},
+            stringify(o,d=0){let s='';for(const k in o){const v=o[k];if(v&&typeof v==='object'&&!Array.isArray(v)){s+=`\n${'.'.repeat(d+1)}[${k}]\n`+TOML.stringify(v,d+1)}else if(Array.isArray(v)){s+=`${k} = [${v.map(x=>typeof x==='string'?`"${x}"`:x).join(', ')}]\n`}else{s+=`${k} = ${typeof v==='string'?`"${v}"`:v}\n`}}return s.trim()}
+        };
+
+        // ==================== CONVERTER DEFINITIONS ====================
+        const converters = {
+            json: { title: 'JSON ↔ YAML', desc: 'Convert config & data files.', left: 'JSON Input', right: 'YAML Output', lPlace: '{\n  "name": "John"\n}', rPlace: 'name: John', accept: '.json,.yaml,.yml' },
+            toml: { title: 'JSON ↔ TOML', desc: 'Convert configuration files.', left: 'JSON Input', right: 'TOML Output', lPlace: '{\n  "title": "App"\n}', rPlace: 'title = "App"', accept: '.json,.toml' },
+            ini: { title: 'JSON ↔ INI', desc: 'Convert legacy config files.', left: 'JSON Input', right: 'INI Output', lPlace: '{\n  "db": { "host": "localhost" }\n}', rPlace: '[db]\nhost=localhost', accept: '.json,.ini,.cfg' },
+            base64: { title: 'Text ↔ Base64', desc: 'Safe UTF-8 Base64 encoding.', left: 'Text Input', right: 'Base64 Output', lPlace: 'Hello 世界 🌍', rPlace: 'SGVsbG8g5LiW55WMIPCfjIA=', accept: '.txt,.b64,.base64' },
+            hex: { title: 'Text ↔ Hex', desc: 'UTF-8 to Hexadecimal.', left: 'Text Input', right: 'Hex Output', lPlace: 'Hi', rPlace: '48 69', accept: '.txt,.hex' },
+            binary: { title: 'Text ↔ Binary', desc: 'UTF-8 to 8-bit Binary.', left: 'Text Input', right: 'Binary Output', lPlace: 'Hi', rPlace: '01001000 01101001', accept: '.txt,.bin' },
+            url: { title: 'URL Encode/Decode', desc: 'Encode for safe URLs.', left: 'Input', right: 'Encoded', lPlace: 'https://example.com/search?q=hello world', rPlace: 'https%3A%2F%2Fexample.com%2Fsearch%3Fq%3Dhello%20world', accept: '.txt,.url' },
+            html: { title: 'HTML Entities ↔ Text', desc: 'Encode/decode HTML chars.', left: 'Text Input', right: 'HTML Entities', lPlace: '<p>Copyright &copy; 2024</p>', rPlace: '&lt;p&gt;Copyright &amp;copy; 2024&lt;/p&gt;', accept: '.html,.htm,.txt' }
+        };
+
+        converters.json.toRight = i => jsyaml.dump(JSON.parse(i), { lineWidth: -1 });
+        converters.json.toLeft = i => JSON.stringify(jsyaml.load(i), null, 2);
+        converters.toml.toRight = i => TOML.stringify(JSON.parse(i));
+        converters.toml.toLeft = i => JSON.stringify(TOML.parse(i), null, 2);
+        converters.ini.toRight = i => INI.stringify(JSON.parse(i));
+        converters.ini.toLeft = i => JSON.stringify(INI.parse(i), null, 2);
+        converters.base64.toRight = i => btoa(unescape(encodeURIComponent(i)));
+        converters.base64.toLeft = i => decodeURIComponent(escape(atob(i.replace(/\s/g, ''))));
+        converters.hex.toRight = i => Array.from(new TextEncoder().encode(i)).map(b => b.toString(16).padStart(2,'0')).join(' ');
+        converters.hex.toLeft = i => new TextDecoder().decode(Uint8Array.from(i.replace(/\s/g,'').match(/.{1,2}/g).map(h => parseInt(h,16))));
+        converters.binary.toRight = i => Array.from(new TextEncoder().encode(i)).map(b => b.toString(2).padStart(8,'0')).join(' ');
+        converters.binary.toLeft = i => new TextDecoder().decode(Uint8Array.from(i.replace(/\s/g,'').match(/.{1,8}/g).map(b => parseInt(b,2))));
+        converters.url.toRight = i => encodeURIComponent(i);
+        converters.url.toLeft = i => decodeURIComponent(i);
+        converters.html.toRight = i => he.encode(i, { useNamedReferences: true });
+        converters.html.toLeft = i => he.decode(i);
+
+        // ==================== STATE & UI ====================
+        let currentTab = 'json', currentFile = null;
+        const $ = s => document.querySelector(s);
+        const $$ = s => Array.from(document.querySelectorAll(s));
+        const showToast = (msg, t='success') => {
+            const icon = t==='success'?'fa-check-circle text-green-400':t==='error'?'fa-exclamation-circle text-red-400':'fa-exclamation-triangle text-yellow-400';
+            $('#toast-icon').className = `fas mr-2 ${icon}`;
+            $('#toast-msg').textContent = msg;
+            $('#toast').style.transform = 'translateY(0)';
+            clearTimeout(window._toastTimeout);
+            window._toastTimeout = setTimeout(() => $('#toast').style.transform = 'translateY(200px)', 3000);
+        };
+
+        const renderTab = key => {
+            currentTab = key; currentFile = null;
+            const c = converters[key];
+            $('#converter-area').innerHTML = `
+                <div class="glass p-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-800">${c.title}</h2>
+                            <p class="text-sm text-gray-500">${c.desc}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="loadExample('${key}')" class="btn-action px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 rounded text-gray-600"><i class="fas fa-lightbulb mr-1"></i> Load Example</button>
+                            <button onclick="clearAll()" class="btn-action px-3 py-1.5 text-xs bg-gray-100 hover:bg-red-50 hover:text-red-600 rounded text-gray-600"><i class="fas fa-trash mr-1"></i> Clear</button>
+                        </div>
+                    </div>
+
+                    <!-- Upload Zone -->
+                    <div id="upload-zone" class="drop-zone p-4 rounded-lg text-center mb-4 bg-gray-50">
+                        <i class="fas fa-cloud-upload-alt text-2xl text-indigo-400 mb-2"></i>
+                        <p class="text-sm text-gray-600 mb-1">Drop <b>.${key.split('.')[0] || 'json'}</b> or <b>.txt</b> file here, or click to browse</p>
+                        <input type="file" id="file-input" class="hidden" accept="${c.accept},.txt">
+                        <button onclick="$('#file-input').click()" class="btn-action mt-2 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-lg">Select File</button>
+                    </div>
+                    <div id="file-info" class="hidden flex items-center justify-between p-3 bg-indigo-50 rounded-lg mb-4 border border-indigo-200">
+                        <span class="flex items-center gap-2 text-sm font-medium text-indigo-700">
+                            <i class="fas fa-file-alt"></i>
+                            <span id="file-name" class="truncate max-w-[200px]">file.txt</span>
+                            <span id="file-size" class="text-indigo-400">(0 KB)</span>
+                        </span>
+                        <button onclick="clearFile()" class="text-red-500 hover:text-red-700 text-sm font-medium"><i class="fas fa-times mr-1"></i> Remove</button>
+                    </div>
+
+                    <!-- Editors -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${c.left}</label>
+                            <textarea id="input-area" class="w-full h-48 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-y" placeholder="${c.lPlace}"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${c.right}</label>
+                            <textarea id="output-area" class="w-full h-48 p-3 border border-gray-300 rounded-lg bg-gray-50 resize-y" readonly placeholder="${c.rPlace}"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                        <button onclick="convert('${key}', 'toRight')" class="btn-action w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium flex items-center justify-center gap-2"><i class="fas fa-arrow-right"></i> Convert →</button>
+                        <button onclick="convert('${key}', 'toLeft')" class="btn-action w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-medium flex items-center justify-center gap-2"><i class="fas fa-arrow-left"></i> ← Convert</button>
+                        <button onclick="swapAreas()" class="btn-action w-full sm:w-auto bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2"><i class="fas fa-exchange-alt"></i> Swap</button>
+                    </div>
+
+                    <div class="flex justify-between mt-3 text-sm">
+                        <span id="status-msg" class="status-msg text-gray-500 italic">Ready</span>
+                        <div class="flex gap-2">
+                            <button onclick="copyOutput()" class="btn-action px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 rounded text-gray-600"><i class="fas fa-copy mr-1"></i> Copy</button>
+                            <button onclick="downloadResult()" class="btn-action px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 rounded text-gray-600"><i class="fas fa-download mr-1"></i> Save File</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Bind file handlers
+            const zone = $('#upload-zone'), input = $('#file-input');
+            zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+            zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+            zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+            zone.addEventListener('click', e => { if(e.target !== input && !e.target.closest('button')) input.click(); });
+            input.addEventListener('change', e => { if(e.target.files[0]) handleFile(e.target.files[0]); });
+
+            // Auto-convert on paste
+            $('#input-area').addEventListener('paste', () => setTimeout(() => convert(currentTab, 'toRight'), 50));
+        };
+
+        const handleFile = file => {
+            if(file.size > 5 * 1024 * 1024) return showToast('File too large (>5MB). Use smaller files for browser conversion.', 'error');
+            if(!file.type.startsWith('text/') && !file.name.match(/\.(json|yaml|yml|toml|ini|cfg|txt|html|htm|b64|base64|hex|bin|url)$/i)) {
+                return showToast('Unsupported file type. Please use text-based files.', 'error');
+            }
+            currentFile = file;
+            const reader = new FileReader();
+            reader.onload = e => {
+                $('#input-area').value = e.target.result;
+                $('#file-info').classList.remove('hidden');
+                $('#file-name').textContent = file.name;
+                $('#file-size').textContent = `(${(file.size/1024).toFixed(1)} KB)`;
+                $('#upload-zone').classList.add('hidden');
+                convert(currentTab, 'toRight');
+                showToast(`Loaded ${file.name}`, 'success');
+            };
+            reader.onerror = () => showToast('Failed to read file. Check permissions.', 'error');
+            reader.readAsText(file, 'UTF-8');
+        };
+
+        const clearFile = () => {
+            currentFile = null;
+            $('#upload-zone').classList.remove('hidden');
+            $('#file-info').classList.add('hidden');
+            $('#file-input').value = '';
+        };
+
+        const convert = (key, dir) => {
+            const input = dir === 'toRight' ? $('#input-area').value : $('#output-area').value;
+            const target = dir === 'toRight' ? $('#output-area') : $('#input-area');
+            const status = $('#status-msg');
+
+            if(!input.trim()){ status.textContent = 'Empty input'; status.className = 'status-msg text-gray-400 italic'; return; }
+            status.textContent = 'Converting...'; status.className = 'status-msg text-indigo-500';
+
+            setTimeout(() => {
+                try {
+                    const result = converters[key][dir](input);
+                    target.value = result;
+                    status.textContent = `✅ Success! ${result.length.toLocaleString()} chars`;
+                    status.className = 'status-msg text-green-600';
+                } catch(err) {
+                    console.error(err);
+                    target.value = '';
+                    status.textContent = `❌ Error: ${err.message.slice(0,60)}...`;
+                    status.className = 'status-msg text-red-600';
+                }
+            }, 10);
+        };
+
+        const swapAreas = () => { const i=$('#input-area'), o=$('#output-area'); [i.value, o.value] = [o.value, i.value]; };
+        const clearAll = () => { clearFile(); $('#input-area').value = ''; $('#output-area').value = ''; $('#status-msg').textContent = 'Cleared'; $('#status-msg').className = 'status-msg text-gray-500 italic'; };
+        const copyOutput = () => { navigator.clipboard.writeText($('#output-area').value).then(()=>showToast('Copied!')).catch(()=>showToast('Copy failed', 'error')); };
+
+        const downloadResult = () => {
+            const val = $('#output-area').value;
+            if(!val) return showToast('Nothing to save', 'warn');
+            const origName = currentFile?.name?.replace(/\.[^/.]+$/, '') || 'converted';
+            let ext = 'txt';
+            if(currentTab==='json') ext = $('#input-area').value.trim()[0]==='{' ? 'yaml' : 'json';
+            else if(currentTab==='toml') ext = $('#input-area').value.trim().includes('=') ? 'json' : 'toml';
+            else if(currentTab==='ini') ext = $('#input-area').value.trim().includes('[') ? 'json' : 'ini';
+            else if(currentTab==='html') ext = $('#input-area').value.trim().startsWith('&') ? 'txt' : 'html';
+            else ext = currentTab;
+
+            const blob = new Blob([val], { type: 'text/plain;charset=utf-8' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${origName}_converted.${ext}`; a.click();
+            setTimeout(()=>URL.revokeObjectURL(a.href), 100);
+            showToast('File saved!');
+        };
+
+        const loadExample = key => { $('#input-area').value = converters[key].lPlace; convert(key, 'toRight'); };
+
+        // ==================== INIT ====================
+        window.addEventListener('load', () => {
+            if(typeof jsyaml==='undefined'||typeof he==='undefined'){
+                $('#loader').innerHTML=`<div class="text-center"><i class="fas fa-exclamation-triangle text-4xl text-yellow-500 mb-4"></i><p class="text-white text-lg mb-4">CDN load failed. Check internet.</p><button onclick="location.reload()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700">Retry</button></div>`;
+                return;
+            }
+            $('#loader').classList.add('hidden');
+            $$('.tab-btn').forEach(btn=>{
+                btn.addEventListener('click',()=>{
+                    $$('.tab-btn').forEach(b=>b.classList.remove('active'));
+                    btn.classList.add('active'); renderTab(btn.dataset.tab);
+                });
+            });
+            renderTab(currentTab);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PRIMARY SEO -->
+    <title>Zylo Free Image Editor - Create Social Media Designs Online</title>
+    <meta name="description" content="Free professional online image editor. Create YouTube thumbnails, Instagram posts, and Facebook banners. No signup required. Browser-based design tool with layers and text effects.">
+    <meta name="keywords" content="free image editor, online photo editor, youtube thumbnail maker, instagram post creator, facebook banner maker, zylo tech, free design tool, browser based editor, no signup photo editor">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.zylotechstudios.space/image-editor.html">
+
+    <!-- OPEN GRAPH / FACEBOOK -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.zylotechstudios.space/image-editor.html">
+    <meta property="og:title" content="Zylo Free Image Editor - Professional Design Tool">
+    <meta property="og:description" content="Create stunning social media graphics for free. No account needed. Includes layers, filters, and custom sizes.">
+    <meta property="og:image" content="https://www.zylotechstudios.space/favicon.ico">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- TWITTER -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.zylotechstudios.space/image-editor.html">
+    <meta property="twitter:title" content="Zylo Free Image Editor">
+    <meta property="twitter:description" content="Free professional online image editor. Create YouTube thumbnails, Instagram posts, and more.">
+    <meta property="twitter:image" content="https://www.zylotechstudios.space/favicon.ico">
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="msapplication-TileColor" content="#ec4899">
+    <meta name="theme-color" content="#0f172a">
+
+    <!-- STRUCTURED DATA (SCHEMA.ORG) FOR SOFTWARE APPLICATION -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Zylo Free Image Editor",
+      "url": "https://www.zylotechstudios.space/image-editor.html",
+      "description": "A free, browser-based professional image editing tool for creating social media content, thumbnails, and banners without signup.",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "ZyloTech Creators Studio"
+      }
+    }
+    </script>
+
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fabric.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Oswald:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto+Mono:wght@400;700&family=Pacifico&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+    <script src="js/include.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f0f0f;
+            color: #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+
+        .glass-panel {
+            background: #1e293b;
+            border-right: 1px solid #334155;
+        }
+
+        .workspace-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* The Canvas Background Area */
+        .canvas-area {
+            flex: 1;
+            background-color: #0f172a;
+            background-image:
+                linear-gradient(45deg, #1e293b 25%, transparent 25%),
+                linear-gradient(-45deg, #1e293b 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #1e293b 75%),
+                linear-gradient(-45deg, transparent 75%, #1e293b 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            box-shadow: inset 0 0 50px #000;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* Wrapper to handle Zoom Scaling */
+        #canvas-wrapper-inner {
+            transition: transform 0.2s ease;
+            transform-origin: top center;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            margin-top: 0;
+        }
+
+        .tool-btn {
+            @apply p-2 rounded-lg hover:bg-slate-700 transition text-slate-400 hover:text-white flex items-center gap-2 text-sm w-full text-left;
+        }
+        .tool-btn.active {
+            @apply bg-pink-600 text-white;
+        }
+
+        .layer-item {
+            @apply flex items-center justify-between p-2 bg-slate-800 mb-1 rounded cursor-pointer border border-transparent hover:border-slate-600 text-xs;
+        }
+        .layer-item.active {
+            @apply border-pink-500 bg-slate-700;
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none; border: none; width: 24px; height: 24px; border-radius: 50%; overflow: hidden; padding: 0; cursor: pointer;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; }
+
+        .donate-btn {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            transition: all 0.3s ease;
+        }
+        .donate-btn:hover { transform: scale(1.05); box-shadow: 0 10px 25px -5px rgba(239,68,68,0.4); }
+
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: #ec4899; cursor: pointer; margin-top: -5px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div data-include="components/header.html" class="z-50 relative shrink-0"></div>
+
+    <!-- NEW SUB-HEADER: SEO & Branding Section -->
+    <section class="bg-slate-900 border-b border-slate-800 py-6 px-4 shrink-0">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+
+            <!-- Title & Description for SEO -->
+            <div class="text-center md:text-left">
+                <h1 class="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 mb-1">
+                    Zylo Free Image Editor
+                </h1>
+                <p class="text-slate-400 text-sm max-w-xl">
+                    The ultimate <strong>browser-based design tool</strong>. Create YouTube thumbnails, Instagram posts, and LinkedIn banners instantly.
+                    <span class="text-pink-400 font-semibold">No signup required.</span> 100% Free.
+                </p>
+            </div>
+
+            <!-- Quick Actions / Trust Signals -->
+            <div class="flex gap-3">
+                <div class="flex flex-col items-center px-4 border-r border-slate-700">
+                    <i class="fas fa-lock text-green-400 mb-1"></i>
+                    <span class="text-[10px] uppercase font-bold text-slate-500">Private</span>
+                </div>
+                <div class="flex flex-col items-center px-4 border-r border-slate-700">
+                    <i class="fas fa-bolt text-yellow-400 mb-1"></i>
+                    <span class="text-[10px] uppercase font-bold text-slate-500">Fast</span>
+                </div>
+                <div class="flex flex-col items-center px-4">
+                    <i class="fas fa-infinity text-blue-400 mb-1"></i>
+                    <span class="text-[10px] uppercase font-bold text-slate-500">Free</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Workspace -->
+    <div class="workspace-container">
+
+        <!-- LEFT SIDEBAR: Tools -->
+        <aside class="w-72 glass-panel flex flex-col z-20 shadow-xl h-full shrink-0">
+
+            <!-- Tool Tabs -->
+            <div class="flex border-b border-slate-700 shrink-0">
+                <button onclick="showPanel('templates')" class="flex-1 py-3 text-xs font-bold text-pink-500 border-b-2 border-pink-500 uppercase tracking-wider"><i class="fas fa-crop-simple mr-1"></i> Size</button>
+                <button onclick="showPanel('text')" class="flex-1 py-3 text-xs font-bold text-slate-400 hover:text-white uppercase tracking-wider"><i class="fas fa-font mr-1"></i> Text</button>
+                <button onclick="showPanel('elements')" class="flex-1 py-3 text-xs font-bold text-slate-400 hover:text-white uppercase tracking-wider"><i class="fas fa-shapes mr-1"></i> Elements</button>
+                <button onclick="showPanel('uploads')" class="flex-1 py-3 text-xs font-bold text-slate-400 hover:text-white uppercase tracking-wider"><i class="fas fa-image mr-1"></i> Upload</button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4">
+
+                <!-- SIZE PANEL -->
+                <div id="panel-templates" class="space-y-4">
+
+                    <!-- Custom Size -->
+                    <div class="bg-slate-800 p-3 rounded-lg border border-slate-700">
+                        <h3 class="text-xs font-bold text-white mb-2">Custom Size (px)</h3>
+                        <div class="flex gap-2 mb-2">
+                            <input type="number" id="custom-w" placeholder="W" class="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm text-white">
+                            <span class="text-slate-500">x</span>
+                            <input type="number" id="custom-h" placeholder="H" class="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm text-white">
+                        </div>
+                        <button onclick="applyCustomSize()" class="w-full bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold py-2 rounded transition">Apply Size</button>
+                    </div>
+
+                    <h3 class="text-xs font-bold text-slate-500 uppercase mt-4 mb-2">Presets</h3>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="setCanvasSize(1280, 720)" class="tool-btn"><i class="fab fa-youtube text-red-500 w-6"></i> YouTube Thumbnail</button>
+                        <button onclick="setCanvasSize(1080, 1080)" class="tool-btn"><i class="fab fa-instagram text-pink-500 w-6"></i> Instagram Post</button>
+                        <button onclick="setCanvasSize(1080, 1920)" class="tool-btn"><i class="fab fa-tiktok text-white w-6"></i> TikTok / Story</button>
+                        <button onclick="setCanvasSize(1200, 630)" class="tool-btn"><i class="fab fa-facebook text-blue-500 w-6"></i> Facebook Post</button>
+                        <button onclick="setCanvasSize(820, 312)" class="tool-btn"><i class="fab fa-facebook text-blue-500 w-6"></i> Facebook Cover</button>
+                        <button onclick="setCanvasSize(1128, 191)" class="tool-btn"><i class="fab fa-linkedin text-blue-400 w-6"></i> LinkedIn Banner</button>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-700">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase mb-2">Background Color</h3>
+                        <div class="flex gap-2 flex-wrap">
+                            <div onclick="setBgColor('#ffffff')" class="w-8 h-8 rounded-full bg-white cursor-pointer border border-slate-600"></div>
+                            <div onclick="setBgColor('#000000')" class="w-8 h-8 rounded-full bg-black cursor-pointer border border-slate-600"></div>
+                            <div onclick="setBgColor('#ec4899')" class="w-8 h-8 rounded-full bg-pink-500 cursor-pointer border border-slate-600"></div>
+                            <div onclick="setBgColor('#3b82f6')" class="w-8 h-8 rounded-full bg-blue-500 cursor-pointer border border-slate-600"></div>
+                            <input type="color" onchange="setBgColor(this.value)" class="w-8 h-8 rounded-full overflow-hidden cursor-pointer">
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-700">
+                         <button onclick="resetCanvas()" class="w-full py-2 border border-red-500 text-red-400 hover:bg-red-500 hover:text-white rounded text-xs font-bold transition"><i class="fas fa-trash-alt mr-1"></i> Reset Canvas</button>
+                    </div>
+                </div>
+
+                <!-- TEXT PANEL -->
+                <div id="panel-text" class="hidden space-y-4">
+                    <button onclick="addText('Heading', 60, 'bold')" class="w-full py-3 bg-slate-800 hover:bg-slate-700 rounded text-2xl font-bold text-white mb-2">Add Heading</button>
+                    <button onclick="addText('Subheading', 40, 'normal')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 rounded text-lg text-slate-200 mb-2">Add Subheading</button>
+
+                    <div id="text-controls" class="hidden mt-4 pt-4 border-t border-slate-700 space-y-3">
+                        <h4 class="text-xs font-bold text-pink-500 uppercase">Edit Text</h4>
+
+                        <!-- Font Family -->
+                        <select id="font-family" onchange="updateTextProp('fontFamily', this.value)" class="w-full bg-slate-800 text-white text-xs rounded p-2 border border-slate-600">
+                            <option value="Inter">Inter</option>
+                            <option value="Oswald">Oswald</option>
+                            <option value="Playfair Display">Playfair</option>
+                            <option value="Roboto Mono">Mono</option>
+                            <option value="Pacifico">Pacifico</option>
+                            <option value="Bebas Neue">Bebas Neue</option>
+                        </select>
+
+                        <div class="flex gap-2">
+                            <input type="color" id="text-color" onchange="updateTextProp('fill', this.value)" title="Text Color" class="shrink-0">
+                            <input type="color" id="stroke-color" onchange="updateTextProp('stroke', this.value)" title="Outline Color" class="shrink-0">
+                            <button onclick="toggleBold()" class="flex-1 bg-slate-800 hover:bg-slate-700 py-1 rounded text-xs font-bold border border-slate-600">B</button>
+                            <button onclick="toggleItalic()" class="flex-1 bg-slate-800 hover:bg-slate-700 py-1 rounded text-xs italic border border-slate-600">I</button>
+                        </div>
+
+                        <!-- Stroke Width -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1"><span>Outline Width</span><span id="val-stroke">0</span></div>
+                            <input type="range" min="0" max="10" step="1" value="0" oninput="updateTextStrokeWidth(this.value)">
+                        </div>
+
+                        <!-- Shadow -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1"><span>Shadow Blur</span><span id="val-shadow">0</span></div>
+                            <input type="range" min="0" max="50" value="0" oninput="updateTextShadow(this.value)">
+                        </div>
+
+                        <!-- Opacity -->
+                        <div>
+                             <div class="flex justify-between text-xs mb-1"><span>Opacity</span></div>
+                             <input type="range" min="0" max="1" step="0.1" value="1" oninput="updateObjectOpacity(this.value)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ELEMENTS PANEL -->
+                <div id="panel-elements" class="hidden space-y-4">
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="addRect()" class="p-4 bg-slate-800 hover:bg-slate-700 rounded flex justify-center"><div class="w-6 h-6 bg-white"></div></button>
+                        <button onclick="addCircle()" class="p-4 bg-slate-800 hover:bg-slate-700 rounded flex justify-center"><div class="w-6 h-6 bg-white rounded-full"></div></button>
+                        <button onclick="addTriangle()" class="p-4 bg-slate-800 hover:bg-slate-700 rounded flex justify-center"><div class="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[20px] border-b-white"></div></button>
+                    </div>
+
+                    <div id="shape-controls" class="hidden pt-4 border-t border-slate-700 space-y-3">
+                         <h4 class="text-xs font-bold text-pink-500 uppercase">Edit Shape</h4>
+                         <div class="flex items-center gap-2">
+                             <label class="text-xs text-slate-400">Color:</label>
+                             <input type="color" id="shape-color" onchange="updateShapeColor(this.value)">
+                         </div>
+                         <div>
+                             <div class="flex justify-between text-xs mb-1"><span>Opacity</span></div>
+                             <input type="range" min="0" max="1" step="0.1" value="1" oninput="updateObjectOpacity(this.value)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- UPLOADS PANEL -->
+                <div id="panel-uploads" class="hidden space-y-4">
+
+                    <!-- Background Image -->
+                    <div class="border-2 border-dashed border-pink-500/50 rounded-lg p-4 text-center hover:bg-slate-800 transition cursor-pointer" onclick="document.getElementById('bg-upload').click()">
+                        <i class="fas fa-image text-pink-500 text-xl mb-2"></i>
+                        <p class="text-xs text-white font-bold">Set Background Image</p>
+                        <p class="text-[10px] text-slate-400">Fills canvas, stays locked</p>
+                        <input type="file" id="bg-upload" accept="image/*" class="hidden">
+                    </div>
+
+                    <!-- Regular Image -->
+                    <div class="border-2 border-dashed border-slate-600 rounded-lg p-4 text-center hover:border-pink-500 transition cursor-pointer" onclick="document.getElementById('img-upload').click()">
+                        <i class="fas fa-cloud-upload-alt text-2xl text-slate-400 mb-2"></i>
+                        <p class="text-xs text-slate-400">Upload Element Image</p>
+                        <input type="file" id="img-upload" accept="image/*" class="hidden">
+                    </div>
+
+                    <div id="image-filters" class="hidden pt-4 border-t border-slate-700 space-y-3">
+                        <h4 class="text-xs font-bold text-pink-500 uppercase">Image Adjustments</h4>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1"><span>Brightness</span></div>
+                            <input type="range" min="-1" max="1" step="0.05" value="0" oninput="updateImageFilter('brightness', this.value)">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1"><span>Contrast</span></div>
+                            <input type="range" min="-1" max="1" step="0.05" value="0" oninput="updateImageFilter('contrast', this.value)">
+                        </div>
+                         <div>
+                            <div class="flex justify-between text-xs mb-1"><span>Opacity</span></div>
+                            <input type="range" min="0" max="1" step="0.1" value="1" oninput="updateObjectOpacity(this.value)">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- CENTER: Canvas -->
+        <main class="flex-1 flex flex-col relative min-w-0">
+
+            <!-- Top Bar -->
+            <div class="h-14 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 z-10 shrink-0">
+                <div class="flex items-center gap-4">
+                    <button onclick="undo()" class="text-slate-400 hover:text-white" title="Undo"><i class="fas fa-undo"></i></button>
+                    <button onclick="redo()" class="text-slate-400 hover:text-white" title="Redo"><i class="fas fa-redo"></i></button>
+                    <div class="h-4 w-px bg-slate-700"></div>
+
+                    <!-- Zoom Controls -->
+                    <div class="flex items-center gap-2 bg-slate-800 rounded-lg px-2 py-1">
+                        <button onclick="adjustZoom(-0.1)" class="text-slate-400 hover:text-white"><i class="fas fa-minus text-xs"></i></button>
+                        <span id="zoom-level" class="text-xs font-mono w-12 text-center">60%</span>
+                        <button onclick="adjustZoom(0.1)" class="text-slate-400 hover:text-white"><i class="fas fa-plus text-xs"></i></button>
+                        <button onclick="fitZoom()" class="text-xs text-pink-500 hover:text-pink-400 ml-2 font-bold">Fit</button>
+                    </div>
+
+                    <span id="canvas-size-display" class="text-xs font-mono text-slate-400 ml-2">1080 x 1080</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                     <button onclick="duplicateObject()" class="text-slate-400 hover:text-white text-sm font-bold" title="Duplicate"><i class="fas fa-copy mr-1"></i></button>
+                     <button onclick="deleteObject()" class="text-red-400 hover:text-red-300 text-sm font-bold"><i class="fas fa-trash mr-1"></i> Delete</button>
+
+                     <!-- Download Dropdown Trigger (Simple implementation) -->
+                     <div class="relative group">
+                         <button class="bg-pink-600 hover:bg-pink-700 text-white px-5 py-2 rounded-full text-sm font-bold shadow-lg shadow-pink-600/20 transition flex items-center gap-2">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                        <!-- Simple Hover Menu for Format -->
+                        <div class="absolute right-0 top-full mt-2 w-32 bg-slate-800 rounded-lg shadow-xl border border-slate-700 hidden group-hover:block z-50">
+                            <button onclick="downloadDesign('png')" class="block w-full text-left px-4 py-2 text-xs hover:bg-slate-700 text-white">PNG (Transparent)</button>
+                            <button onclick="downloadDesign('jpeg')" class="block w-full text-left px-4 py-2 text-xs hover:bg-slate-700 text-white">JPG (Small Size)</button>
+                        </div>
+                     </div>
+                </div>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="canvas-area" id="canvas-wrapper">
+                <!-- Inner Wrapper for Zooming -->
+                <div id="canvas-wrapper-inner">
+                    <canvas id="c"></canvas>
+                </div>
+            </div>
+
+            <!-- Donate Floating -->
+            <div class="absolute bottom-6 right-6 z-30 pointer-events-none">
+                 <div class="p-4 rounded-xl bg-slate-900/90 border border-pink-500/30 text-center backdrop-blur-md shadow-2xl pointer-events-auto">
+                    <button id="donateBtn" class="donate-btn px-4 py-2 rounded-full text-white font-bold text-xs flex items-center gap-2 mx-auto shadow-xl">
+                        <i class="fas fa-coffee"></i> Support ZyloTech
+                    </button>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- RIGHT SIDEBAR: Layers -->
+        <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col z-20 h-full shrink-0">
+            <div class="p-3 border-b border-slate-800 shrink-0 flex justify-between items-center">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Layers</h3>
+            </div>
+            <div id="layers-list" class="flex-1 overflow-y-auto p-2 space-y-1">
+                <!-- Layers injected here via JS -->
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Footer -->
+    <div data-include="components/footer.html" class="z-50 relative shrink-0"></div>
+
+    <script>
+        // --- Initialization ---
+        let canvas;
+        let history = [];
+        let historyStep = -1;
+        let isHistoryLocked = false;
+        let currentZoom = 0.6;
+
+        window.onload = function() {
+            initCanvas();
+
+            // Donation Logic
+            document.getElementById('donateBtn')?.addEventListener('click', () => {
+                window.open('https://paystack.com/pay/zylotech-support', '_blank');
+            });
+
+            // Listeners
+            document.getElementById('img-upload').addEventListener('change', handleImageUpload);
+            document.getElementById('bg-upload').addEventListener('change', handleBgUpload);
+        };
+
+        function initCanvas() {
+            canvas = new fabric.Canvas('c', {
+                backgroundColor: '#1e293b',
+                preserveObjectStacking: true,
+                selection: true
+            });
+
+            setCanvasSize(1080, 1080);
+
+            // Events
+            canvas.on('object:added', updateLayers);
+            canvas.on('object:removed', updateLayers);
+            canvas.on('object:modified', updateLayers);
+            canvas.on('selection:created', handleSelection);
+            canvas.on('selection:updated', handleSelection);
+            canvas.on('selection:cleared', handleDeselection);
+
+            // History
+            canvas.on('object:modified', saveHistory);
+            canvas.on('object:added', saveHistory);
+            canvas.on('object:removed', saveHistory);
+        }
+
+        // --- Zoom Logic ---
+        function updateZoomDisplay() {
+            document.getElementById('zoom-level').innerText = Math.round(currentZoom * 100) + '%';
+            const wrapper = document.getElementById('canvas-wrapper-inner');
+            wrapper.style.transform = `scale(${currentZoom})`;
+        }
+
+        function adjustZoom(delta) {
+            currentZoom += delta;
+            if (currentZoom < 0.1) currentZoom = 0.1;
+            if (currentZoom > 2.0) currentZoom = 2.0;
+            updateZoomDisplay();
+        }
+
+        function fitZoom() {
+            const wrapper = document.getElementById('canvas-wrapper');
+            const w = canvas.getWidth();
+            const h = canvas.getHeight();
+            const availW = wrapper.clientWidth - 40;
+            const availH = wrapper.clientHeight - 40;
+            const scaleW = availW / w;
+            const scaleH = availH / h;
+            currentZoom = Math.min(scaleW, scaleH, 1);
+            if (currentZoom < 0.1) currentZoom = 0.1;
+            updateZoomDisplay();
+        }
+
+        // --- Canvas Management ---
+        function setCanvasSize(w, h) {
+            canvas.setWidth(w);
+            canvas.setHeight(h);
+            document.getElementById('canvas-size-display').innerText = `${w} x ${h}`;
+            canvas.setBackgroundColor(canvas.backgroundColor, canvas.renderAll.bind(canvas)); // Keep color
+            saveHistory();
+            setTimeout(() => { fitZoom(); document.getElementById('canvas-wrapper').scrollTop = 0; }, 50);
+        }
+
+        function applyCustomSize() {
+            const w = parseInt(document.getElementById('custom-w').value);
+            const h = parseInt(document.getElementById('custom-h').value);
+            if(w && h) setCanvasSize(w, h);
+        }
+
+        function setBgColor(color) {
+            canvas.setBackgroundColor(color, canvas.renderAll.bind(canvas));
+            // Remove background image if color is set
+            canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
+            saveHistory();
+        }
+
+        function resetCanvas() {
+            if(confirm("Are you sure you want to clear everything?")) {
+                canvas.clear();
+                canvas.setBackgroundColor('#1e293b', canvas.renderAll.bind(canvas));
+                history = [];
+                historyStep = -1;
+                saveHistory();
+            }
+        }
+
+        // --- Panels ---
+        function showPanel(id) {
+            ['templates', 'text', 'elements', 'uploads'].forEach(p => {
+                document.getElementById(`panel-${p}`).classList.add('hidden');
+            });
+            document.getElementById(`panel-${id}`).classList.remove('hidden');
+
+            const buttons = document.querySelectorAll('aside button');
+            buttons.forEach(btn => {
+                if(btn.getAttribute('onclick')?.includes(id)) {
+                    btn.classList.add('text-pink-500', 'border-b-2', 'border-pink-500');
+                    btn.classList.remove('text-slate-400');
+                } else if (btn.parentElement.classList.contains('border-b')) {
+                     btn.classList.remove('text-pink-500', 'border-b-2', 'border-pink-500');
+                     btn.classList.add('text-slate-400');
+                }
+            });
+        }
+
+        // --- Text Tools ---
+        function addText(text, size, weight) {
+            const t = new fabric.IText(text, {
+                left: canvas.width / 2,
+                top: canvas.height / 2,
+                fontFamily: 'Inter',
+                fill: '#ffffff',
+                fontSize: size,
+                fontWeight: weight,
+                originX: 'center',
+                originY: 'center',
+                shadow: new fabric.Shadow({ color: "rgba(0,0,0,0.5)", blur: 10, offsetX: 2, offsetY: 2 })
+            });
+            canvas.add(t);
+            canvas.setActiveObject(t);
+            canvas.renderAll();
+        }
+
+        function updateTextProp(prop, value) {
+            const obj = canvas.getActiveObject();
+            if (obj && obj.type === 'i-text') {
+                obj.set(prop, value);
+                canvas.renderAll();
+                saveHistory();
+            }
+        }
+
+        function toggleBold() {
+            const obj = canvas.getActiveObject();
+            if (obj && obj.type === 'i-text') {
+                obj.set('fontWeight', obj.fontWeight === 'bold' ? 'normal' : 'bold');
+                canvas.renderAll();
+                saveHistory();
+            }
+        }
+
+        function toggleItalic() {
+             const obj = canvas.getActiveObject();
+            if (obj && obj.type === 'i-text') {
+                obj.set('fontStyle', obj.fontStyle === 'italic' ? 'normal' : 'italic');
+                canvas.renderAll();
+                saveHistory();
+            }
+        }
+
+        function updateTextStrokeWidth(val) {
+            const obj = canvas.getActiveObject();
+            if (obj && obj.type === 'i-text') {
+                obj.set('strokeWidth', parseInt(val));
+                document.getElementById('val-stroke').innerText = val;
+                canvas.renderAll();
+                saveHistory();
+            }
+        }
+
+        function updateTextShadow(val) {
+            const obj = canvas.getActiveObject();
+            if (obj && obj.type === 'i-text') {
+                obj.set('shadow', new fabric.Shadow({ color: "rgba(0,0,0,0.8)", blur: parseInt(val), offsetX: 2, offsetY: 2 }));
+                document.getElementById('val-shadow').innerText = val;
+                canvas.renderAll();
+            }
+        }
+
+        // --- Shapes ---
+        function addRect() {
+            const rect = new fabric.Rect({
+                left: canvas.width / 2, top: canvas.height / 2, fill: '#ec4899', width: 100, height: 100, originX: 'center', originY: 'center'
+            });
+            canvas.add(rect);
+            canvas.setActiveObject(rect);
+        }
+        function addCircle() {
+            const circle = new fabric.Circle({
+                left: canvas.width / 2, top: canvas.height / 2, fill: '#3b82f6', radius: 50, originX: 'center', originY: 'center'
+            });
+            canvas.add(circle);
+            canvas.setActiveObject(circle);
+        }
+        function addTriangle() {
+             const tri = new fabric.Triangle({
+                left: canvas.width / 2, top: canvas.height / 2, fill: '#f59e0b', width: 100, height: 100, originX: 'center', originY: 'center'
+            });
+            canvas.add(tri);
+            canvas.setActiveObject(tri);
+        }
+
+        function updateShapeColor(color) {
+            const obj = canvas.getActiveObject();
+            if (obj && (obj.type === 'rect' || obj.type === 'circle' || obj.type === 'triangle')) {
+                obj.set('fill', color);
+                canvas.renderAll();
+                saveHistory();
+            }
+        }
+
+        // --- Images & Backgrounds ---
+        function handleBgUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(f) {
+                fabric.Image.fromURL(f.target.result, function(img) {
+                    img.scaleToCover(canvas.width, canvas.height);
+                    img.set({ left: 0, top: 0, originX: 'left', originY: 'top', selectable: false, evented: false });
+                    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+                    saveHistory();
+                });
+            };
+            reader.readAsDataURL(file);
+            e.target.value = '';
+        }
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(f) {
+                fabric.Image.fromURL(f.target.result, function(img) {
+                    if (img.width > canvas.width) img.scaleToWidth(canvas.width * 0.8);
+                    img.set({ left: canvas.width/2, top: canvas.height/2, originX: 'center', originY: 'center' });
+                    canvas.add(img);
+                    canvas.setActiveObject(img);
+                    canvas.renderAll();
+                });
+            };
+            reader.readAsDataURL(file);
+            e.target.value = '';
+        }
+
+        function updateImageFilter(filterType, value) {
+            const obj = canvas.getActiveObject();
+            if (!obj || obj.type !== 'image') return;
+
+            let filter;
+            if (filterType === 'brightness') filter = new fabric.Image.filters.Brightness({ brightness: parseFloat(value) });
+            if (filterType === 'contrast') filter = new fabric.Image.filters.Contrast({ contrast: parseFloat(value) });
+
+            const filterIndex = obj.filters.findIndex(f => f.type === filterType);
+            if (filterIndex > -1) obj.filters[filterIndex] = filter;
+            else obj.filters.push(filter);
+
+            obj.applyFilters();
+            canvas.renderAll();
+        }
+
+        function updateObjectOpacity(val) {
+            const obj = canvas.getActiveObject();
+            if(obj) {
+                obj.set('opacity', parseFloat(val));
+                canvas.renderAll();
+            }
+        }
+
+        // --- Layers System ---
+        function updateLayers() {
+            const list = document.getElementById('layers-list');
+            list.innerHTML = '';
+            const objects = canvas.getObjects().slice().reverse();
+
+            objects.forEach((obj, index) => {
+                const div = document.createElement('div');
+                div.className = 'layer-item';
+                if (obj === canvas.getActiveObject()) div.classList.add('active');
+
+                let icon = 'fa-square';
+                let name = 'Shape';
+
+                if (obj.type === 'i-text') { icon = 'fa-font'; name = obj.text.substring(0, 15) + '...'; }
+                if (obj.type === 'image') { icon = 'fa-image'; name = 'Image'; }
+                if (obj.type === 'rect') { icon = 'fa-square'; name = 'Rectangle'; }
+                if (obj.type === 'circle') { icon = 'fa-circle'; name = 'Circle'; }
+
+                div.innerHTML = `
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <i class="fas ${icon} text-slate-500 text-xs"></i>
+                        <span class="text-xs text-slate-300 truncate">${name}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <i onclick="moveLayer('up', ${objects.length - 1 - index})" class="fas fa-chevron-up text-slate-500 hover:text-white text-xs cursor-pointer"></i>
+                        <i onclick="moveLayer('down', ${objects.length - 1 - index})" class="fas fa-chevron-down text-slate-500 hover:text-white text-xs cursor-pointer"></i>
+                    </div>
+                `;
+
+                div.onclick = (e) => {
+                    if(!e.target.classList.contains('fa-chevron-up') && !e.target.classList.contains('fa-chevron-down')) {
+                        canvas.setActiveObject(obj);
+                        canvas.renderAll();
+                    }
+                };
+
+                list.appendChild(div);
+            });
+        }
+
+        function moveLayer(dir, originalIndex) {
+            const obj = canvas.getObjects()[originalIndex];
+            if (dir === 'up') obj.bringForward();
+            else obj.sendBackwards();
+            canvas.renderAll();
+            saveHistory();
+        }
+
+        // --- Selection Handling ---
+        function handleSelection() {
+            const obj = canvas.getActiveObject();
+            if (!obj) return;
+
+            if (obj.type === 'i-text') {
+                document.getElementById('text-controls').classList.remove('hidden');
+                document.getElementById('shape-controls').classList.add('hidden');
+                document.getElementById('image-filters').classList.add('hidden');
+
+                document.getElementById('font-family').value = obj.fontFamily;
+                document.getElementById('text-color').value = obj.fill;
+                document.getElementById('stroke-color').value = obj.stroke || '#000000';
+                document.getElementById('val-stroke').innerText = obj.strokeWidth || 0;
+            } else if (obj.type === 'image') {
+                document.getElementById('text-controls').classList.add('hidden');
+                document.getElementById('shape-controls').classList.add('hidden');
+                document.getElementById('image-filters').classList.remove('hidden');
+            } else {
+                document.getElementById('text-controls').classList.add('hidden');
+                document.getElementById('shape-controls').classList.remove('hidden');
+                document.getElementById('image-filters').classList.add('hidden');
+            }
+
+            updateLayers();
+        }
+
+        function handleDeselection() {
+            document.getElementById('text-controls').classList.add('hidden');
+            document.getElementById('shape-controls').classList.add('hidden');
+            document.getElementById('image-filters').classList.add('hidden');
+            updateLayers();
+        }
+
+        function deleteObject() {
+            const obj = canvas.getActiveObject();
+            if (obj) {
+                canvas.remove(obj);
+                canvas.discardActiveObject();
+                canvas.renderAll();
+            }
+        }
+
+        function duplicateObject() {
+            const obj = canvas.getActiveObject();
+            if(obj) {
+                obj.clone(function(cloned) {
+                    canvas.discardActiveObject();
+                    cloned.set({
+                        left: cloned.left + 20,
+                        top: cloned.top + 20,
+                        evented: true
+                    });
+                    if (cloned.type === 'activeSelection') {
+                        // active selection needs a reference to the canvas.
+                        cloned.canvas = canvas;
+                        cloned.forEachObject(function(obj) {
+                            canvas.add(obj);
+                        });
+                        cloned.setCoords();
+                    } else {
+                        canvas.add(cloned);
+                    }
+                    canvas.setActiveObject(cloned);
+                    canvas.requestRenderAll();
+                });
+            }
+        }
+
+        // --- History ---
+        function saveHistory() {
+            if (isHistoryLocked) return;
+            historyStep++;
+            if (historyStep < history.length) history.length = historyStep;
+            history.push(JSON.stringify(canvas));
+        }
+
+        function undo() {
+            if (historyStep > 0) {
+                isHistoryLocked = true;
+                historyStep--;
+                canvas.loadFromJSON(history[historyStep], () => { canvas.renderAll(); isHistoryLocked = false; updateLayers(); });
+            }
+        }
+
+        function redo() {
+            if (historyStep < history.length - 1) {
+                isHistoryLocked = true;
+                historyStep++;
+                canvas.loadFromJSON(history[historyStep], () => { canvas.renderAll(); isHistoryLocked = false; updateLayers(); });
+            }
+        }
+
+        // --- Export ---
+        function downloadDesign(format) {
+            canvas.discardActiveObject();
+            canvas.renderAll();
+
+            const dataURL = canvas.toDataURL({
+                format: format,
+                quality: 1,
+                multiplier: 1
+            });
+
+            const link = document.createElement('a');
+            link.download = `zylo-design.${format}`;
+            link.href = dataURL;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+    </script>
+</body>
+</html>

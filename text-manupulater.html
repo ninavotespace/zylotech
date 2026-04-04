@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Text Manipulator - Case Converter, Word Counter, Sort Lines, Slugify | ZyloTech</title>
+    <meta name="description" content="Free online text manipulator. Case converter, reverse text, word counter, remove duplicates, sort lines, find & replace, remove whitespace, slugify URLs. 100% browser-based.">
+    <meta name="keywords" content="free text manipulator, case converter, word counter, sort lines, slugify url, remove duplicates, text formatter">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Text Manipulator - Case Converter, Word Counter, Slugify | ZyloTech">
+    <meta property="og:description" content="Free online text manipulator. Convert case, count words, sort lines, remove duplicates, slugify URLs. All in your browser.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/text-manipulator.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Text Manipulator - ZyloTech">
+    <meta name="twitter:description" content="Free text manipulation tools: case converter, word counter, sort lines, slugify, and more.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/text-manipulator.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/include.js"></script>
+
+    <style>
+        :root { --primary: #f59e0b; --primary-hover: #d97706; --accent: #fbbf24; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #451a03 100%); color: #f1f5f9; min-height: 100vh; }
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: #1f2937; }
+        .glass-dark { background: rgba(15,23,42,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        .tab-btn { position: relative; padding: 12px 24px; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s ease; color: #94a3b8; cursor: pointer; }
+        .tab-btn.active { border-bottom-color: var(--primary); color: white; }
+        .tool-card { transition: all 0.2s ease; cursor: pointer; }
+        .tool-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px -4px rgba(0,0,0,0.2); }
+        .copy-btn { background: #e2e8f0; border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+        .copy-btn:hover { background: var(--primary); color: white; }
+        .clear-btn { background: #fee2e2; color: #ef4444; border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+        .clear-btn:hover { background: #ef4444; color: white; }
+        textarea { font-family: 'Monaco', 'Menlo', 'Courier New', monospace; font-size: 13px; line-height: 1.5; resize: vertical; }
+        input, select { transition: all 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); ring: 2px solid var(--primary); }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .hidden { display: none !important; }
+        .stat-box { text-align: center; padding: 12px; background: #f8fafc; border-radius: 12px; }
+        .stat-number { font-size: 1.8rem; font-weight: bold; color: var(--primary); }
+        .stat-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+        .result-area { background: #f8fafc; border-radius: 12px; padding: 16px; min-height: 200px; max-height: 400px; overflow: auto; font-family: monospace; white-space: pre-wrap; word-wrap: break-word; }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #f59e0b;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #d97706; transform: scale(1.1); }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-4">
+                <i class="fas fa-paragraph text-amber-400"></i>
+                <span class="text-sm text-gray-200">Free • Browser-Based • Instant</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-2">
+                <i class="fas fa-magic mr-2 text-amber-400"></i>Free Text Manipulator
+            </h1>
+            <p class="text-gray-300 max-w-2xl mx-auto">Case Converter, Reverse Text, Word Counter, Sort Lines, Find & Replace, Slugify. 100% Free.</p>
+            <div class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-full shadow-lg">
+                <i class="fas fa-chart-simple"></i>
+                <span id="view-counter" class="font-bold">0</span>
+                <span class="text-sm">operations done</span>
+            </div>
+        </div>
+
+        <!-- Main Input Area -->
+        <div class="glass p-6 rounded-2xl mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold flex items-center gap-2"><i class="fas fa-edit text-amber-500"></i>Input Text</h2>
+                <div class="flex gap-2">
+                    <button id="clear-input" class="clear-btn"><i class="fas fa-trash mr-1"></i>Clear</button>
+                    <button id="copy-input" class="copy-btn"><i class="fas fa-copy mr-1"></i>Copy</button>
+                </div>
+            </div>
+            <textarea id="input-text" rows="8" class="w-full p-4 border rounded-xl" placeholder="Enter or paste your text here...&#10;&#10;Example:&#10;Hello World!&#10;This is a sample text.&#10;It has multiple lines.&#10;Hello World! (duplicate line)"></textarea>
+
+            <!-- Statistics -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                <div class="stat-box">
+                    <div class="stat-number" id="char-count">0</div>
+                    <div class="stat-label">Characters</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="word-count">0</div>
+                    <div class="stat-label">Words</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="line-count">0</div>
+                    <div class="stat-label">Lines</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="para-count">0</div>
+                    <div class="stat-label">Paragraphs</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tool Categories -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <div class="tool-card glass p-3 rounded-xl text-center cursor-pointer" data-tool="case">
+                <i class="fas fa-font text-amber-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Case Converter</p>
+            </div>
+            <div class="tool-card glass p-3 rounded-xl text-center cursor-pointer" data-tool="reverse">
+                <i class="fas fa-arrow-right-arrow-left text-amber-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Reverse Text</p>
+            </div>
+            <div class="tool-card glass p-3 rounded-xl text-center cursor-pointer" data-tool="duplicate">
+                <i class="fas fa-copy text-amber-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Remove Duplicates</p>
+            </div>
+            <div class="tool-card glass p-3 rounded-xl text-center cursor-pointer" data-tool="sort">
+                <i class="fas fa-sort-amount-down text-amber-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Sort Lines</p>
+            </div>
+            <div class="tool-card glass p-3 rounded-xl text-center cursor-pointer" data-tool="replace">
+                <i class="fas fa-exchange-alt text-amber-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Find & Replace</p>
+            </div>
+            <div class="tool-card glass p-3 rounded-xl text-center cursor-pointer" data-tool="whitespace">
+                <i class="fas fa-eraser text-amber-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Remove Whitespace</p>
+            </div>
+            <div class="tool-card glass p-3 rounded-xl text-center cursor-pointer" data-tool="slugify">
+                <i class="fas fa-link text-amber-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Slugify URL</p>
+            </div>
+            <div class="tool-card glass p-3 rounded-xl text-center cursor-pointer" data-tool="wordcount">
+                <i class="fas fa-chart-simple text-amber-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Word Frequency</p>
+            </div>
+        </div>
+
+        <!-- ==================== CASE CONVERTER ==================== -->
+        <div id="case-tool" class="tool-panel glass p-6 rounded-2xl mb-6">
+            <h3 class="font-bold text-lg mb-3 flex items-center gap-2"><i class="fas fa-font text-amber-500"></i>Case Converter</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                <button id="to-upper" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">UPPERCASE</button>
+                <button id="to-lower" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">lowercase</button>
+                <button id="to-title" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Title Case</button>
+                <button id="to-sentence" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Sentence case</button>
+                <button id="to-camel" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">camelCase</button>
+                <button id="to-pascal" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">PascalCase</button>
+                <button id="to-snake" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">snake_case</button>
+                <button id="to-kebab" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">kebab-case</button>
+            </div>
+            <div class="result-area" id="case-result"></div>
+            <button class="copy-result-btn copy-btn mt-3" data-source="case-result">Copy Result</button>
+        </div>
+
+        <!-- ==================== REVERSE TEXT ==================== -->
+        <div id="reverse-tool" class="tool-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-lg mb-3 flex items-center gap-2"><i class="fas fa-arrow-right-arrow-left text-amber-500"></i>Reverse Text</h3>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <button id="reverse-string" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Reverse String</button>
+                <button id="reverse-words" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Reverse Words Order</button>
+                <button id="reverse-lines" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Reverse Lines</button>
+            </div>
+            <div class="result-area" id="reverse-result"></div>
+            <button class="copy-result-btn copy-btn mt-3" data-source="reverse-result">Copy Result</button>
+        </div>
+
+        <!-- ==================== REMOVE DUPLICATES ==================== -->
+        <div id="duplicate-tool" class="tool-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-lg mb-3 flex items-center gap-2"><i class="fas fa-copy text-amber-500"></i>Remove Duplicate Lines</h3>
+            <div class="mb-4">
+                <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" id="case-sensitive" class="rounded"> Case sensitive
+                </label>
+            </div>
+            <button id="remove-duplicates" class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition mb-4">Remove Duplicates</button>
+            <div class="result-area" id="duplicate-result"></div>
+            <button class="copy-result-btn copy-btn mt-3" data-source="duplicate-result">Copy Result</button>
+        </div>
+
+        <!-- ==================== SORT LINES ==================== -->
+        <div id="sort-tool" class="tool-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-lg mb-3 flex items-center gap-2"><i class="fas fa-sort-amount-down text-amber-500"></i>Sort Lines</h3>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <button id="sort-asc" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Sort A → Z</button>
+                <button id="sort-desc" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Sort Z → A</button>
+                <button id="sort-length-asc" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Sort by Length (shortest first)</button>
+                <button id="sort-length-desc" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Sort by Length (longest first)</button>
+            </div>
+            <div class="result-area" id="sort-result"></div>
+            <button class="copy-result-btn copy-btn mt-3" data-source="sort-result">Copy Result</button>
+        </div>
+
+        <!-- ==================== FIND & REPLACE ==================== -->
+        <div id="replace-tool" class="tool-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-lg mb-3 flex items-center gap-2"><i class="fas fa-exchange-alt text-amber-500"></i>Find & Replace</h3>
+            <div class="space-y-3 mb-4">
+                <input type="text" id="find-text" placeholder="Find..." class="w-full p-2 border rounded-lg">
+                <input type="text" id="replace-text" placeholder="Replace with..." class="w-full p-2 border rounded-lg">
+                <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="regex-mode"> Use Regular Expression</label>
+                <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="case-sensitive-replace"> Case sensitive</label>
+                <button id="find-replace" class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition">Replace All</button>
+            </div>
+            <div class="result-area" id="replace-result"></div>
+            <button class="copy-result-btn copy-btn mt-3" data-source="replace-result">Copy Result</button>
+        </div>
+
+        <!-- ==================== REMOVE WHITESPACE ==================== -->
+        <div id="whitespace-tool" class="tool-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-lg mb-3 flex items-center gap-2"><i class="fas fa-eraser text-amber-500"></i>Remove Whitespace</h3>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <button id="trim-spaces" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Trim Spaces</button>
+                <button id="remove-all-spaces" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Remove All Spaces</button>
+                <button id="remove-extra-spaces" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Remove Extra Spaces</button>
+                <button id="remove-line-breaks" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Remove Line Breaks</button>
+                <button id="remove-tabs" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Remove Tabs</button>
+                <button id="normalize-whitespace" class="bg-gray-100 p-2 rounded-lg hover:bg-amber-500 hover:text-white transition">Normalize Whitespace</button>
+            </div>
+            <div class="result-area" id="whitespace-result"></div>
+            <button class="copy-result-btn copy-btn mt-3" data-source="whitespace-result">Copy Result</button>
+        </div>
+
+        <!-- ==================== SLUGIFY URL ==================== -->
+        <div id="slugify-tool" class="tool-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-lg mb-3 flex items-center gap-2"><i class="fas fa-link text-amber-500"></i>Slugify URL</h3>
+            <p class="text-sm text-gray-500 mb-3">Convert text to URL-friendly slug (lowercase, hyphens, no special chars)</p>
+            <div class="mb-4">
+                <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="lowercase-slug" checked> Convert to lowercase</label>
+                <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="remove-stopwords"> Remove common stop words</label>
+            </div>
+            <button id="slugify" class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition mb-4">Generate Slug</button>
+            <div class="result-area" id="slugify-result"></div>
+            <button class="copy-result-btn copy-btn mt-3" data-source="slugify-result">Copy Result</button>
+        </div>
+
+        <!-- ==================== WORD FREQUENCY ==================== -->
+        <div id="wordcount-tool" class="tool-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-lg mb-3 flex items-center gap-2"><i class="fas fa-chart-simple text-amber-500"></i>Word Frequency</h3>
+            <div class="mb-4">
+                <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="case-sensitive-freq"> Case sensitive</label>
+                <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="exclude-common" checked> Exclude common words (a, an, the, etc.)</label>
+            </div>
+            <button id="analyze-frequency" class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition mb-4">Analyze Frequency</button>
+            <div class="result-area" id="frequency-result"></div>
+            <button class="copy-result-btn copy-btn mt-3" data-source="frequency-result">Copy Result</button>
+        </div>
+
+        <!-- Feature Section for SEO -->
+        <div class="mt-8 p-6 bg-white/5 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-3 text-center">Free Text Manipulator Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div><i class="fas fa-font text-amber-400 mr-2"></i> <strong>Case Converter</strong> - 8 different case styles</div>
+                <div><i class="fas fa-arrow-right-arrow-left text-amber-400 mr-2"></i> <strong>Reverse Text</strong> - Reverse string, words, or lines</div>
+                <div><i class="fas fa-copy text-amber-400 mr-2"></i> <strong>Remove Duplicates</strong> - Remove duplicate lines</div>
+                <div><i class="fas fa-sort-amount-down text-amber-400 mr-2"></i> <strong>Sort Lines</strong> - Sort alphabetically or by length</div>
+                <div><i class="fas fa-exchange-alt text-amber-400 mr-2"></i> <strong>Find & Replace</strong> - With regex support</div>
+                <div><i class="fas fa-eraser text-amber-400 mr-2"></i> <strong>Remove Whitespace</strong> - Multiple whitespace options</div>
+                <div><i class="fas fa-link text-amber-400 mr-2"></i> <strong>Slugify URL</strong> - Create URL-friendly slugs</div>
+                <div><i class="fas fa-chart-simple text-amber-400 mr-2"></i> <strong>Word Frequency</strong> - Analyze word usage</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Counter
+        let operationCount = localStorage.getItem('textManipulatorCount') || 0;
+        document.getElementById('view-counter').textContent = operationCount;
+        function incrementCounter() { operationCount++; localStorage.setItem('textManipulatorCount', operationCount); document.getElementById('view-counter').textContent = operationCount; }
+
+        // Toast
+        let toastTimeout;
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas fa-check-circle mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        // Get input text
+        const inputTextarea = document.getElementById('input-text');
+
+        function getInputText() { return inputTextarea.value; }
+        function setOutput(elementId, text) {
+            document.getElementById(elementId).innerHTML = escapeHtml(text);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Update statistics
+        function updateStats() {
+            const text = getInputText();
+            const chars = text.length;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const lines = text ? text.split(/\r?\n/).length : 0;
+            const paragraphs = text ? text.split(/\r?\n\s*\r?\n/).filter(p => p.trim()).length : 0;
+            document.getElementById('char-count').textContent = chars.toLocaleString();
+            document.getElementById('word-count').textContent = words.toLocaleString();
+            document.getElementById('line-count').textContent = lines.toLocaleString();
+            document.getElementById('para-count').textContent = paragraphs.toLocaleString();
+        }
+
+        inputTextarea.addEventListener('input', updateStats);
+        document.getElementById('clear-input').addEventListener('click', () => {
+            inputTextarea.value = '';
+            updateStats();
+            showToast('Input cleared');
+        });
+        document.getElementById('copy-input').addEventListener('click', () => {
+            navigator.clipboard.writeText(getInputText());
+            showToast('Input copied!');
+        });
+
+        // Tool panel switching
+        const panels = ['case', 'reverse', 'duplicate', 'sort', 'replace', 'whitespace', 'slugify', 'wordcount'];
+        function showTool(toolName) {
+            panels.forEach(p => {
+                const panel = document.getElementById(`${p}-tool`);
+                if (panel) panel.classList.add('hidden');
+            });
+            document.getElementById(`${toolName}-tool`).classList.remove('hidden');
+            incrementCounter();
+        }
+
+        document.querySelectorAll('.tool-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const tool = card.dataset.tool;
+                showTool(tool);
+                showToast(`${tool.replace(/([A-Z])/g, ' $1').trim()} tool opened`);
+            });
+        });
+
+        // Copy result buttons
+        document.querySelectorAll('.copy-result-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const sourceId = btn.dataset.source;
+                const text = document.getElementById(sourceId).innerText;
+                navigator.clipboard.writeText(text);
+                showToast('Result copied!');
+            });
+        });
+
+        // ==================== CASE CONVERTER ====================
+        document.getElementById('to-upper').addEventListener('click', () => {
+            setOutput('case-result', getInputText().toUpperCase());
+            incrementCounter();
+        });
+        document.getElementById('to-lower').addEventListener('click', () => {
+            setOutput('case-result', getInputText().toLowerCase());
+            incrementCounter();
+        });
+        document.getElementById('to-title').addEventListener('click', () => {
+            const text = getInputText();
+            setOutput('case-result', text.replace(/\b\w/g, c => c.toUpperCase()));
+            incrementCounter();
+        });
+        document.getElementById('to-sentence').addEventListener('click', () => {
+            const text = getInputText();
+            setOutput('case-result', text.replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase()));
+            incrementCounter();
+        });
+        document.getElementById('to-camel').addEventListener('click', () => {
+            let text = getInputText().toLowerCase().replace(/[^a-z0-9]+(.)/g, (m, c) => c.toUpperCase());
+            setOutput('case-result', text);
+            incrementCounter();
+        });
+        document.getElementById('to-pascal').addEventListener('click', () => {
+            let text = getInputText().toLowerCase().replace(/(?:^|[^a-z0-9]+)(.)/g, (m, c) => c.toUpperCase());
+            setOutput('case-result', text);
+            incrementCounter();
+        });
+        document.getElementById('to-snake').addEventListener('click', () => {
+            setOutput('case-result', getInputText().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, ''));
+            incrementCounter();
+        });
+        document.getElementById('to-kebab').addEventListener('click', () => {
+            setOutput('case-result', getInputText().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''));
+            incrementCounter();
+        });
+
+        // ==================== REVERSE TEXT ====================
+        document.getElementById('reverse-string').addEventListener('click', () => {
+            setOutput('reverse-result', getInputText().split('').reverse().join(''));
+            incrementCounter();
+        });
+        document.getElementById('reverse-words').addEventListener('click', () => {
+            setOutput('reverse-result', getInputText().split(/\s+/).reverse().join(' '));
+            incrementCounter();
+        });
+        document.getElementById('reverse-lines').addEventListener('click', () => {
+            setOutput('reverse-result', getInputText().split(/\r?\n/).reverse().join('\n'));
+            incrementCounter();
+        });
+
+        // ==================== REMOVE DUPLICATES ====================
+        document.getElementById('remove-duplicates').addEventListener('click', () => {
+            const lines = getInputText().split(/\r?\n/);
+            const caseSensitive = document.getElementById('case-sensitive').checked;
+            const seen = new Set();
+            const unique = [];
+            for (const line of lines) {
+                const key = caseSensitive ? line : line.toLowerCase();
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    unique.push(line);
+                }
+            }
+            setOutput('duplicate-result', unique.join('\n'));
+            incrementCounter();
+        });
+
+        // ==================== SORT LINES ====================
+        document.getElementById('sort-asc').addEventListener('click', () => {
+            const lines = getInputText().split(/\r?\n/);
+            lines.sort((a, b) => a.localeCompare(b));
+            setOutput('sort-result', lines.join('\n'));
+            incrementCounter();
+        });
+        document.getElementById('sort-desc').addEventListener('click', () => {
+            const lines = getInputText().split(/\r?\n/);
+            lines.sort((a, b) => b.localeCompare(a));
+            setOutput('sort-result', lines.join('\n'));
+            incrementCounter();
+        });
+        document.getElementById('sort-length-asc').addEventListener('click', () => {
+            const lines = getInputText().split(/\r?\n/);
+            lines.sort((a, b) => a.length - b.length);
+            setOutput('sort-result', lines.join('\n'));
+            incrementCounter();
+        });
+        document.getElementById('sort-length-desc').addEventListener('click', () => {
+            const lines = getInputText().split(/\r?\n/);
+            lines.sort((a, b) => b.length - a.length);
+            setOutput('sort-result', lines.join('\n'));
+            incrementCounter();
+        });
+
+        // ==================== FIND & REPLACE ====================
+        document.getElementById('find-replace').addEventListener('click', () => {
+            let text = getInputText();
+            const find = document.getElementById('find-text').value;
+            const replace = document.getElementById('replace-text').value;
+            const useRegex = document.getElementById('regex-mode').checked;
+            const caseSensitive = document.getElementById('case-sensitive-replace').checked;
+
+            if (!find) {
+                setOutput('replace-result', text);
+                return;
+            }
+
+            try {
+                let result;
+                if (useRegex) {
+                    const flags = caseSensitive ? 'g' : 'gi';
+                    const regex = new RegExp(find, flags);
+                    result = text.replace(regex, replace);
+                } else {
+                    const flags = caseSensitive ? 'g' : 'gi';
+                    const regex = new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), flags);
+                    result = text.replace(regex, replace);
+                }
+                setOutput('replace-result', result);
+                incrementCounter();
+            } catch(e) {
+                setOutput('replace-result', 'Invalid regular expression');
+            }
+        });
+
+        // ==================== REMOVE WHITESPACE ====================
+        document.getElementById('trim-spaces').addEventListener('click', () => {
+            setOutput('whitespace-result', getInputText().trim());
+            incrementCounter();
+        });
+        document.getElementById('remove-all-spaces').addEventListener('click', () => {
+            setOutput('whitespace-result', getInputText().replace(/\s/g, ''));
+            incrementCounter();
+        });
+        document.getElementById('remove-extra-spaces').addEventListener('click', () => {
+            setOutput('whitespace-result', getInputText().replace(/\s+/g, ' ').trim());
+            incrementCounter();
+        });
+        document.getElementById('remove-line-breaks').addEventListener('click', () => {
+            setOutput('whitespace-result', getInputText().replace(/\r?\n/g, ' ').replace(/\s+/g, ' ').trim());
+            incrementCounter();
+        });
+        document.getElementById('remove-tabs').addEventListener('click', () => {
+            setOutput('whitespace-result', getInputText().replace(/\t/g, ''));
+            incrementCounter();
+        });
+        document.getElementById('normalize-whitespace').addEventListener('click', () => {
+            setOutput('whitespace-result', getInputText().replace(/[ \t]+/g, ' ').replace(/[\r\n]+/g, '\n').trim());
+            incrementCounter();
+        });
+
+        // ==================== SLUGIFY URL ====================
+        function slugify(text, lowercase, removeStopwords) {
+            const stopwords = ['a', 'an', 'and', 'the', 'of', 'to', 'in', 'for', 'on', 'with', 'by', 'at', 'from', 'is', 'was', 'are', 'were', 'be', 'been', 'being'];
+            let slug = text;
+            if (lowercase) slug = slug.toLowerCase();
+            if (removeStopwords) {
+                const words = slug.split(/\s+/);
+                slug = words.filter(w => !stopwords.includes(w)).join(' ');
+            }
+            slug = slug.replace(/[^\w\s-]/g, '');
+            slug = slug.replace(/[\s_-]+/g, '-');
+            slug = slug.replace(/^-+|-+$/g, '');
+            return slug || 'slug';
+        }
+
+        document.getElementById('slugify').addEventListener('click', () => {
+            const text = getInputText();
+            const lowercase = document.getElementById('lowercase-slug').checked;
+            const removeStopwords = document.getElementById('remove-stopwords').checked;
+            const result = slugify(text, lowercase, removeStopwords);
+            setOutput('slugify-result', result);
+            incrementCounter();
+        });
+
+        // ==================== WORD FREQUENCY ====================
+        document.getElementById('analyze-frequency').addEventListener('click', () => {
+            const text = getInputText();
+            const caseSensitive = document.getElementById('case-sensitive-freq').checked;
+            const excludeCommon = document.getElementById('exclude-common').checked;
+            const commonWords = ['a', 'an', 'and', 'the', 'of', 'to', 'in', 'for', 'on', 'with', 'by', 'at', 'from', 'is', 'was', 'are', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'but', 'or', 'so', 'for', 'nor', 'yet', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'her', 'its', 'our', 'their'];
+
+            let words = text.toLowerCase().match(/\b\w+\b/g) || [];
+            if (!caseSensitive) words = words.map(w => w.toLowerCase());
+
+            const freq = {};
+            for (const word of words) {
+                if (excludeCommon && commonWords.includes(word.toLowerCase())) continue;
+                freq[word] = (freq[word] || 0) + 1;
+            }
+
+            const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+            let result = '';
+            for (const [word, count] of sorted) {
+                result += `${word}: ${count}\n`;
+            }
+            setOutput('frequency-result', result || 'No words found');
+            incrementCounter();
+        });
+
+        // Initialize
+        updateStats();
+        showTool('case');
+    </script>
+</body>
+</html>

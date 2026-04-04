@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Number & Math Tools - Base Converter, Roman Numerals, Fractions, Scientific | ZyloTech</title>
+    <meta name="description" content="Free online number and math tools. Convert between binary, decimal, hex, octal. Roman numerals converter. Fractions to decimals. Scientific notation. 100% browser-based.">
+    <meta name="keywords" content="free math tools, base converter, binary to decimal, roman numerals converter, fraction to decimal, scientific notation, number converter">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Number & Math Tools - Base Converter, Roman Numerals, Fractions | ZyloTech">
+    <meta property="og:description" content="Free online math tools. Convert between number bases, roman numerals, fractions, scientific notation.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/math-converter.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Number & Math Tools - ZyloTech">
+    <meta name="twitter:description" content="Free math tools: base converter, roman numerals, fractions, scientific notation.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/math-converter.html">
+
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/include.js"></script>
+
+    <style>
+        body { background-color: #0f172a; color: #f1f5f9; font-family: sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        input { background: #1e293b; border: 1px solid #334155; color: white; }
+        input:focus { outline: none; border-color: #6366f1; ring: 2px solid #6366f1; }
+        .tab-active { border-bottom: 2px solid #6366f1; color: #6366f1; }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #6366f1;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #4f46e5; transform: scale(1.1); }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-4">
+                <i class="fas fa-calculator text-indigo-400"></i>
+                <span class="text-sm text-gray-200">Free • Browser-Based • No Server</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2"><i class="fas fa-calculator text-indigo-500 mr-2"></i>Free Number & Math Tools</h1>
+            <p class="text-gray-400">Base Converter • Roman Numerals • Fractions • Scientific Notation. 100% Free.</p>
+            <div class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full shadow-lg">
+                <i class="fas fa-chart-simple"></i>
+                <span id="view-counter" class="font-bold">0</span>
+                <span class="text-sm">calculations done</span>
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="flex flex-wrap justify-center gap-4 mb-6 border-b border-gray-700 pb-2">
+            <button onclick="switchTab('base')" id="tab-base" class="tab-btn tab-active px-4 py-2 font-medium transition hover:text-white">Base Converter</button>
+            <button onclick="switchTab('roman')" id="tab-roman" class="tab-btn px-4 py-2 font-medium text-gray-400 transition hover:text-white">Roman Numerals</button>
+            <button onclick="switchTab('fraction')" id="tab-fraction" class="tab-btn px-4 py-2 font-medium text-gray-400 transition hover:text-white">Fractions</button>
+            <button onclick="switchTab('sci')" id="tab-sci" class="tab-btn px-4 py-2 font-medium text-gray-400 transition hover:text-white">Scientific</button>
+        </div>
+
+        <!-- CONTENT AREA -->
+        <div id="content-area" class="glass rounded-xl p-6 shadow-xl">
+            <!-- Content injected by JS -->
+        </div>
+
+        <!-- Feature Section for SEO -->
+        <div class="mt-8 p-6 bg-white/5 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-3 text-center">Free Number & Math Tools Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div><i class="fas fa-code text-indigo-400 mr-2"></i> <strong>Base Converter</strong> - Binary, Decimal, Hex, Octal</div>
+                <div><i class="fas fa-landmark text-indigo-400 mr-2"></i> <strong>Roman Numerals</strong> - Convert to/from Arabic numbers</div>
+                <div><i class="fas fa-chart-pie text-indigo-400 mr-2"></i> <strong>Fractions</strong> - Convert fractions to decimals and back</div>
+                <div><i class="fas fa-flask text-indigo-400 mr-2"></i> <strong>Scientific Notation</strong> - Convert standard numbers to scientific</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Counter
+        let calculationCount = localStorage.getItem('mathToolsCount') || 0;
+        document.getElementById('view-counter').textContent = calculationCount;
+        function incrementCounter() { calculationCount++; localStorage.setItem('mathToolsCount', calculationCount); document.getElementById('view-counter').textContent = calculationCount; }
+
+        // ==================== LOGIC FUNCTIONS ====================
+
+        // 1. Base Converter Logic
+        function updateBase(source, value) {
+            if (value === '') {
+                document.getElementById('base-dec').value = '';
+                document.getElementById('base-bin').value = '';
+                document.getElementById('base-hex').value = '';
+                document.getElementById('base-oct').value = '';
+                return;
+            }
+
+            let decimal;
+            try {
+                if (source === 'dec') decimal = parseInt(value, 10);
+                if (source === 'bin') decimal = parseInt(value, 2);
+                if (source === 'hex') decimal = parseInt(value, 16);
+                if (source === 'oct') decimal = parseInt(value, 8);
+
+                if (isNaN(decimal)) return; // Invalid input
+
+                // Update other fields if they aren't the source
+                if (source !== 'dec') document.getElementById('base-dec').value = decimal.toString(10);
+                if (source !== 'bin') document.getElementById('base-bin').value = decimal.toString(2);
+                if (source !== 'hex') document.getElementById('base-hex').value = decimal.toString(16).toUpperCase();
+                if (source !== 'oct') document.getElementById('base-oct').value = decimal.toString(8);
+                incrementCounter();
+            } catch (e) { console.error(e); }
+        }
+
+        // 2. Roman Numeral Logic
+        const romanMap = [
+            {m:1000, d:'M'}, {m:900, d:'CM'}, {m:500, d:'D'}, {m:400, d:'CD'},
+            {m:100, d:'C'}, {m:90, d:'XC'}, {m:50, d:'L'}, {m:40, d:'XL'},
+            {m:10, d:'X'}, {m:9, d:'IX'}, {m:5, d:'V'}, {m:4, d:'IV'}, {m:1, d:'I'}
+        ];
+
+        function toRoman(num) {
+            if (num < 1 || num > 3999) return "Out of Range (1-3999)";
+            let result = '';
+            for (let i of romanMap) {
+                while (num >= i.m) {
+                    result += i.d;
+                    num -= i.m;
+                }
+            }
+            return result;
+        }
+
+        function fromRoman(str) {
+            str = str.toUpperCase();
+            let result = 0;
+            let i = 0;
+            while (i < str.length) {
+                let matched = false;
+                for (let j of romanMap) {
+                    if (str.substr(i, j.d.length) === j.d) {
+                        result += j.m;
+                        i += j.d.length;
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched) return "Invalid Roman Numeral";
+            }
+            // Validate by converting back
+            if (toRoman(result) !== str) return "Invalid Format";
+            return result;
+        }
+
+        function handleRomanInput(type, val) {
+            const errEl = document.getElementById('roman-error');
+            errEl.classList.add('hidden');
+
+            if (type === 'arabic') {
+                const num = parseInt(val);
+                if (num >= 1 && num <= 3999) {
+                    document.getElementById('roman-out').value = toRoman(num);
+                    incrementCounter();
+                } else if (val !== '') {
+                    document.getElementById('roman-out').value = '';
+                    errEl.innerText = "Enter 1-3999";
+                    errEl.classList.remove('hidden');
+                } else {
+                    document.getElementById('roman-out').value = '';
+                }
+            } else {
+                if (val === '') {
+                    document.getElementById('roman-arabic').value = '';
+                    return;
+                }
+                const res = fromRoman(val);
+                if (typeof res === 'number') {
+                    document.getElementById('roman-arabic').value = res;
+                    incrementCounter();
+                } else {
+                    document.getElementById('roman-arabic').value = '';
+                    errEl.innerText = res;
+                    errEl.classList.remove('hidden');
+                }
+            }
+        }
+
+        // 3. Fraction Logic
+        function gcd(a, b) {
+            return b ? gcd(b, a % b) : a;
+        }
+
+        function updateFraction(source, val) {
+            if (val === '' || isNaN(val)) {
+                if(source !== 'num') document.getElementById('frac-num').value = '';
+                if(source !== 'den') document.getElementById('frac-den').value = '';
+                if(source !== 'dec') document.getElementById('frac-dec').value = '';
+                return;
+            }
+
+            if (source === 'dec') {
+                // Decimal to Fraction
+                const decimal = parseFloat(val);
+                const len = val.split('.')[1]?.length || 0;
+                const denominator = Math.pow(10, len);
+                const numerator = decimal * denominator;
+                const divisor = gcd(numerator, denominator);
+
+                document.getElementById('frac-num').value = numerator / divisor;
+                document.getElementById('frac-den').value = denominator / divisor;
+                incrementCounter();
+            } else {
+                // Fraction to Decimal
+                const num = parseFloat(document.getElementById('frac-num').value);
+                const den = parseFloat(document.getElementById('frac-den').value);
+                if (den && den !== 0) {
+                    document.getElementById('frac-dec').value = num / den;
+                    incrementCounter();
+                }
+            }
+        }
+
+        // 4. Scientific Notation Logic
+        function updateSci(source, val) {
+            if (val === '') {
+                document.getElementById('sci-std').value = '';
+                document.getElementById('sci-sci').value = '';
+                return;
+            }
+
+            if (source === 'std') {
+                const num = parseFloat(val);
+                if (!isNaN(num)) {
+                    // Clean up trailing zeros in exponent
+                    document.getElementById('sci-sci').value = num.toExponential(4).replace(/\.?0+e/, 'e');
+                    incrementCounter();
+                }
+            } else {
+                const num = parseFloat(val);
+                if (!isNaN(num)) {
+                    document.getElementById('sci-std').value = num.toString();
+                    incrementCounter();
+                }
+            }
+        }
+
+        // ==================== UI RENDERING ====================
+
+        const views = {
+            base: `
+                <h2 class="text-xl font-bold mb-4 text-indigo-400">Base Converter</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Decimal (Base 10)</label>
+                        <input type="text" id="base-dec" oninput="updateBase('dec', this.value)" class="w-full p-3 rounded font-mono" placeholder="e.g. 255">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Binary (Base 2)</label>
+                        <input type="text" id="base-bin" oninput="updateBase('bin', this.value)" class="w-full p-3 rounded font-mono" placeholder="e.g. 11111111">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Hexadecimal (Base 16)</label>
+                        <input type="text" id="base-hex" oninput="updateBase('hex', this.value)" class="w-full p-3 rounded font-mono uppercase" placeholder="e.g. FF">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Octal (Base 8)</label>
+                        <input type="text" id="base-oct" oninput="updateBase('oct', this.value)" class="w-full p-3 rounded font-mono" placeholder="e.g. 377">
+                    </div>
+                </div>
+            `,
+            roman: `
+                <h2 class="text-xl font-bold mb-4 text-indigo-400">Roman Numerals</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Arabic Number (1-3999)</label>
+                        <input type="number" id="roman-arabic" oninput="handleRomanInput('arabic', this.value)" class="w-full p-3 rounded font-mono" placeholder="e.g. 2024">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Roman Numeral</label>
+                        <input type="text" id="roman-out" oninput="handleRomanInput('roman', this.value)" class="w-full p-3 rounded font-mono uppercase" placeholder="e.g. MMXXIV">
+                    </div>
+                </div>
+                <p id="roman-error" class="text-red-400 text-sm mt-2 hidden"></p>
+            `,
+            fraction: `
+                <h2 class="text-xl font-bold mb-4 text-indigo-400">Fraction ↔ Decimal</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Decimal</label>
+                        <input type="number" step="any" id="frac-dec" oninput="updateFraction('dec', this.value)" class="w-full p-3 rounded font-mono" placeholder="e.g. 0.75">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="flex-1">
+                            <label class="block text-xs text-gray-400 mb-1">Numerator</label>
+                            <input type="number" id="frac-num" oninput="updateFraction('num', this.value)" class="w-full p-3 rounded font-mono text-center" placeholder="3">
+                        </div>
+                        <span class="text-2xl text-gray-500 mt-4">/</span>
+                        <div class="flex-1">
+                            <label class="block text-xs text-gray-400 mb-1">Denominator</label>
+                            <input type="number" id="frac-den" oninput="updateFraction('den', this.value)" class="w-full p-3 rounded font-mono text-center" placeholder="4">
+                        </div>
+                    </div>
+                </div>
+            `,
+            sci: `
+                <h2 class="text-xl font-bold mb-4 text-indigo-400">Scientific Notation</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Standard Number</label>
+                        <input type="text" id="sci-std" oninput="updateSci('std', this.value)" class="w-full p-3 rounded font-mono" placeholder="e.g. 12300">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Scientific Notation</label>
+                        <input type="text" id="sci-sci" oninput="updateSci('sci', this.value)" class="w-full p-3 rounded font-mono" placeholder="e.g. 1.23e+4">
+                    </div>
+                </div>
+            `
+        };
+
+        function switchTab(tabName) {
+            // Update Buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active', 'text-indigo-500');
+                btn.classList.add('text-gray-400');
+            });
+            const activeBtn = document.getElementById('tab-' + tabName);
+            activeBtn.classList.add('tab-active', 'text-indigo-500');
+            activeBtn.classList.remove('text-gray-400');
+
+            // Update Content
+            document.getElementById('content-area').innerHTML = views[tabName];
+        }
+
+        // Initialize
+        window.onload = function() {
+            switchTab('base');
+        };
+    </script>
+</body>
+</html>

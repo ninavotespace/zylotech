@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyloQR - Free Professional QR Code Generator | ZyloTech Creators Studio</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Free professional QR code generator. Create custom QR codes for URLs, WiFi, Text, and Email. Add logos, change colors, and download high-resolution PNGs. 100% free, private, and browser-based.">
+    <meta name="keywords" content="free qr generator, qr code maker, custom qr code, wifi qr code, logo qr code, high res qr code, zylo tech, free tools">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ZyloQR - Free Professional QR Code Generator">
+    <meta property="og:description" content="Create custom QR codes with logos and colors. Free, private, and instant.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/zylo-qr.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+    <meta property="og:image" content="https://www.zylotechstudios.space/og-qr.jpg">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ZyloQR - Free QR Generator">
+    <meta name="twitter:description" content="Generate custom QR codes instantly in your browser.">
+    <meta name="twitter:site" content="@zylotech">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/zylo-qr.html">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.ico">
+
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="js/include.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #0f0f0f; color: white; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+
+        .glass-panel {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* QR Container Styling */
+        #qrcode {
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            display: inline-block;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Logo Overlay */
+        #logo-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 5px;
+            border-radius: 50%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        #logo-img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+
+        .tab-btn.active {
+            background-color: #ec4899;
+            color: white;
+            border-color: #ec4899;
+        }
+
+        .donate-btn {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            transition: all 0.3s ease;
+        }
+        .donate-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px -5px rgba(239,68,68,0.4);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ec4899;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #db2777; transform: scale(1.1); }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col">
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- LEFT: Controls -->
+        <div class="lg:col-span-7 space-y-6">
+
+            <!-- Input Type Tabs -->
+            <div class="glass-panel rounded-xl p-2 flex gap-2 overflow-x-auto">
+                <button onclick="setTab('url')" id="tab-url" class="tab-btn active flex-1 py-2 px-4 rounded-lg text-sm font-medium transition border border-transparent hover:bg-slate-700 text-slate-300">
+                    <i class="fas fa-link mr-2"></i> URL
+                </button>
+                <button onclick="setTab('text')" id="tab-text" class="tab-btn flex-1 py-2 px-4 rounded-lg text-sm font-medium transition border border-transparent hover:bg-slate-700 text-slate-300">
+                    <i class="fas fa-font mr-2"></i> Text
+                </button>
+                <button onclick="setTab('wifi')" id="tab-wifi" class="tab-btn flex-1 py-2 px-4 rounded-lg text-sm font-medium transition border border-transparent hover:bg-slate-700 text-slate-300">
+                    <i class="fas fa-wifi mr-2"></i> WiFi
+                </button>
+                <button onclick="setTab('email')" id="tab-email" class="tab-btn flex-1 py-2 px-4 rounded-lg text-sm font-medium transition border border-transparent hover:bg-slate-700 text-slate-300">
+                    <i class="fas fa-envelope mr-2"></i> Email
+                </button>
+            </div>
+
+            <!-- Input Forms -->
+            <div class="glass-panel rounded-xl p-6">
+
+                <!-- URL Input -->
+                <div id="input-url" class="space-y-4">
+                    <label class="block text-sm font-medium text-slate-300">Website URL</label>
+                    <input type="url" id="url-input" placeholder="https://www.example.com" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition" oninput="generateQR()">
+                </div>
+
+                <!-- Text Input -->
+                <div id="input-text" class="space-y-4 hidden">
+                    <label class="block text-sm font-medium text-slate-300">Plain Text</label>
+                    <textarea id="text-input" rows="4" placeholder="Enter your message here..." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition" oninput="generateQR()"></textarea>
+                </div>
+
+                <!-- WiFi Input -->
+                <div id="input-wifi" class="space-y-4 hidden">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Network Name (SSID)</label>
+                            <input type="text" id="wifi-ssid" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" oninput="generateQR()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Password</label>
+                            <input type="text" id="wifi-pass" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" oninput="generateQR()">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Encryption</label>
+                        <select id="wifi-type" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" onchange="generateQR()">
+                            <option value="WPA">WPA/WPA2</option>
+                            <option value="WEP">WEP</option>
+                            <option value="nopass">No Password</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Email Input -->
+                <div id="input-email" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Email Address</label>
+                        <input type="email" id="email-addr" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" oninput="generateQR()">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Subject</label>
+                        <input type="text" id="email-sub" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" oninput="generateQR()">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Message</label>
+                        <textarea id="email-body" rows="2" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" oninput="generateQR()"></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Customization -->
+            <div class="glass-panel rounded-xl p-6">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-paint-brush text-pink-500"></i> Customize Design</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Colors -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Foreground Color</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="color-dark" value="#000000" class="h-10 w-10 rounded cursor-pointer bg-transparent border-0" onchange="generateQR()">
+                                <span class="text-sm text-slate-300 font-mono">#000000</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Background Color</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="color-light" value="#ffffff" class="h-10 w-10 rounded cursor-pointer bg-transparent border-0" onchange="generateQR()">
+                                <span class="text-sm text-slate-300 font-mono">#FFFFFF</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logo & Size -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Add Logo (Optional)</label>
+                            <input type="file" id="logo-input" accept="image/*" class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-pink-600 file:text-white hover:file:bg-pink-700 transition cursor-pointer">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Resolution (Size)</label>
+                            <select id="qr-size" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" onchange="generateQR()">
+                                <option value="200">Small (200x200)</option>
+                                <option value="400" selected>Medium (400x400)</option>
+                                <option value="800">Large (800x800)</option>
+                                <option value="1200">Extra Large (1200x1200)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT: Preview & Download -->
+        <div class="lg:col-span-5">
+            <div class="sticky top-24 space-y-6">
+
+                <!-- Preview Card -->
+                <div class="glass-panel rounded-xl p-8 flex flex-col items-center justify-center min-h-[400px] relative">
+                    <div id="qr-wrapper" class="relative">
+                        <div id="qrcode"></div>
+                        <!-- Logo Overlay Container -->
+                        <div id="logo-container" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-1 rounded-full shadow-lg">
+                            <img id="logo-preview" src="" class="w-12 h-12 object-contain rounded-full">
+                        </div>
+                    </div>
+
+                    <p id="error-msg" class="text-red-400 text-sm mt-4 hidden"><i class="fas fa-exclamation-circle"></i> Please enter valid content</p>
+                </div>
+
+                <!-- Actions -->
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="downloadQR()" class="bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-pink-600/20">
+                        <i class="fas fa-download"></i> Download PNG
+                    </button>
+                    <button onclick="copyToClipboard()" class="bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
+                        <i class="fas fa-copy"></i> Copy Image
+                    </button>
+                </div>
+
+                <!-- Scanner Toggle -->
+                <div class="glass-panel rounded-xl p-4">
+                    <button onclick="toggleScanner()" class="w-full py-2 text-sm text-slate-300 hover:text-white flex items-center justify-center gap-2 transition">
+                        <i class="fas fa-camera"></i> Open QR Scanner
+                    </button>
+                </div>
+
+                <!-- Donation Banner -->
+                <div class="p-6 rounded-xl bg-gradient-to-r from-pink-600/20 to-purple-600/20 border border-pink-500/30 text-center">
+                    <i class="fas fa-heart text-pink-400 text-2xl mb-2"></i>
+                    <h3 class="text-lg font-bold text-white mb-1">Support Free Tools</h3>
+                    <p class="text-gray-300 text-xs mb-3">Help us keep ZyloQR free for everyone.</p>
+                    <button id="donateBtn" class="donate-btn px-6 py-2 rounded-full text-white font-bold text-sm flex items-center gap-2 mx-auto shadow-xl">
+                        <i class="fas fa-coffee"></i> Donate $1
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Scanner Modal -->
+    <div id="scanner-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 rounded-2xl w-full max-w-md overflow-hidden border border-slate-700">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="text-white font-bold">QR Scanner</h3>
+                <button onclick="toggleScanner()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-4">
+                <video id="scanner-video" class="w-full rounded-lg bg-black" autoplay playsinline></video>
+                <canvas id="scanner-canvas" class="hidden"></canvas>
+                <p id="scan-result" class="mt-4 text-center text-green-400 font-mono break-all min-h-[1.5rem]"></p>
+                <button onclick="startScanner()" id="start-scan-btn" class="w-full mt-4 bg-pink-600 py-2 rounded-lg text-white font-bold">Start Camera</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script>
+        // --- State ---
+        let currentType = 'url';
+        let qrCodeObj = null;
+        let logoDataUrl = null;
+
+        // --- Initialization ---
+        window.onload = function() {
+            // Force Default Colors (Black/White)
+            document.getElementById('color-dark').value = "#000000";
+            document.getElementById('color-light').value = "#ffffff";
+
+            generateQR();
+
+            // Back to top logic
+            const backToTop = document.getElementById('backToTop');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) backToTop.classList.add('show');
+                else backToTop.classList.remove('show');
+            });
+            backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+            // Donation logic
+            const DONATION_LINK = 'https://paystack.com/pay/zylotech-support';
+            document.getElementById('donateBtn')?.addEventListener('click', () => {
+                window.open(DONATION_LINK, '_blank');
+            });
+        };
+
+        // --- Tab Switching ---
+        function setTab(type) {
+            currentType = type;
+
+            // Update Buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${type}`).classList.add('active');
+
+            // Update Inputs
+            ['url', 'text', 'wifi', 'email'].forEach(t => {
+                document.getElementById(`input-${t}`).classList.add('hidden');
+            });
+            document.getElementById(`input-${type}`).classList.remove('hidden');
+
+            generateQR();
+        }
+
+        // --- QR Generation Logic ---
+        function getContent() {
+            if (currentType === 'url') return document.getElementById('url-input').value;
+            if (currentType === 'text') return document.getElementById('text-input').value;
+
+            if (currentType === 'wifi') {
+                const ssid = document.getElementById('wifi-ssid').value;
+                const pass = document.getElementById('wifi-pass').value;
+                const type = document.getElementById('wifi-type').value;
+                if (!ssid) return '';
+                return `WIFI:T:${type};S:${ssid};P:${pass};;`;
+            }
+
+            if (currentType === 'email') {
+                const mail = document.getElementById('email-addr').value;
+                const sub = document.getElementById('email-sub').value;
+                const body = document.getElementById('email-body').value;
+                if (!mail) return '';
+                return `mailto:${mail}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
+            }
+            return '';
+        }
+
+        function generateQR() {
+            const content = getContent();
+            const container = document.getElementById('qrcode');
+            const size = parseInt(document.getElementById('qr-size').value);
+            const colorDark = document.getElementById('color-dark').value;
+            const colorLight = document.getElementById('color-light').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            // Clear previous
+            container.innerHTML = '';
+
+            if (!content) {
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            errorMsg.classList.add('hidden');
+
+            // Generate new QR
+            try {
+                qrCodeObj = new QRCode(container, {
+                    text: content,
+                    width: size,
+                    height: size,
+                    colorDark : colorDark,
+                    colorLight : colorLight,
+                    correctLevel : QRCode.CorrectLevel.H // High error correction for logos
+                });
+
+                // Handle Logo Overlay if exists
+                if (logoDataUrl) {
+                    setTimeout(() => {
+                        const logoContainer = document.getElementById('logo-container');
+                        const logoImg = document.getElementById('logo-preview');
+                        logoImg.src = logoDataUrl;
+                        logoContainer.classList.remove('hidden');
+
+                        // Adjust logo size based on QR size
+                        const scale = size / 400;
+                        logoContainer.style.width = `${50 * scale}px`;
+                        logoContainer.style.height = `${50 * scale}px`;
+                        logoImg.style.width = `${40 * scale}px`;
+                        logoImg.style.height = `${40 * scale}px`;
+                    }, 100);
+                } else {
+                    document.getElementById('logo-container').classList.add('hidden');
+                }
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // --- Logo Handling ---
+        document.getElementById('logo-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    logoDataUrl = event.target.result;
+                    generateQR();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // --- Download Function ---
+        function downloadQR() {
+            const canvas = document.querySelector('#qrcode canvas');
+            if (!canvas) return;
+
+            // Create a temporary canvas to merge logo if present
+            const tempCanvas = document.createElement('canvas');
+            const ctx = tempCanvas.getContext('2d');
+            const size = parseInt(document.getElementById('qr-size').value);
+
+            tempCanvas.width = size;
+            tempCanvas.height = size;
+
+            // Draw QR
+            ctx.drawImage(canvas, 0, 0, size, size);
+
+            // Draw Logo if exists
+            if (logoDataUrl) {
+                const logoImg = new Image();
+                logoImg.onload = function() {
+                    const logoSize = size * 0.2; // 20% of QR size
+                    const x = (size - logoSize) / 2;
+                    const y = (size - logoSize) / 2;
+
+                    // White background for logo
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(size/2, size/2, logoSize/1.8, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    ctx.drawImage(logoImg, x, y, logoSize, logoSize);
+
+                    // Trigger Download
+                    triggerDownload(tempCanvas);
+                };
+                logoImg.src = logoDataUrl;
+            } else {
+                triggerDownload(canvas);
+            }
+        }
+
+        function triggerDownload(canvasElement) {
+            const link = document.createElement('a');
+            link.download = `zylo-qr-${Date.now()}.png`;
+            link.href = canvasElement.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- Copy to Clipboard ---
+        async function copyToClipboard() {
+            const canvas = document.querySelector('#qrcode canvas');
+            if (!canvas) return;
+
+            try {
+                canvas.toBlob(async (blob) => {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({ 'image/png': blob })
+                    ]);
+                    alert('QR Code copied to clipboard!');
+                });
+            } catch (err) {
+                alert('Failed to copy. Try downloading instead.');
+            }
+        }
+
+        // --- Scanner Logic ---
+        let stream = null;
+        function toggleScanner() {
+            const modal = document.getElementById('scanner-modal');
+            modal.classList.toggle('hidden');
+            if (modal.classList.contains('hidden')) {
+                stopScanner();
+            }
+        }
+
+        async function startScanner() {
+            const video = document.getElementById('scanner-video');
+            const resultText = document.getElementById('scan-result');
+            const btn = document.getElementById('start-scan-btn');
+
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                video.srcObject = stream;
+                btn.classList.add('hidden');
+                resultText.innerText = "Camera active. Point at a QR code.";
+            } catch (err) {
+                resultText.innerText = "Error accessing camera: " + err.message;
+            }
+        }
+
+        function stopScanner() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            document.getElementById('start-scan-btn').classList.remove('hidden');
+        }
+
+    </script>
+</body>
+</html>

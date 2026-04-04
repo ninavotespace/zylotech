@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyloDocs Pro - Ultimate Word Processor</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts - ENHANCED with more fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@400;700&family=Roboto+Mono:wght@400;500&family=Lato:wght@400;700&family=Open+Sans:wght@400;600&family=Montserrat:wght@400;600&family=Dancing+Script:wght@500&family=Garamond:wght@400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&family=EB+Garamond:wght@400;500;600;700;800&family=Libre+Baskerville:wght@400;700&family=Crimson+Text:wght@400;600;700&family=Work+Sans:wght@400;500;600&family=Poppins:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&family=Nunito:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Sans+Pro:wght@400;600;700&family=Oswald:wght@400;500;600&family=Ubuntu:wght@400;500;700&family=PT+Serif:wght@400;700&family=Cabin:wght@400;500;600&family=Heebo:wght@400;500;700&family=Comfortaa:wght@400;500;700&family=Rubik:wght@400;500;700&family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Fira+Code:wght@400;500;600&family=Source+Code+Pro:wght@400;500;600" rel="stylesheet">
+
+    <!-- PDF Parsing Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <!-- Mammoth for DOCX parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.4.2/mammoth.browser.min.js"></script>
+
+    <!-- HTML2PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        body { background-color: #e5e7eb; font-family: 'Inter', sans-serif; overflow: hidden; }
+
+        /* The A4/Letter Page */
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            margin: 30px auto;
+            padding: 25mm;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            outline: none;
+            position: relative;
+            color: #000;
+            transition: padding 0.3s ease;
+        }
+
+        /* Editor Content Styles */
+        .editor-content h1 { font-size: 2.2em; font-weight: 700; margin-bottom: 0.5em; color: #111; }
+        .editor-content h2 { font-size: 1.7em; font-weight: 600; margin-bottom: 0.5em; color: #333; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .editor-content h3 { font-size: 1.4em; font-weight: 600; margin-bottom: 0.5em; color: #444; }
+        .editor-content p { margin-bottom: 1em; line-height: 1.6; font-size: 11pt; }
+        .editor-content ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em; }
+        .editor-content ol { list-style-type: decimal; padding-left: 1.5em; margin-bottom: 1em; }
+        .editor-content blockquote { border-left: 4px solid #3b82f6; padding-left: 1em; color: #555; font-style: italic; background: #f9fafb; padding: 10px; margin: 10px 0; }
+        .editor-content table { width: 100%; border-collapse: collapse; margin-bottom: 1.5em; font-size: 10pt; }
+        .editor-content td, .editor-content th { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; }
+        .editor-content th { background-color: #f1f5f9; font-weight: 600; }
+        .editor-content img { max-width: 100%; height: auto; display: block; margin: 15px 0; border-radius: 4px; }
+        .editor-content hr { border: 0; border-top: 2px solid #e5e7eb; margin: 2em 0; }
+
+        /* Code Block Styling */
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            margin: 1em 0;
+            border-left: 4px solid #ec4899;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+        /* Print Optimization */
+        @media print {
+            body { background: white; overflow: visible; }
+            .no-print { display: none !important; }
+            .page { box-shadow: none; margin: 0; padding: 0; width: 100%; min-height: auto; }
+            #scrollContainer { overflow: visible; height: auto; }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            font-size: 14px;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Loading overlay for PDF export */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .loading-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-progress {
+            width: 300px;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            margin: 15px auto 0;
+            overflow: hidden;
+        }
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        /* Word count modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            width: 400px;
+            max-width: 90%;
+        }
+
+        /* Custom font size input */
+        .custom-size-input {
+            width: 60px;
+            text-align: center;
+            font-size: 12px;
+            padding: 4px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-left: 5px;
+        }
+        .custom-size-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            ring: 2px solid #3b82f6;
+        }
+
+        /* File upload button */
+        .upload-btn {
+            background: #10b981;
+            color: white;
+        }
+        .upload-btn:hover {
+            background: #059669;
+        }
+
+        /* Helper class for PDF capture mode */
+        .pdf-capture-mode {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            margin: 0 !important;
+            z-index: -1 !important;
+            visibility: visible !important; /* Crucial for rendering */
+            overflow: visible !important;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <!-- PDF Export Loading Overlay -->
+    <div id="pdfLoadingOverlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Exporting PDF...</h3>
+            <p id="pdfLoadingStatus" class="text-sm text-gray-500">Preparing document</p>
+            <div class="loading-progress">
+                <div id="pdfLoadingBar" class="loading-progress-bar"></div>
+            </div>
+            <p id="pdfLoadingPercent" class="text-xs text-gray-400 mt-2">0%</p>
+        </div>
+    </div>
+
+    <!-- HEADER: File Ops -->
+    <header class="bg-white border-b border-gray-300 px-6 py-3 flex justify-between items-center shadow-sm z-20 no-print">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg text-white flex items-center justify-center font-bold text-xl shadow-md">Z</div>
+            <div>
+                <input type="text" id="docTitle" value="Untitled Document" class="font-semibold text-gray-800 bg-transparent border-none focus:ring-2 focus:ring-blue-100 rounded px-2 py-1 text-lg w-64 transition">
+                <div class="text-xs text-gray-400 flex items-center gap-1">
+                    <i class="fas fa-check-circle text-green-500"></i> Saved locally
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-2">
+            <!-- Upload Button Group -->
+            <div class="relative">
+                <button id="uploadBtn" class="upload-btn px-4 py-2 text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition flex items-center gap-2">
+                    <i class="fas fa-upload"></i> Upload
+                </button>
+                <div id="uploadDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-30">
+                    <div class="py-1">
+                        <label class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                            <i class="fas fa-file-word text-blue-600 mr-2"></i> Upload Word (.docx)
+                            <input type="file" id="uploadDocx" accept=".docx" class="hidden">
+                        </label>
+                        <label class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                            <i class="fas fa-file-pdf text-red-600 mr-2"></i> Upload PDF
+                            <input type="file" id="uploadPdf" accept=".pdf" class="hidden">
+                        </label>
+                        <label class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                            <i class="fas fa-file-alt text-gray-600 mr-2"></i> Upload HTML
+                            <input type="file" id="uploadHtml" accept=".html,.htm" class="hidden">
+                        </label>
+                        <label class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                            <i class="fas fa-file-alt text-gray-600 mr-2"></i> Upload TXT
+                            <input type="file" id="uploadTxt" accept=".txt" class="hidden">
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <button onclick="showWordCountModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-300 transition flex items-center gap-2">
+                <i class="fas fa-chart-simple"></i> Word Count
+            </button>
+            <button onclick="showFindReplace()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-300 transition flex items-center gap-2">
+                <i class="fas fa-search"></i> Find/Replace
+            </button>
+            <button onclick="downloadHTML()" class="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition flex items-center gap-2">
+                <i class="fas fa-file-word"></i> Save for Word
+            </button>
+            <button onclick="downloadPDF()" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md hover:shadow-lg transition flex items-center gap-2">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </button>
+        </div>
+    </header>
+
+    <!-- TOOLBAR: Rich Formatting - ENHANCED with more options -->
+    <div class="bg-white border-b border-gray-300 px-4 py-2 flex flex-wrap gap-2 items-center justify-center shadow-sm z-10 no-print select-none">
+
+        <!-- History -->
+        <div class="flex gap-1 border-r border-gray-200 pr-3">
+            <button onclick="execCmd('undo')" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i></button>
+            <button onclick="execCmd('redo')" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded" title="Redo (Ctrl+Y)"><i class="fas fa-redo"></i></button>
+        </div>
+
+        <!-- Font Family (ALL WORD FONTS + GOOGLE FONTS - ENHANCED) -->
+        <div class="relative group">
+            <select id="fontSelect" onchange="execCmd('fontName', this.value)" class="w-52 h-8 text-sm border border-gray-300 rounded px-2 bg-white hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                <optgroup label="Standard Word Fonts">
+                    <option value="Arial" style="font-family: Arial;">Arial</option>
+                    <option value="Times New Roman" style="font-family: 'Times New Roman';">Times New Roman</option>
+                    <option value="Calibri" style="font-family: Calibri, sans-serif;">Calibri</option>
+                    <option value="Courier New" style="font-family: 'Courier New';">Courier New</option>
+                    <option value="Georgia" style="font-family: Georgia;">Georgia</option>
+                    <option value="Verdana" style="font-family: Verdana;">Verdana</option>
+                    <option value="Tahoma" style="font-family: Tahoma;">Tahoma</option>
+                    <option value="Trebuchet MS" style="font-family: 'Trebuchet MS';">Trebuchet MS</option>
+                    <option value="Impact" style="font-family: Impact;">Impact</option>
+                    <option value="Comic Sans MS" style="font-family: 'Comic Sans MS';">Comic Sans MS</option>
+                    <option value="Garamond" style="font-family: 'Garamond';">Garamond</option>
+                    <option value="Palatino Linotype" style="font-family: 'Palatino Linotype';">Palatino Linotype</option>
+                    <option value="Book Antiqua" style="font-family: 'Book Antiqua';">Book Antiqua</option>
+                    <option value="Century Gothic" style="font-family: 'Century Gothic';">Century Gothic</option>
+                </optgroup>
+                <optgroup label="Google Fonts">
+                    <option value="Inter" style="font-family: 'Inter';">Inter</option>
+                    <option value="Merriweather" style="font-family: 'Merriweather';">Merriweather</option>
+                    <option value="Playfair Display" style="font-family: 'Playfair Display';">Playfair Display</option>
+                    <option value="Lato" style="font-family: 'Lato';">Lato</option>
+                    <option value="Open Sans" style="font-family: 'Open Sans';">Open Sans</option>
+                    <option value="Montserrat" style="font-family: 'Montserrat';">Montserrat</option>
+                    <option value="Roboto Mono" style="font-family: 'Roboto Mono';">Roboto Mono</option>
+                    <option value="Dancing Script" style="font-family: 'Dancing Script';">Dancing Script</option>
+                    <option value="Poppins" style="font-family: 'Poppins';">Poppins</option>
+                    <option value="Raleway" style="font-family: 'Raleway';">Raleway</option>
+                    <option value="Nunito" style="font-family: 'Nunito';">Nunito</option>
+                    <option value="Roboto" style="font-family: 'Roboto';">Roboto</option>
+                    <option value="Source Sans Pro" style="font-family: 'Source Sans Pro';">Source Sans Pro</option>
+                    <option value="Oswald" style="font-family: 'Oswald';">Oswald</option>
+                    <option value="Ubuntu" style="font-family: 'Ubuntu';">Ubuntu</option>
+                    <option value="PT Serif" style="font-family: 'PT Serif';">PT Serif</option>
+                    <option value="Cabin" style="font-family: 'Cabin';">Cabin</option>
+                    <option value="Heebo" style="font-family: 'Heebo';">Heebo</option>
+                    <option value="Comfortaa" style="font-family: 'Comfortaa';">Comfortaa</option>
+                    <option value="Rubik" style="font-family: 'Rubik';">Rubik</option>
+                    <option value="DM Sans" style="font-family: 'DM Sans';">DM Sans</option>
+                    <option value="Space Grotesk" style="font-family: 'Space Grotesk';">Space Grotesk</option>
+                    <option value="JetBrains Mono" style="font-family: 'JetBrains Mono';">JetBrains Mono</option>
+                    <option value="Fira Code" style="font-family: 'Fira Code';">Fira Code</option>
+                    <option value="Source Code Pro" style="font-family: 'Source Code Pro';">Source Code Pro</option>
+                    <option value="Cormorant Garamond" style="font-family: 'Cormorant Garamond';">Cormorant Garamond</option>
+                    <option value="EB Garamond" style="font-family: 'EB Garamond';">EB Garamond</option>
+                    <option value="Libre Baskerville" style="font-family: 'Libre Baskerville';">Libre Baskerville</option>
+                    <option value="Crimson Text" style="font-family: 'Crimson Text';">Crimson Text</option>
+                    <option value="Work Sans" style="font-family: 'Work Sans';">Work Sans</option>
+                    <option value="Quicksand" style="font-family: 'Quicksand';">Quicksand</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <!-- Font Size - COMPLETE PT RANGE + CUSTOM INPUT -->
+        <div class="flex items-center gap-2 border-r border-gray-200 pr-3">
+            <select id="fontSizeSelect" onchange="applyFontSize(this.value)" class="w-24 h-8 text-sm border border-gray-300 rounded px-2 bg-white hover:border-gray-400 focus:outline-none">
+                <option value="6">6pt</option>
+                <option value="7">7pt</option>
+                <option value="8">8pt</option>
+                <option value="9">9pt</option>
+                <option value="10">10pt</option>
+                <option value="11">11pt</option>
+                <option value="12" selected>12pt</option>
+                <option value="14">14pt</option>
+                <option value="16">16pt</option>
+                <option value="18">18pt</option>
+                <option value="20">20pt</option>
+                <option value="22">22pt</option>
+                <option value="24">24pt</option>
+                <option value="26">26pt</option>
+                <option value="28">28pt</option>
+                <option value="30">30pt</option>
+                <option value="32">32pt</option>
+                <option value="34">34pt</option>
+                <option value="36">36pt</option>
+                <option value="38">38pt</option>
+                <option value="40">40pt</option>
+                <option value="42">42pt</option>
+                <option value="44">44pt</option>
+                <option value="46">46pt</option>
+                <option value="48">48pt</option>
+                <option value="50">50pt</option>
+                <option value="52">52pt</option>
+                <option value="54">54pt</option>
+                <option value="56">56pt</option>
+                <option value="58">58pt</option>
+                <option value="60">60pt</option>
+                <option value="62">62pt</option>
+                <option value="64">64pt</option>
+                <option value="66">66pt</option>
+                <option value="68">68pt</option>
+                <option value="70">70pt</option>
+                <option value="72">72pt</option>
+                <option value="custom">Custom...</option>
+            </select>
+            <input type="number" id="customFontSize" placeholder="pt" class="custom-size-input hidden" min="1" max="200" step="1">
+        </div>
+
+        <!-- Basic Style -->
+        <div class="flex gap-1 border-r border-gray-200 pr-3">
+            <button onclick="execCmd('bold')" class="w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded font-bold" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
+            <button onclick="execCmd('italic')" class="w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded italic" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
+            <button onclick="execCmd('underline')" class="w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded underline" title="Underline (Ctrl+U)"><i class="fas fa-underline"></i></button>
+            <button onclick="execCmd('strikeThrough')" class="w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded line-through" title="Strikethrough"><i class="fas fa-strikethrough"></i></button>
+            <button onclick="execCmd('superscript')" class="w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded" title="Superscript"><i class="fas fa-superscript"></i></button>
+            <button onclick="execCmd('subscript')" class="w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded" title="Subscript"><i class="fas fa-subscript"></i></button>
+
+            <div class="relative w-8 h-8 flex items-center justify-center group">
+                <input type="color" id="textColorPicker" onchange="execCmd('foreColor', this.value)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" title="Text Color">
+                <button class="w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded"><i class="fas fa-font"></i><span class="absolute bottom-1 w-4 h-1 bg-blue-500"></span></button>
+            </div>
+
+            <div class="relative w-8 h-8 flex items-center justify-center group">
+                <input type="color" id="hiliteColorPicker" onchange="execCmd('hiliteColor', this.value)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" title="Highlight Color">
+                <button class="w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded"><i class="fas fa-highlighter"></i></button>
+            </div>
+        </div>
+
+        <!-- Alignment -->
+        <div class="flex gap-1 border-r border-gray-200 pr-3">
+            <button onclick="execCmd('justifyLeft')" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded"><i class="fas fa-align-left"></i></button>
+            <button onclick="execCmd('justifyCenter')" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded"><i class="fas fa-align-center"></i></button>
+            <button onclick="execCmd('justifyRight')" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded"><i class="fas fa-align-right"></i></button>
+            <button onclick="execCmd('justifyFull')" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded"><i class="fas fa-align-justify"></i></button>
+        </div>
+
+        <!-- Lists & Indent -->
+        <div class="flex gap-1 border-r border-gray-200 pr-3">
+            <button onclick="execCmd('insertUnorderedList')" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded"><i class="fas fa-list-ul"></i></button>
+            <button onclick="execCmd('insertOrderedList')" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded"><i class="fas fa-list-ol"></i></button>
+            <button onclick="execCmd('indent')" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded"><i class="fas fa-indent"></i></button>
+            <button onclick="execCmd('outdent')" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded"><i class="fas fa-outdent"></i></button>
+        </div>
+
+        <!-- Headings -->
+        <div class="flex gap-1 border-r border-gray-200 pr-3">
+            <button onclick="execCmd('formatBlock', 'H1')" class="px-2 h-8 text-xs font-bold text-gray-600 hover:bg-gray-100 rounded">H1</button>
+            <button onclick="execCmd('formatBlock', 'H2')" class="px-2 h-8 text-xs font-bold text-gray-600 hover:bg-gray-100 rounded">H2</button>
+            <button onclick="execCmd('formatBlock', 'H3')" class="px-2 h-8 text-xs font-bold text-gray-600 hover:bg-gray-100 rounded">H3</button>
+            <button onclick="execCmd('formatBlock', 'H4')" class="px-2 h-8 text-xs font-bold text-gray-600 hover:bg-gray-100 rounded">H4</button>
+            <button onclick="execCmd('formatBlock', 'P')" class="px-2 h-8 text-xs text-gray-600 hover:bg-gray-100 rounded">¶</button>
+        </div>
+
+        <!-- Layout Controls -->
+        <div class="flex gap-2 border-r border-gray-200 pr-3 items-center">
+            <select id="lineSpacingSelect" onchange="changeLineSpacing(this.value)" class="w-28 h-8 text-xs border border-gray-300 rounded px-2 bg-white hover:border-gray-400 focus:outline-none" title="Line Spacing">
+                <option value="1">Single (1.0)</option>
+                <option value="1.15">1.15 Spacing</option>
+                <option value="1.5" selected>1.5 Spacing</option>
+                <option value="2">Double (2.0)</option>
+            </select>
+            <select id="marginSelect" onchange="changeMargins(this.value)" class="w-28 h-8 text-xs border border-gray-300 rounded px-2 bg-white hover:border-gray-400 focus:outline-none" title="Page Margins">
+                <option value="25mm">Normal Margins</option>
+                <option value="15mm">Narrow Margins</option>
+                <option value="40mm">Wide Margins</option>
+                <option value="0mm">No Margins</option>
+            </select>
+        </div>
+
+        <!-- Inserts -->
+        <div class="flex gap-1">
+            <button onclick="insertImage()" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded" title="Insert Image"><i class="fas fa-image"></i></button>
+            <button onclick="insertTable()" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded" title="Insert Table"><i class="fas fa-table"></i></button>
+            <button onclick="insertLink()" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded" title="Insert Link"><i class="fas fa-link"></i></button>
+            <button onclick="insertCodeBlock()" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded" title="Insert Code Block"><i class="fas fa-code"></i></button>
+            <button onclick="insertHR()" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded" title="Horizontal Rule"><i class="fas fa-minus"></i></button>
+            <button onclick="insertSpecialChar()" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded" title="Insert Special Character"><i class="fas fa-omega"></i></button>
+            <button onclick="execCmd('removeFormat')" class="w-8 h-8 flex items-center justify-center text-red-500 hover:bg-red-50 rounded" title="Clear Formatting"><i class="fas fa-eraser"></i></button>
+            <button onclick="selectAll()" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded" title="Select All (Ctrl+A)"><i class="fas fa-check-double"></i></button>
+        </div>
+    </div>
+
+    <!-- WORKSPACE -->
+    <div id="scrollContainer" class="flex-grow overflow-y-auto bg-gray-200 relative">
+        <div id="editor" class="page editor-content" contenteditable="true" spellcheck="true">
+            <h1 style="text-align: center;">Professional Document</h1>
+            <p style="text-align: center; color: #666;">Created with ZyloDocs Pro</p>
+            <hr>
+            <h2>Introduction</h2>
+            <p>Welcome to <b>ZyloDocs Pro</b>. This is a fully featured word processor running entirely in your browser. It supports rich text formatting, tables, images, and code blocks.</p>
+
+            <h3>Key Features:</h3>
+            <ul>
+                <li><b>All Word Fonts:</b> Arial, Times New Roman, Calibri, Garamond, plus 40+ Google Fonts.</li>
+                <li><b>Layout Control:</b> Adjust line spacing and page margins instantly.</li>
+                <li><b>Export to Word:</b> Downloads as .doc compatible with MS Word.</li>
+                <li><b>PDF Export:</b> High-quality print-ready PDFs.</li>
+                <li><b>Auto-Save:</b> Your work is saved locally in real-time.</li>
+                <li><b>Find & Replace:</b> Search and replace text throughout your document.</li>
+                <li><b>Word Count:</b> Detailed statistics about your document.</li>
+                <li><b>Complete Font Size Range:</b> 6pt to 72pt + custom sizes.</li>
+                <li><b>Upload Support:</b> Import Word, PDF, HTML, and TXT files.</li>
+            </ul>
+
+            <blockquote>"Simplicity is the ultimate sophistication." - Leonardo da Vinci</blockquote>
+
+            <h3>Sample Table</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Rich Text</td>
+                        <td>Active</td>
+                        <td>Full formatting support</td>
+                    </tr>
+                    <tr>
+                        <td>Images</td>
+                        <td>Active</td>
+                        <td>Embed via URL</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Code Example</h3>
+            <div class="code-block">function helloWorld() {
+  console.log("Hello from ZyloDocs!");
+}</div>
+
+            <p>Start editing this document to create your own professional content.</p>
+        </div>
+    </div>
+
+    <!-- STATUS BAR -->
+    <div class="bg-white border-t border-gray-300 px-4 py-1 text-xs text-gray-500 flex justify-between items-center no-print select-none">
+        <div class="flex gap-4">
+            <span id="wordCount">Words: 0</span>
+            <span id="charCount">Characters: 0</span>
+            <span id="charNoSpace">Chars (no spaces): 0</span>
+        </div>
+        <div class="flex gap-4">
+            <span>Page: A4</span>
+            <span>Zoom: 100%</span>
+        </div>
+    </div>
+
+    <!-- Find/Replace Modal -->
+    <div id="findReplaceModal" class="modal hidden">
+        <div class="modal-content">
+            <h3 class="text-lg font-bold mb-4">Find & Replace</h3>
+            <input type="text" id="findText" placeholder="Find..." class="w-full p-2 border rounded-lg mb-3">
+            <input type="text" id="replaceText" placeholder="Replace with..." class="w-full p-2 border rounded-lg mb-4">
+            <div class="flex gap-2">
+                <button onclick="findNext()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">Find Next</button>
+                <button onclick="replaceAll()" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">Replace All</button>
+                <button onclick="closeFindReplace()" class="px-4 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Word Count Modal -->
+    <div id="wordCountModal" class="modal hidden">
+        <div class="modal-content">
+            <h3 class="text-lg font-bold mb-4">Document Statistics</h3>
+            <div class="space-y-2">
+                <p><strong>Pages:</strong> <span id="modalPages">0</span> (estimated)</p>
+                <p><strong>Words:</strong> <span id="modalWords">0</span></p>
+                <p><strong>Characters (no spaces):</strong> <span id="modalCharsNoSpace">0</span></p>
+                <p><strong>Characters (with spaces):</strong> <span id="modalChars">0</span></p>
+                <p><strong>Paragraphs:</strong> <span id="modalParagraphs">0</span></p>
+                <p><strong>Lines:</strong> <span id="modalLines">0</span></p>
+                <p><strong>Reading Time:</strong> <span id="modalReadingTime">0</span> minutes</p>
+            </div>
+            <button onclick="closeWordCountModal()" class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const scrollContainer = document.getElementById('scrollContainer');
+        let lastFindIndex = 0;
+
+        // Configure PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+        // --- Core Commands ---
+        function execCmd(command, value = null) {
+            document.execCommand(command, false, value);
+            editor.focus();
+            updateStats();
+        }
+
+        // Select All
+        function selectAll() {
+            document.execCommand('selectAll', false, null);
+            editor.focus();
+        }
+
+        // --- Font Size Functions (ENHANCED) ---
+        function applyFontSize(value) {
+            if (value === 'custom') {
+                const customInput = document.getElementById('customFontSize');
+                customInput.classList.remove('hidden');
+                customInput.focus();
+                customInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const customVal = parseInt(this.value);
+                        if (!isNaN(customVal) && customVal >= 1 && customVal <= 200) {
+                            document.execCommand('fontSize', false, '7');
+                            const selection = window.getSelection();
+                            if (!selection.isCollapsed) {
+                                const range = selection.getRangeAt(0);
+                                const span = document.createElement('span');
+                                span.style.fontSize = customVal + 'pt';
+                                range.surroundContents(span);
+                            } else {
+                                document.execCommand('insertHTML', false, `<span style="font-size: ${customVal}pt;">&nbsp;</span>`);
+                            }
+                            showToast(`Font size set to ${customVal}pt`);
+                        }
+                        customInput.classList.add('hidden');
+                        customInput.value = '';
+                    }
+                });
+                customInput.addEventListener('blur', function() {
+                    this.classList.add('hidden');
+                    this.value = '';
+                });
+            } else {
+                document.getElementById('customFontSize').classList.add('hidden');
+                let fontSizeMap = {
+                    '6': '1', '7': '1', '8': '1', '9': '1', '10': '2', '11': '2', '12': '3',
+                    '14': '4', '16': '4', '18': '5', '20': '5', '22': '5', '24': '6', '26': '6',
+                    '28': '6', '30': '6', '32': '6', '34': '6', '36': '7', '38': '7', '40': '7',
+                    '42': '7', '44': '7', '46': '7', '48': '7', '50': '7', '52': '7', '54': '7',
+                    '56': '7', '58': '7', '60': '7', '62': '7', '64': '7', '66': '7', '68': '7',
+                    '70': '7', '72': '7'
+                };
+                const cmdValue = fontSizeMap[value] || '3';
+                document.execCommand('fontSize', false, cmdValue);
+                const selection = window.getSelection();
+                if (!selection.isCollapsed) {
+                    const range = selection.getRangeAt(0);
+                    const span = document.createElement('span');
+                    span.style.fontSize = value + 'pt';
+                    try {
+                        range.surroundContents(span);
+                    } catch(e) {}
+                }
+                showToast(`Font size set to ${value}pt`);
+            }
+            editor.focus();
+            updateStats();
+        }
+
+        // --- Layout Controls ---
+        function changeLineSpacing(value) {
+            editor.style.lineHeight = value;
+            localStorage.setItem('zyloProLineSpacing', value);
+        }
+
+        function changeMargins(value) {
+            editor.style.padding = value;
+            localStorage.setItem('zyloProMargins', value);
+        }
+
+        // --- Insert Functions ---
+        function insertImage() {
+            const url = prompt('Enter Image URL:', 'https://via.placeholder.com/600x300');
+            if (url) execCmd('insertImage', url);
+        }
+
+        function insertLink() {
+            const url = prompt('Enter URL:', 'https://');
+            if (url) execCmd('createLink', url);
+        }
+
+        function insertHR() {
+            execCmd('insertHorizontalRule');
+        }
+
+        function insertTable() {
+            const rows = prompt('Rows:', '3');
+            const cols = prompt('Columns:', '3');
+            if (rows && cols) {
+                let html = '<table style="width:100%; border-collapse: collapse;">';
+                for (let i = 0; i < rows; i++) {
+                    html += '<tr>';
+                    for (let j = 0; j < cols; j++) {
+                        html += `<td style="border:1px solid #ccc; padding:8px;">Cell ${i+1}-${j+1}</td>`;
+                    }
+                    html += '</tr>';
+                }
+                html += '</table><p><br></p>';
+                execCmd('insertHTML', html);
+            }
+        }
+
+        function insertCodeBlock() {
+            const code = prompt('Enter Code:', '// Paste your code here');
+            if (code) {
+                const html = `<div class="code-block">${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div><p><br></p>`;
+                execCmd('insertHTML', html);
+            }
+        }
+
+        function insertSpecialChar() {
+            const chars = ['©', '®', '™', '€', '£', '¥', '¢', '§', '¶', '†', '‡', '•', '…', '‰', '′', '″', '←', '→', '↑', '↓', '✓', '✗', '★', '☆', '❤', '♠', '♣', '♥', '♦'];
+            const charList = chars.join('  ');
+            const selected = prompt(`Select a special character:\n${charList}\n\nEnter the character or code:`, '©');
+            if (selected && selected.length === 1) {
+                execCmd('insertHTML', selected);
+            } else if (selected) {
+                execCmd('insertHTML', selected.charAt(0));
+            }
+        }
+
+        // --- UPLOAD FUNCTIONS ---
+        const uploadBtn = document.getElementById('uploadBtn');
+        const uploadDropdown = document.getElementById('uploadDropdown');
+
+        uploadBtn.addEventListener('click', () => {
+            uploadDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!uploadBtn.contains(e.target) && !uploadDropdown.contains(e.target)) {
+                uploadDropdown.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('uploadDocx').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            showToast('Processing Word document...', 'info');
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+                editor.innerHTML = result.value;
+                document.getElementById('docTitle').value = file.name.replace(/\.docx$/, '');
+                updateStats();
+                showToast('Word document loaded successfully!', 'success');
+            } catch (err) {
+                showToast('Error loading Word file: ' + err.message, 'error');
+            }
+            e.target.value = '';
+            uploadDropdown.classList.add('hidden');
+        });
+
+        document.getElementById('uploadPdf').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            showToast('Processing PDF...', 'info');
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullText = '';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    fullText += `<p>${pageText}</p>`;
+                }
+                editor.innerHTML = fullText || '<p>No text found in PDF (scanned image PDFs may not work).</p>';
+                document.getElementById('docTitle').value = file.name.replace(/\.pdf$/, '');
+                updateStats();
+                showToast('PDF loaded successfully!', 'success');
+            } catch (err) {
+                showToast('Error loading PDF: ' + err.message, 'error');
+            }
+            e.target.value = '';
+            uploadDropdown.classList.add('hidden');
+        });
+
+        document.getElementById('uploadHtml').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            showToast('Processing HTML file...', 'info');
+            try {
+                const text = await file.text();
+                editor.innerHTML = text;
+                document.getElementById('docTitle').value = file.name.replace(/\.html$|\.htm$/, '');
+                updateStats();
+                showToast('HTML file loaded successfully!', 'success');
+            } catch (err) {
+                showToast('Error loading HTML file: ' + err.message, 'error');
+            }
+            e.target.value = '';
+            uploadDropdown.classList.add('hidden');
+        });
+
+        document.getElementById('uploadTxt').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            showToast('Processing text file...', 'info');
+            try {
+                const text = await file.text();
+                editor.innerHTML = `<p>${text.replace(/\n/g, '</p><p>')}</p>`;
+                document.getElementById('docTitle').value = file.name.replace(/\.txt$/, '');
+                updateStats();
+                showToast('Text file loaded successfully!', 'success');
+            } catch (err) {
+                showToast('Error loading text file: ' + err.message, 'error');
+            }
+            e.target.value = '';
+            uploadDropdown.classList.add('hidden');
+        });
+
+        // --- Find & Replace Functions ---
+        function showFindReplace() {
+            document.getElementById('findReplaceModal').classList.remove('hidden');
+            document.getElementById('findText').focus();
+            lastFindIndex = 0;
+        }
+
+        function closeFindReplace() {
+            document.getElementById('findReplaceModal').classList.add('hidden');
+        }
+
+        function findNext() {
+            const findText = document.getElementById('findText').value;
+            if (!findText) return;
+            const text = editor.innerText;
+            const index = text.toLowerCase().indexOf(findText.toLowerCase(), lastFindIndex);
+            if (index !== -1) {
+                const range = document.createRange();
+                const sel = window.getSelection();
+                const textNode = findTextNode(editor, index);
+                if (textNode) {
+                    range.setStart(textNode, index - getTextLengthBefore(textNode));
+                    range.setEnd(textNode, index - getTextLengthBefore(textNode) + findText.length);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    lastFindIndex = index + findText.length;
+                    showToast(`Found "${findText}"`);
+                }
+            } else {
+                lastFindIndex = 0;
+                showToast('No more matches found', 'info');
+            }
+        }
+
+        function findTextNode(node, index) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                if (index <= node.textContent.length) return node;
+                return null;
+            }
+            for (let child of node.childNodes) {
+                const result = findTextNode(child, index);
+                if (result) return result;
+                if (child.textContent) index -= child.textContent.length;
+            }
+            return null;
+        }
+
+        function getTextLengthBefore(node) {
+            let length = 0;
+            let parent = node.parentNode;
+            for (let child of parent.childNodes) {
+                if (child === node) break;
+                if (child.textContent) length += child.textContent.length;
+            }
+            return length;
+        }
+
+        function replaceAll() {
+            const findText = document.getElementById('findText').value;
+            const replaceText = document.getElementById('replaceText').value;
+            if (!findText) return;
+            const currentHtml = editor.innerHTML;
+            const newHtml = currentHtml.split(findText).join(replaceText);
+            editor.innerHTML = newHtml;
+            updateStats();
+            showToast(`Replaced all occurrences of "${findText}"`);
+            closeFindReplace();
+        }
+
+        // --- Word Count Modal ---
+        function showWordCountModal() {
+            const text = editor.innerText;
+            const html = editor.innerHTML;
+            const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+            const chars = text.length;
+            const charsNoSpace = text.replace(/\s/g, '').length;
+            const paragraphs = html.split(/<\/p>/i).filter(p => p.includes('<p>')).length;
+            const lines = text.split(/\n/).length;
+            const readingTime = Math.ceil(words / 200);
+            const estimatedPages = Math.ceil(words / 500);
+
+            document.getElementById('modalPages').textContent = estimatedPages;
+            document.getElementById('modalWords').textContent = words;
+            document.getElementById('modalCharsNoSpace').textContent = charsNoSpace;
+            document.getElementById('modalChars').textContent = chars;
+            document.getElementById('modalParagraphs').textContent = paragraphs;
+            document.getElementById('modalLines').textContent = lines;
+            document.getElementById('modalReadingTime').textContent = readingTime;
+
+            document.getElementById('wordCountModal').classList.remove('hidden');
+        }
+
+        function closeWordCountModal() {
+            document.getElementById('wordCountModal').classList.add('hidden');
+        }
+
+        // --- Statistics & Auto-Save ---
+        function updateStats() {
+            const text = editor.innerText || '';
+            const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+            const chars = text.length;
+            const charsNoSpace = text.replace(/\s/g, '').length;
+
+            document.getElementById('wordCount').innerText = `Words: ${words}`;
+            document.getElementById('charCount').innerText = `Characters: ${chars}`;
+            document.getElementById('charNoSpace').innerText = `Chars (no spaces): ${charsNoSpace}`;
+
+            localStorage.setItem('zyloProDocContent', editor.innerHTML);
+            localStorage.setItem('zyloProDocTitle', document.getElementById('docTitle').value);
+            localStorage.setItem('zyloProLineSpacing', editor.style.lineHeight);
+            localStorage.setItem('zyloProMargins', editor.style.padding);
+        }
+
+        // --- Toast Notification ---
+        function showToast(message, type = 'success') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'} mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // --- PDF Export with Loading State (FIXED - CAPTURE MODE) ---
+        async function downloadPDF() {
+            const element = document.getElementById('editor');
+            const title = document.getElementById('docTitle').value;
+
+            // Show loading overlay
+            const overlay = document.getElementById('pdfLoadingOverlay');
+            const loadingStatus = document.getElementById('pdfLoadingStatus');
+            const loadingBar = document.getElementById('pdfLoadingBar');
+            const loadingPercent = document.getElementById('pdfLoadingPercent');
+
+            overlay.classList.remove('hidden');
+            loadingStatus.textContent = 'Preparing document...';
+            loadingBar.style.width = '10%';
+            loadingPercent.textContent = '10%';
+
+            // Small delay to ensure UI updates
+            await new Promise(r => setTimeout(r, 100));
+
+            // Store original styles to restore later
+            const originalPosition = element.style.position;
+            const originalLeft = element.style.left;
+            const originalTop = element.style.top;
+            const originalMargin = element.style.margin;
+            const originalZIndex = element.style.zIndex;
+            const originalOverflow = scrollContainer.style.overflow;
+
+            try {
+                loadingStatus.textContent = 'Rendering document...';
+                loadingBar.style.width = '30%';
+                loadingPercent.textContent = '30%';
+
+                // APPLY CAPTURE MODE: Move element to top-left, visible, but behind UI
+                element.classList.add('pdf-capture-mode');
+                scrollContainer.style.overflow = 'visible'; // Allow full height calculation
+
+                await new Promise(r => setTimeout(r, 200)); // Wait for reflow
+
+                loadingStatus.textContent = 'Generating PDF...';
+                loadingBar.style.width = '60%';
+                loadingPercent.textContent = '60%';
+
+                // Configure PDF options
+                const opt = {
+                    margin: 0, // Margin is handled by the element's padding
+                    filename: `${title}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: {
+                        scale: 2, // High quality
+                        useCORS: true,
+                        logging: false,
+                        letterRendering: true,
+                        scrollX: 0,
+                        scrollY: 0,
+                        windowWidth: element.scrollWidth,
+                        windowHeight: element.scrollHeight
+                    },
+                    jsPDF: {
+                        unit: 'mm',
+                        format: 'a4',
+                        orientation: 'portrait',
+                        compress: true
+                    },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
+
+                // Generate PDF directly from the live element
+                await html2pdf().set(opt).from(element).save();
+
+                loadingStatus.textContent = 'Complete!';
+                loadingBar.style.width = '100%';
+                loadingPercent.textContent = '100%';
+
+            } catch (error) {
+                console.error('PDF export error:', error);
+                showToast('Error exporting PDF: ' + error.message, 'error');
+            } finally {
+                // RESTORE ORIGINAL STYLES immediately
+                element.classList.remove('pdf-capture-mode');
+                element.style.position = originalPosition;
+                element.style.left = originalLeft;
+                element.style.top = originalTop;
+                element.style.margin = originalMargin;
+                element.style.zIndex = originalZIndex;
+                scrollContainer.style.overflow = originalOverflow;
+
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    showToast('PDF exported successfully!');
+                }, 500);
+            }
+        }
+
+        // --- Word Export (unchanged) ---
+        function downloadHTML() {
+            const title = document.getElementById('docTitle').value;
+            const content = editor.innerHTML;
+
+            const html = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office'
+                      xmlns:w='urn:schemas-microsoft-com:office:word'
+                      xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <meta charset='utf-8'>
+                    <title>${title}</title>
+                    <style>
+                        body { font-family: 'Arial', sans-serif; font-size: 11pt; line-height: ${editor.style.lineHeight || '1.5'}; }
+                        table { border-collapse: collapse; width: 100%; }
+                        td, th { border: 1px solid #000; padding: 5px; }
+                        .code-block { background: #f0f0f0; padding: 10px; font-family: monospace; }
+                    </style>
+                </head>
+                <body>${content}</body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${title}.doc`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Document saved as Word file!');
+        }
+
+        // Load Data on Start
+        window.onload = function() {
+            const savedContent = localStorage.getItem('zyloProDocContent');
+            const savedTitle = localStorage.getItem('zyloProDocTitle');
+            const savedLineSpacing = localStorage.getItem('zyloProLineSpacing');
+            const savedMargins = localStorage.getItem('zyloProMargins');
+
+            if (savedContent) editor.innerHTML = savedContent;
+            if (savedTitle) document.getElementById('docTitle').value = savedTitle;
+            if (savedLineSpacing) {
+                editor.style.lineHeight = savedLineSpacing;
+                document.getElementById('lineSpacingSelect').value = savedLineSpacing;
+            }
+            if (savedMargins) {
+                editor.style.padding = savedMargins;
+                document.getElementById('marginSelect').value = savedMargins;
+            }
+
+            updateStats();
+            showToast('ZyloDocs Pro ready!', 'success');
+        };
+
+        editor.addEventListener('input', updateStats);
+        editor.addEventListener('keyup', updateStats);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                showFindReplace();
+            }
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                downloadHTML();
+            }
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                downloadPDF();
+            }
+        });
+
+        // Click outside modals to close
+        document.getElementById('findReplaceModal').addEventListener('click', function(e) {
+            if (e.target === this) closeFindReplace();
+        });A
+        document.getElementById('wordCountModal').addEventListener('click', function(e) {
+            if (e.target === this) closeWordCountModal();
+        });
+    </script>
+</body>
+</html>                                                                                                       

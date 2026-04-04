@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Audio Converter - Convert MP3, WAV, OGG, M4A Online | ZyloTech</title>
+    <meta name="description" content="Free online audio converter. Convert MP3, WAV, OGG, AAC, M4A, WebM. Trim, adjust speed & volume. 100% browser-based, no upload required.">
+    <meta name="keywords" content="free audio converter, convert mp3 to wav, audio converter online, free mp3 converter, wav to mp3, audio trimmer">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Audio Converter - Convert Any Audio Format | ZyloTech">
+    <meta property="og:description" content="Free online audio converter. Convert MP3, WAV, OGG, AAC, M4A, WebM. Trim, adjust speed & volume. No upload needed.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/audio-converter.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Audio Converter - ZyloTech">
+    <meta name="twitter:description" content="Convert any audio format online for free. Fast, private, browser-based.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/audio-converter.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="js/include.js"></script>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --accent: #8b5cf6;
+            --handle-start: #3b82f6;
+            --handle-end: #ef4444;
+        }
+
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f3f4f6; color: #1f2937; }
+        .glass { background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .drop-zone { border: 3px dashed #cbd5e1; transition: all 0.2s ease; cursor: pointer; }
+        .drop-zone:hover, .drop-zone.drag-over { border-color: var(--primary); background: #eff6ff; }
+        .format-btn { transition: all 0.2s; border: 2px solid #e5e7eb; }
+        .format-btn.active { border-color: var(--primary); background: #e0e7ff; color: var(--primary); font-weight: 600; }
+        .speed-btn { transition: all 0.2s; border: 1px solid #e5e7eb; }
+        .speed-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .waveform-container {
+            position: relative;
+            height: 100px;
+            background: #f8fafc;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: text;
+            border: 1px solid #e2e8f0;
+            contain: layout style;
+        }
+        .waveform-canvas { display: block; width: 100%; height: 100%; }
+        .selection-overlay {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            background: rgba(79, 70, 229, 0.15);
+            pointer-events: none;
+            border-top: 2px solid var(--primary);
+            border-bottom: 2px solid var(--primary);
+            transition: left 0.05s linear, width 0.05s linear;
+        }
+        .handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            cursor: ew-resize;
+            z-index: 20;
+            transition: background 0.2s, width 0.1s;
+            box-sizing: border-box;
+        }
+        .handle:hover, .handle.dragging { width: 6px; margin-left: -1px; }
+        .handle-start { background: var(--handle-start); left: 0; border-radius: 2px 0 0 2px; }
+        .handle-end { background: var(--handle-end); right: 0; border-radius: 0 2px 2px 0; }
+        .handle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 24px;
+            background: white;
+            border-radius: 3px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            left: 50%;
+            margin-left: -8px;
+        }
+
+        .progress-track { background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden; position: relative; }
+        .progress-fill {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            height: 100%;
+            width: 0%;
+            transition: width 0.15s ease-out;
+            will-change: width;
+        }
+        .progress-text {
+            position: absolute;
+            right: 8px;
+            top: -18px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #4b5563;
+        }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(2px); }
+        .overlay-card { background: white; padding: 2rem; border-radius: 1rem; width: 90%; max-width: 400px; text-align: center; animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes pop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .hidden { display: none !important; }
+        input[type="range"] { accent-color: var(--primary); }
+        .file-item { transition: all 0.2s ease; cursor: pointer; }
+        .file-item:hover { background-color: #f9fafb; transform: translateX(4px); }
+        .file-item.selected { background-color: #e0e7ff; border-left: 4px solid var(--primary); }
+
+        #overlay { pointer-events: none; }
+        #overlay:not(.hidden) { pointer-events: auto; }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4f46e5;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #4338ca; transform: scale(1.1); }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <!-- Processing Overlay -->
+    <div id="overlay" class="overlay hidden">
+        <div class="overlay-card">
+            <div class="animate-spin w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full mx-auto mb-4"></div>
+            <h3 id="overlay-title" class="text-xl font-bold text-gray-800 mb-2">Processing...</h3>
+            <p id="overlay-msg" class="text-sm text-gray-500 mb-6">Please wait</p>
+            <div class="progress-track mb-1">
+                <div id="progress-bar" class="progress-fill" style="width: 0%"></div>
+                <span id="progress-text" class="progress-text">0%</span>
+            </div>
+            <button id="cancel-btn" class="mt-4 text-sm text-red-500 hover:text-red-700 font-medium hidden">Cancel Operation</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 transition-transform duration-300 z-50 flex items-center gap-3 pointer-events-none">
+        <i id="toast-icon" class="fas fa-info-circle text-blue-400"></i>
+        <span id="toast-msg">Notification</span>
+    </div>
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Hero Section -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-2">
+                <i class="fas fa-waveform mr-2 text-indigo-500"></i>Free Audio Converter
+            </h1>
+            <p class="text-gray-500">Convert MP3, WAV, OGG, M4A, AAC, WebM • Trim • Adjust Speed & Volume • 100% Free</p>
+        </div>
+
+        <!-- Mode Tabs -->
+        <div class="flex gap-2 mb-6 border-b">
+            <button id="tabSingle" class="tab-btn px-6 py-3 font-semibold text-indigo-600 border-b-2 border-indigo-600">
+                <i class="fas fa-file-audio mr-2"></i>Single File
+            </button>
+            <button id="tabBatch" class="tab-btn px-6 py-3 font-semibold text-gray-500 hover:text-gray-700">
+                <i class="fas fa-layer-group mr-2"></i>Batch Convert
+            </button>
+        </div>
+
+        <!-- Single File Mode -->
+        <div id="singleMode">
+            <div id="upload-area" class="glass p-8 mb-6 text-center drop-zone">
+                <i class="fas fa-cloud-upload-alt text-5xl text-indigo-300 mb-4"></i>
+                <h2 class="text-xl font-bold text-gray-700 mb-2">Drop Audio File Here</h2>
+                <p class="text-gray-400 mb-4">MP3, WAV, OGG, M4A, AAC, WEBM, FLAC</p>
+                <input type="file" id="file-input" class="hidden" accept="audio/*">
+                <button onclick="triggerFileInput('file-input')" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">Browse Files</button>
+            </div>
+
+            <div id="editor" class="hidden space-y-6">
+                <div class="glass p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
+                                <i class="fas fa-file-audio"></i>
+                            </div>
+                            <div>
+                                <p id="file-name" class="font-bold text-gray-800 truncate max-w-xs md:max-w-md">filename.mp3</p>
+                                <p id="file-meta" class="text-xs text-gray-500">0.0 MB • 00:00</p>
+                            </div>
+                        </div>
+                        <button id="reset-btn" class="text-sm text-red-500 hover:text-red-700 font-medium">
+                            <i class="fas fa-trash-alt mr-1"></i> Remove
+                        </button>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>Start: <b id="lbl-start" class="text-blue-600">0.00s</b></span>
+                            <span>End: <b id="lbl-end" class="text-red-600">0.00s</b></span>
+                        </div>
+                        <div class="waveform-container" id="waveform-box">
+                            <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
+                            <div id="selection-overlay" class="selection-overlay" style="left: 0%; width: 100%;"></div>
+                            <div id="handle-start" class="handle handle-start" style="left: 0%;"></div>
+                            <div id="handle-end" class="handle handle-end" style="left: 100%;"></div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1 text-center">Drag handles to trim • Click waveform to seek</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Original</label>
+                            <audio id="player-orig" controls class="w-full h-8"></audio>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Converted</label>
+                            <audio id="player-conv" controls class="w-full h-8"></audio>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass p-6">
+                        <h3 class="font-bold text-gray-800 mb-4 border-b pb-2"><i class="fas fa-sliders-h mr-2 text-indigo-500"></i>Adjustments</h3>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600">Volume</span>
+                                <span id="vol-val" class="font-bold text-indigo-600">100%</span>
+                            </div>
+                            <input type="range" id="volume-slider" min="0" max="200" value="100" class="w-full">
+                        </div>
+                        <div>
+                            <span class="text-gray-600 text-sm block mb-2">Output Speed</span>
+                            <div class="flex flex-wrap gap-2" id="speed-buttons">
+                                <button data-speed="0.5" class="speed-btn px-3 py-1.5 rounded text-sm">0.5x</button>
+                                <button data-speed="0.75" class="speed-btn px-3 py-1.5 rounded text-sm">0.75x</button>
+                                <button data-speed="1" class="speed-btn active px-3 py-1.5 rounded text-sm">1.0x</button>
+                                <button data-speed="1.25" class="speed-btn px-3 py-1.5 rounded text-sm">1.25x</button>
+                                <button data-speed="1.5" class="speed-btn px-3 py-1.5 rounded text-sm">1.5x</button>
+                                <button data-speed="2" class="speed-btn px-3 py-1.5 rounded text-sm">2.0x</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass p-6">
+                        <h3 class="font-bold text-gray-800 mb-4 border-b pb-2"><i class="fas fa-exchange-alt mr-2 text-indigo-500"></i>Convert To</h3>
+                        <div class="grid grid-cols-3 gap-2 mb-4" id="format-buttons">
+                            <button data-fmt="mp3" class="format-btn active px-3 py-3 rounded text-center">MP3</button>
+                            <button data-fmt="wav" class="format-btn px-3 py-3 rounded text-center">WAV</button>
+                            <button data-fmt="ogg" class="format-btn px-3 py-3 rounded text-center">OGG</button>
+                            <button data-fmt="m4a" class="format-btn px-3 py-3 rounded text-center">M4A</button>
+                            <button data-fmt="aac" class="format-btn px-3 py-3 rounded text-center">AAC</button>
+                            <button data-fmt="webm" class="format-btn px-3 py-3 rounded text-center">WebM</button>
+                        </div>
+                        <div id="mp3-options" class="mb-4 p-3 bg-gray-50 rounded border">
+                            <label class="text-xs text-gray-500 block mb-1">MP3 Bitrate</label>
+                            <select id="mp3-bitrate" class="w-full p-2 border rounded text-sm bg-white">
+                                <option value="128">128 kbps</option>
+                                <option value="192" selected>192 kbps</option>
+                                <option value="256">256 kbps</option>
+                                <option value="320">320 kbps</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="convert-btn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
+                    <i class="fas fa-cogs"></i> Convert Now - Free
+                </button>
+                <div id="download-area" class="hidden text-center">
+                    <button id="download-btn" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-download"></i> Download Converted File
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Batch Mode -->
+        <div id="batchMode" class="hidden">
+            <div id="batch-drop-zone" class="glass p-8 mb-6 text-center drop-zone">
+                <i class="fas fa-cloud-upload-alt text-5xl text-indigo-300 mb-4"></i>
+                <h2 class="text-xl font-bold text-gray-700 mb-2">Drop Multiple Audio Files</h2>
+                <p class="text-gray-400 mb-4">Up to 10 files at once - Batch convert for free</p>
+                <input type="file" id="batch-file-input" class="hidden" accept="audio/*" multiple>
+                <button onclick="triggerFileInput('batch-file-input')" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">Select Files</button>
+            </div>
+
+            <div id="batch-file-list" class="hidden glass p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-gray-800"><i class="fas fa-list mr-2"></i>Files (<span id="batch-count">0</span>)</h3>
+                    <button id="clear-batch-btn" class="text-red-500 text-sm hover:text-red-700"><i class="fas fa-trash"></i> Clear All</button>
+                </div>
+                <div id="batch-files-container" class="max-h-96 overflow-y-auto space-y-2"></div>
+
+                <div class="mt-6 grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm text-gray-600 block mb-1">Output Format:</label>
+                        <select id="batch-format" class="w-full px-3 py-2 border rounded-lg">
+                            <option value="mp3">MP3</option>
+                            <option value="wav">WAV</option>
+                            <option value="ogg">OGG</option>
+                            <option value="m4a">M4A</option>
+                            <option value="aac">AAC</option>
+                            <option value="webm">WebM</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600 block mb-1">MP3 Bitrate:</label>
+                        <select id="batch-bitrate" class="w-full px-3 py-2 border rounded-lg">
+                            <option value="128">128 kbps</option>
+                            <option value="192" selected>192 kbps</option>
+                            <option value="256">256 kbps</option>
+                            <option value="320">320 kbps</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <label class="text-sm text-gray-600 block mb-1">Output Speed (all files):</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="batch-speed-btn px-3 py-1.5 text-sm rounded border border-gray-200" data-speed="0.5">0.5x</button>
+                        <button class="batch-speed-btn px-3 py-1.5 text-sm rounded border border-gray-200" data-speed="0.75">0.75x</button>
+                        <button class="batch-speed-btn active px-3 py-1.5 text-sm rounded border border-gray-200 bg-indigo-600 text-white" data-speed="1">1.0x</button>
+                        <button class="batch-speed-btn px-3 py-1.5 text-sm rounded border border-gray-200" data-speed="1.25">1.25x</button>
+                        <button class="batch-speed-btn px-3 py-1.5 text-sm rounded border border-gray-200" data-speed="1.5">1.5x</button>
+                        <button class="batch-speed-btn px-3 py-1.5 text-sm rounded border border-gray-200" data-speed="2">2.0x</button>
+                    </div>
+                </div>
+
+                <button id="batch-convert-btn" class="w-full mt-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-bold hover:from-indigo-700 hover:to-purple-700 transition">
+                    <i class="fas fa-play"></i> Batch Convert - Free
+                </button>
+
+                <div id="batch-progress" class="hidden mt-4">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span><i class="fas fa-spinner fa-spin mr-1"></i> Converting...</span>
+                        <span id="batch-progress-text" class="font-semibold text-indigo-600">0/0</span>
+                    </div>
+                    <div class="progress-track">
+                        <div id="batch-progress-bar" class="progress-fill" style="width: 0%"></div>
+                        <span id="batch-progress-percent" class="progress-text">0%</span>
+                    </div>
+                    <p id="batch-current-file" class="text-xs text-gray-400 mt-2 truncate"></p>
+                </div>
+
+                <div id="batch-results" class="hidden mt-4">
+                    <button id="download-all-btn" class="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition">
+                        <i class="fas fa-download"></i> Download All as ZIP
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Section for SEO -->
+        <div class="mt-12 p-6 bg-gray-50 rounded-xl">
+            <h2 class="text-xl font-bold text-gray-800 mb-3">Free Audio Converter Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div><i class="fas fa-fast-forward text-indigo-500 mr-2"></i> <strong>Fast Conversion</strong> - Convert audio in seconds</div>
+                <div><i class="fas fa-shield-alt text-indigo-500 mr-2"></i> <strong>100% Private</strong> - No upload, all local</div>
+                <div><i class="fas fa-cut text-indigo-500 mr-2"></i> <strong>Trim Audio</strong> - Cut unwanted parts</div>
+                <div><i class="fas fa-volume-up text-indigo-500 mr-2"></i> <strong>Adjust Volume</strong> - Boost or reduce audio</div>
+                <div><i class="fas fa-tachometer-alt text-indigo-500 mr-2"></i> <strong>Change Speed</strong> - Slow down or speed up</div>
+                <div><i class="fas fa-layer-group text-indigo-500 mr-2"></i> <strong>Batch Convert</strong> - Convert multiple files</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // ==================== UTILITIES ====================
+        const $ = (sel, ctx = document) => ctx.querySelector(sel);
+        const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+        const formatBytes = (bytes, decimals = 2) => {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i];
+        };
+        const formatTime = (s) => {
+            const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+            return `${m}:${sec.toString().padStart(2, '0')}`;
+        };
+
+        const triggerFileInput = (id) => {
+            const input = document.getElementById(id);
+            if (input) input.click();
+        };
+
+        let lastProgressUpdate = 0;
+        const updateProgressThrottled = (barEl, textEl, percent, minInterval = 100) => {
+            const now = performance.now();
+            if (now - lastProgressUpdate >= minInterval) {
+                const p = Math.min(100, Math.max(0, Math.round(percent)));
+                barEl.style.width = p + '%';
+                if (textEl) textEl.textContent = p + '%';
+                lastProgressUpdate = now;
+            }
+        };
+
+        let toastTimeout;
+        const showToast = (msg, type = 'info') => {
+            const toast = $('#toast'), icon = $('#toast-icon'), text = $('#toast-msg');
+            text.textContent = msg;
+            icon.className = `fas mr-2 ${type === 'success' ? 'fa-check-circle text-green-400' : type === 'error' ? 'fa-exclamation-circle text-red-400' : 'fa-info-circle text-blue-400'}`;
+            toast.style.transform = 'translateY(0)';
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => { toast.style.transform = 'translateY(200px)'; }, 3000);
+        };
+
+        const showOverlay = (title, msg) => {
+            $('#overlay').classList.remove('hidden');
+            $('#overlay-title').textContent = title;
+            $('#overlay-msg').textContent = msg;
+            $('#cancel-btn').classList.add('hidden');
+            updateProgressThrottled($('#progress-bar'), $('#progress-text'), 0);
+        };
+        const hideOverlay = () => $('#overlay').classList.add('hidden');
+
+        // ==================== STATE ====================
+        const state = {
+            file: null, buffer: null, audioCtx: null,
+            format: 'mp3', outputSpeed: 1.0, volume: 1.0,
+            trimStart: 0, trimEnd: 0, resultBlob: null,
+            isProcessing: false, shouldCancel: false
+        };
+        let batchFiles = [], batchResults = [], batchSpeed = 1.0;
+
+        // DOM Elements
+        const els = {
+            uploadArea: $('#upload-area'), fileInput: $('#file-input'),
+            editor: $('#editor'), resetBtn: $('#reset-btn'),
+            fileName: $('#file-name'), fileMeta: $('#file-meta'),
+            canvas: $('#waveform-canvas'), waveBox: $('#waveform-box'),
+            selOverlay: $('#selection-overlay'), hStart: $('#handle-start'), hEnd: $('#handle-end'),
+            lblStart: $('#lbl-start'), lblEnd: $('#lbl-end'),
+            playerOrig: $('#player-orig'), playerConv: $('#player-conv'),
+            volSlider: $('#volume-slider'), volVal: $('#vol-val'),
+            speedBtns: $('#speed-buttons'), fmtBtns: $('#format-buttons'),
+            mp3Opts: $('#mp3-options'), mp3Bitrate: $('#mp3-bitrate'),
+            convertBtn: $('#convert-btn'), downloadArea: $('#download-area'),
+            downloadBtn: $('#download-btn'), cancelBtn: $('#cancel-btn')
+        };
+
+        // ==================== INIT ====================
+        els.fileInput.addEventListener('change', e => {
+            if (e.target.files[0]) loadFile(e.target.files[0]);
+            e.target.value = '';
+        });
+        els.uploadArea.addEventListener('dragover', e => { e.preventDefault(); els.uploadArea.classList.add('drag-over'); });
+        els.uploadArea.addEventListener('dragleave', () => els.uploadArea.classList.remove('drag-over'));
+        els.uploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            els.uploadArea.classList.remove('drag-over');
+            if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+        });
+
+        const batchFileInput = $('#batch-file-input');
+        batchFileInput.addEventListener('change', e => {
+            if (e.target.files.length) addBatchFiles(Array.from(e.target.files));
+            e.target.value = '';
+        });
+        $('#batch-drop-zone').addEventListener('dragover', e => { e.preventDefault(); $('#batch-drop-zone').classList.add('drag-over'); });
+        $('#batch-drop-zone').addEventListener('dragleave', () => $('#batch-drop-zone').classList.remove('drag-over'));
+        $('#batch-drop-zone').addEventListener('drop', e => {
+            e.preventDefault();
+            $('#batch-drop-zone').classList.remove('drag-over');
+            const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('audio/'));
+            if (files.length) addBatchFiles(files);
+            else showToast('Please drop audio files only', 'error');
+        });
+
+        els.resetBtn.addEventListener('click', () => location.reload());
+
+        els.fmtBtns.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+            els.fmtBtns.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+            state.format = b.dataset.fmt;
+            els.mp3Opts.classList.toggle('hidden', state.format !== 'mp3');
+        }));
+
+        els.speedBtns.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+            els.speedBtns.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+            state.outputSpeed = parseFloat(b.dataset.speed);
+            showToast(`Output speed: ${state.outputSpeed}x`, 'info');
+        }));
+
+        els.volSlider.addEventListener('input', () => {
+            state.volume = els.volSlider.value / 100;
+            els.volVal.textContent = els.volSlider.value + '%';
+            if (els.playerOrig) els.playerOrig.volume = state.volume;
+        });
+
+        $$('.batch-speed-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                $$('.batch-speed-btn').forEach(b => {
+                    b.classList.remove('active', 'bg-indigo-600', 'text-white');
+                    b.classList.add('border-gray-200');
+                });
+                btn.classList.add('active', 'bg-indigo-600', 'text-white');
+                btn.classList.remove('border-gray-200');
+                batchSpeed = parseFloat(btn.dataset.speed);
+                showToast(`Batch speed: ${batchSpeed}x`, 'info');
+            });
+        });
+
+        $('#tabSingle').addEventListener('click', () => {
+            $('#tabSingle').classList.add('border-b-2', 'border-indigo-600', 'text-indigo-600');
+            $('#tabSingle').classList.remove('text-gray-500');
+            $('#tabBatch').classList.remove('border-b-2', 'border-indigo-600', 'text-indigo-600');
+            $('#tabBatch').classList.add('text-gray-500');
+            $('#singleMode').classList.remove('hidden');
+            $('#batchMode').classList.add('hidden');
+        });
+        $('#tabBatch').addEventListener('click', () => {
+            $('#tabBatch').classList.add('border-b-2', 'border-indigo-600', 'text-indigo-600');
+            $('#tabBatch').classList.remove('text-gray-500');
+            $('#tabSingle').classList.remove('border-b-2', 'border-indigo-600', 'text-indigo-600');
+            $('#tabSingle').classList.add('text-gray-500');
+            $('#batchMode').classList.remove('hidden');
+            $('#singleMode').classList.add('hidden');
+        });
+
+        // ==================== FILE LOADING ====================
+        async function loadFile(file) {
+            if (!file) return;
+            showOverlay('Loading', `Reading ${file.name}...`);
+            try {
+                if (!state.audioCtx) state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const arrayBuf = await file.arrayBuffer();
+                state.buffer = await state.audioCtx.decodeAudioData(arrayBuf);
+                state.file = file;
+                state.trimStart = 0;
+                state.trimEnd = state.buffer.duration;
+
+                els.fileName.textContent = file.name;
+                els.fileMeta.textContent = `${formatBytes(file.size)} • ${formatTime(state.buffer.duration)}`;
+                els.playerOrig.src = URL.createObjectURL(file);
+                els.playerOrig.volume = state.volume;
+
+                els.uploadArea.classList.add('hidden');
+                els.editor.classList.remove('hidden');
+
+                drawWaveform();
+                updateHandles();
+                hideOverlay();
+                showToast('File loaded!', 'success');
+            } catch (e) {
+                hideOverlay();
+                showToast('Error loading file', 'error');
+                console.error(e);
+            }
+        }
+
+        // ==================== WAVEFORM & HANDLES ====================
+        function drawWaveform() {
+            if (!state.buffer) return;
+            const canvas = els.canvas, ctx = canvas.getContext('2d');
+            const data = state.buffer.getChannelData(0);
+            const step = Math.ceil(data.length / canvas.width);
+            const amp = canvas.height / 2;
+
+            canvas.width = els.waveBox.clientWidth;
+            canvas.height = els.waveBox.clientHeight;
+
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#94a3b8';
+
+            for (let i = 0; i < canvas.width; i++) {
+                let min = 1, max = -1;
+                for (let j = 0; j < step; j++) {
+                    const idx = Math.min(data.length - 1, i * step + j);
+                    const d = data[idx];
+                    if (d < min) min = d;
+                    if (d > max) max = d;
+                }
+                const h = Math.max(1, (max - min) * amp);
+                ctx.fillRect(i, (canvas.height - h) / 2, 1, h);
+            }
+        }
+
+        function updateHandles() {
+            if (!state.buffer) return;
+            const dur = state.buffer.duration;
+            state.trimStart = Math.max(0, Math.min(state.trimStart, dur - 0.1));
+            state.trimEnd = Math.max(state.trimStart + 0.1, Math.min(state.trimEnd, dur));
+
+            const pStart = Math.max(0, Math.min(100, (state.trimStart / dur) * 100));
+            const pEnd = Math.max(0, Math.min(100, (state.trimEnd / dur) * 100));
+
+            els.hStart.style.left = `${pStart}%`;
+            els.hEnd.style.left = `${pEnd}%`;
+            els.selOverlay.style.left = `${pStart}%`;
+            els.selOverlay.style.width = `${Math.max(0, pEnd - pStart)}%`;
+
+            els.lblStart.textContent = state.trimStart.toFixed(2) + 's';
+            els.lblEnd.textContent = state.trimEnd.toFixed(2) + 's';
+        }
+
+        let dragTarget = null, dragStartX = 0, dragStartLeft = 0, dragStartRight = 0;
+
+        const startDrag = (e, target) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dragTarget = target;
+            dragStartX = e.touches ? e.touches[0].clientX : e.clientX;
+            dragStartLeft = parseFloat(els.hStart.style.left) || 0;
+            dragStartRight = parseFloat(els.hEnd.style.left) || 100;
+            els.hStart.classList.toggle('dragging', target === 'start');
+            els.hEnd.classList.toggle('dragging', target === 'end');
+
+            window.addEventListener('mousemove', onDrag, { passive: false });
+            window.addEventListener('touchmove', onDrag, { passive: false });
+            window.addEventListener('mouseup', stopDrag);
+            window.addEventListener('touchend', stopDrag);
+        };
+
+        const onDrag = (e) => {
+            if (!dragTarget || !state.buffer) return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            const rect = els.waveBox.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const deltaX = clientX - dragStartX;
+            const deltaPct = (deltaX / rect.width) * 100;
+
+            const dur = state.buffer.duration;
+            const minGap = 0.1;
+
+            if (dragTarget === 'start') {
+                let newPct = Math.max(0, Math.min(100, dragStartLeft + deltaPct));
+                let newTime = (newPct / 100) * dur;
+                state.trimStart = Math.min(newTime, state.trimEnd - minGap);
+            } else {
+                let newPct = Math.max(0, Math.min(100, dragStartRight + deltaPct));
+                let newTime = (newPct / 100) * dur;
+                state.trimEnd = Math.max(newTime, state.trimStart + minGap);
+            }
+            updateHandles();
+        };
+
+        const stopDrag = () => {
+            dragTarget = null;
+            els.hStart.classList.remove('dragging');
+            els.hEnd.classList.remove('dragging');
+            window.removeEventListener('mousemove', onDrag);
+            window.removeEventListener('touchmove', onDrag);
+            window.removeEventListener('mouseup', stopDrag);
+            window.removeEventListener('touchend', stopDrag);
+        };
+
+        els.hStart.addEventListener('mousedown', e => startDrag(e, 'start'));
+        els.hStart.addEventListener('touchstart', e => startDrag(e, 'start'), { passive: false });
+        els.hEnd.addEventListener('mousedown', e => startDrag(e, 'end'));
+        els.hEnd.addEventListener('touchstart', e => startDrag(e, 'end'), { passive: false });
+
+        els.waveBox.addEventListener('click', (e) => {
+            if (dragTarget || !state.buffer || !els.playerOrig) return;
+            const rect = els.waveBox.getBoundingClientRect();
+            const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            els.playerOrig.currentTime = pct * state.buffer.duration;
+        });
+
+        window.addEventListener('resize', () => { if (state.buffer) drawWaveform(); });
+
+        // ==================== OPTIMIZED AUDIO PROCESSING ====================
+        const processAudioBuffer = async (srcBuf, trimStart, trimEnd, volume, speed) => {
+            const sr = srcBuf.sampleRate, ch = srcBuf.numberOfChannels;
+            const startS = Math.floor(trimStart * sr), endS = Math.floor(trimEnd * sr);
+            const srcLen = endS - startS;
+            if (srcLen <= 0) throw new Error('Invalid trim');
+
+            const outLen = Math.max(1, Math.floor(srcLen / speed));
+            const outBuf = state.audioCtx.createBuffer(ch, outLen, sr);
+
+            const CHUNK = 131072;
+
+            for (let c = 0; c < ch; c++) {
+                const src = srcBuf.getChannelData(c);
+                const dst = outBuf.getChannelData(c);
+
+                for (let outIdx = 0; outIdx < outLen; outIdx += CHUNK) {
+                    if (state.shouldCancel) throw new Error('Cancelled');
+                    const end = Math.min(outIdx + CHUNK, outLen);
+
+                    for (let i = outIdx; i < end; i++) {
+                        const srcFloat = startS + (i * speed);
+                        const idx = srcFloat | 0;
+                        const frac = srcFloat - idx;
+
+                        let sample = 0;
+                        if (idx + 1 < src.length) {
+                            sample = src[idx] + frac * (src[idx + 1] - src[idx]);
+                        } else if (idx < src.length) {
+                            sample = src[idx];
+                        }
+                        dst[i] = sample * volume;
+                        if (dst[i] > 1) dst[i] = 1;
+                        else if (dst[i] < -1) dst[i] = -1;
+                    }
+
+                    if (outIdx % (CHUNK * 2) === 0) {
+                        await new Promise(r => setTimeout(r, 0));
+                    }
+                }
+            }
+            return outBuf;
+        };
+
+        async function encodeWav(buf) {
+            const ch = buf.numberOfChannels, sr = buf.sampleRate, len = buf.length;
+            const dataSize = len * ch * 2;
+            const arr = new ArrayBuffer(44 + dataSize);
+            const v = new DataView(arr);
+
+            const ws = (o, s) => { for(let i=0;i<s.length;i++) v.setUint8(o+i, s.charCodeAt(i)); };
+            ws(0,'RIFF'); v.setUint32(4,36+dataSize,true); ws(8,'WAVE');
+            ws(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true);
+            v.setUint16(22,ch,true); v.setUint32(24,sr,true); v.setUint32(28,sr*ch*2,true);
+            v.setUint16(32,ch*2,true); v.setUint16(34,16,true);
+            ws(36,'data'); v.setUint32(40,dataSize,true);
+
+            const CHUNK = 65536;
+            let off = 44;
+            for (let i = 0; i < len; i += CHUNK) {
+                if (state.shouldCancel) return null;
+                const end = Math.min(i + CHUNK, len);
+                for (let s = i; s < end; s++) {
+                    for (let c = 0; c < ch; c++) {
+                        const sample = buf.getChannelData(c)[s];
+                        const int16 = sample < 0 ? sample * 32768 : sample * 32767;
+                        v.setInt16(off, int16 | 0, true);
+                        off += 2;
+                    }
+                }
+                if (i % (CHUNK * 2) === 0) {
+                    updateProgressThrottled($('#progress-bar'), $('#progress-text'), 45 + (i/len)*45);
+                    await new Promise(r => setTimeout(r, 0));
+                }
+            }
+            return new Blob([arr], { type: 'audio/wav' });
+        }
+
+        async function encodeMp3(buf) {
+            const ch = buf.numberOfChannels, sr = buf.sampleRate;
+            const bitrate = parseInt(els.mp3Bitrate.value);
+            const encoder = new lamejs.Mp3Encoder(ch, sr, bitrate);
+            const len = buf.length, mp3Data = [];
+            const blockSize = 1152;
+
+            const int16Bufs = [];
+            const CONV_CHUNK = 131072;
+            for (let c = 0; c < ch; c++) {
+                const data = buf.getChannelData(c);
+                const int16 = new Int16Array(len);
+                for (let i = 0; i < len; i += CONV_CHUNK) {
+                    if (state.shouldCancel) return null;
+                    const end = Math.min(i + CONV_CHUNK, len);
+                    for (let j = i; j < end; j++) {
+                        const s = data[j];
+                        int16[j] = s < 0 ? s * 32768 : s * 32767;
+                    }
+                    if (i % (CONV_CHUNK * 2) === 0) await new Promise(r => setTimeout(r, 0));
+                }
+                int16Bufs.push(int16);
+            }
+
+            for (let i = 0; i < len; i += blockSize) {
+                if (state.shouldCancel) return null;
+                const end = Math.min(i + blockSize, len);
+                const chunks = int16Bufs.map(b => b.subarray(i, end));
+                const mp3buf = ch === 1 ? encoder.encodeBuffer(chunks[0]) : encoder.encodeBuffer(chunks[0], chunks[1]);
+                if (mp3buf.length > 0) mp3Data.push(mp3buf);
+                if (i % (blockSize * 50) === 0) {
+                    updateProgressThrottled($('#progress-bar'), $('#progress-text'), 70 + (i/len)*28);
+                    await new Promise(r => setTimeout(r, 0));
+                }
+            }
+            const flush = encoder.flush();
+            if (flush.length > 0) mp3Data.push(flush);
+            return new Blob(mp3Data, { type: 'audio/mpeg' });
+        }
+
+        async function encodeMediaRecorder(buf, format) {
+            return new Promise((resolve, reject) => {
+                const actx = new (window.AudioContext || window.webkitAudioContext)();
+                const dest = actx.createMediaStreamDestination();
+                const src = actx.createBufferSource();
+                src.buffer = buf;
+                src.connect(dest);
+                src.start(0);
+
+                let mime = 'audio/webm;codecs=opus';
+                if (format === 'ogg' && MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) mime = 'audio/ogg;codecs=opus';
+                else if ((format === 'aac' || format === 'm4a') && MediaRecorder.isTypeSupported('audio/mp4;codecs=mp4a.40.2')) mime = 'audio/mp4;codecs=mp4a.40.2';
+
+                const rec = new MediaRecorder(dest.stream, { mimeType: mime });
+                const chunks = [];
+                rec.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+                rec.onstop = () => { src.stop(); actx.close(); resolve(new Blob(chunks, { type: mime })); };
+                rec.onerror = e => { src.stop(); actx.close(); reject(e); };
+                rec.start(100);
+
+                const dur = buf.duration * 1000, start = Date.now();
+                const timer = setInterval(() => {
+                    if (state.shouldCancel) { rec.stop(); reject(new Error('Cancelled')); return; }
+                    const pct = Math.min(95, ((Date.now() - start) / dur) * 100);
+                    updateProgressThrottled($('#progress-bar'), $('#progress-text'), 40 + pct * 0.55, 200);
+                }, 200);
+                src.onended = () => { clearInterval(timer); setTimeout(() => rec.stop(), 100); };
+            });
+        }
+
+        // ==================== CONVERSION ====================
+        els.convertBtn.addEventListener('click', async () => {
+            if (state.isProcessing) return;
+            state.isProcessing = true;
+            state.shouldCancel = false;
+            els.downloadArea.classList.add('hidden');
+            els.convertBtn.classList.add('hidden');
+
+            showOverlay('Converting', `Processing ${state.format.toUpperCase()} at ${state.outputSpeed}x...`);
+            $('#cancel-btn').classList.remove('hidden');
+            updateProgressThrottled($('#progress-bar'), $('#progress-text'), 0);
+
+            try {
+                const processed = await processAudioBuffer(state.buffer, state.trimStart, state.trimEnd, state.volume, state.outputSpeed);
+                updateProgressThrottled($('#progress-bar'), $('#progress-text'), 40);
+
+                if (state.shouldCancel) throw new Error('Cancelled');
+
+                let blob;
+                if (state.format === 'wav') blob = await encodeWav(processed);
+                else if (state.format === 'mp3') blob = await encodeMp3(processed);
+                else blob = await encodeMediaRecorder(processed, state.format);
+
+                if (!blob) throw new Error('Encoding failed');
+
+                state.resultBlob = blob;
+                updateProgressThrottled($('#progress-bar'), $('#progress-text'), 100);
+
+                els.playerConv.src = URL.createObjectURL(blob);
+                els.downloadArea.classList.remove('hidden');
+                showToast('Conversion complete!', 'success');
+
+            } catch (e) {
+                if (e.message !== 'Cancelled') showToast('Conversion failed: ' + e.message, 'error');
+            } finally {
+                state.isProcessing = false;
+                hideOverlay();
+                els.convertBtn.classList.remove('hidden');
+            }
+        });
+
+        $('#cancel-btn').addEventListener('click', () => { state.shouldCancel = true; });
+
+        els.downloadBtn.addEventListener('click', () => {
+            if (!state.resultBlob) return;
+            const ext = state.format === 'aac' ? 'm4a' : state.format;
+            const speed = state.outputSpeed !== 1 ? `_${state.outputSpeed}x` : '';
+            const name = state.file.name.replace(/\.[^/.]+$/, '') + speed + '_converted.' + ext;
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(state.resultBlob);
+            a.download = name;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(a.href), 100);
+            showToast('Download started!', 'success');
+        });
+
+        // ==================== BATCH CONVERSION ====================
+        const addBatchFiles = (files) => {
+            batchFiles = [...batchFiles, ...files].slice(0, 10);
+            renderBatchList();
+            $('#batch-file-list').classList.remove('hidden');
+            $('#batch-convert-btn').innerHTML = `<i class="fas fa-play"></i> Convert All (${batchFiles.length} files)`;
+        };
+
+        const renderBatchList = () => {
+            const container = $('#batch-files-container');
+            container.innerHTML = '';
+            $('#batch-count').textContent = batchFiles.length;
+
+            batchFiles.forEach((file, idx) => {
+                const div = document.createElement('div');
+                div.className = 'file-item flex justify-between items-center p-3 bg-gray-50 rounded-lg';
+                div.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0">
+                        <i class="fas fa-file-audio text-indigo-400"></i>
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium text-gray-700 truncate">${file.name}</p>
+                            <p class="text-xs text-gray-400">${formatBytes(file.size)}</p>
+                        </div>
+                    </div>
+                    <button class="remove-batch text-red-400 hover:text-red-600 p-1" data-idx="${idx}">
+                        <i class="fas fa-times"></i>
+                    </button>`;
+                container.appendChild(div);
+            });
+
+            $$('.remove-batch').forEach(btn => {
+                btn.onclick = () => {
+                    batchFiles.splice(parseInt(btn.dataset.idx), 1);
+                    renderBatchList();
+                    $('#batch-convert-btn').innerHTML = `<i class="fas fa-play"></i> Convert All (${batchFiles.length} files)`;
+                    if (batchFiles.length === 0) $('#batch-file-list').classList.add('hidden');
+                };
+            });
+        };
+
+        $('#clear-batch-btn').addEventListener('click', () => {
+            batchFiles = [];
+            batchResults = [];
+            renderBatchList();
+            $('#batch-file-list').classList.add('hidden');
+            $('#batch-results').classList.add('hidden');
+        });
+
+        $('#batch-convert-btn').addEventListener('click', async () => {
+            if (batchFiles.length === 0) return;
+            batchResults = [];
+            $('#batch-progress').classList.remove('hidden');
+            $('#batch-results').classList.add('hidden');
+
+            const fmt = $('#batch-format').value, bitrate = parseInt($('#batch-bitrate').value);
+            if (!state.audioCtx) state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+            for (let i = 0; i < batchFiles.length; i++) {
+                const pct = ((i + 1) / batchFiles.length) * 100;
+                updateProgressThrottled($('#batch-progress-bar'), $('#batch-progress-percent'), pct);
+                $('#batch-progress-text').textContent = `${i+1}/${batchFiles.length}`;
+                $('#batch-current-file').textContent = `Converting: ${batchFiles[i].name}`;
+
+                try {
+                    const abuf = await batchFiles[i].arrayBuffer();
+                    const abuf_decoded = await state.audioCtx.decodeAudioData(abuf);
+
+                    const processed = await processAudioBuffer(abuf_decoded, 0, abuf_decoded.duration, 1.0, batchSpeed);
+
+                    let blob;
+                    if (fmt === 'wav') blob = await encodeWav(processed);
+                    else if (fmt === 'mp3') {
+                        const origBitrate = els.mp3Bitrate.value;
+                        els.mp3Bitrate.value = bitrate;
+                        blob = await encodeMp3(processed);
+                        els.mp3Bitrate.value = origBitrate;
+                    } else blob = await encodeMediaRecorder(processed, fmt);
+
+                    const ext = fmt === 'aac' ? 'm4a' : fmt;
+                    const speedSuffix = batchSpeed !== 1 ? `_${batchSpeed}x` : '';
+                    const name = batchFiles[i].name.replace(/\.[^/.]+$/, '') + speedSuffix + '_converted.' + ext;
+                    batchResults.push({ name, blob });
+
+                } catch (e) {
+                    console.error('Batch error:', e);
+                    $('#batch-current-file').textContent = `Failed: ${batchFiles[i].name}`;
+                }
+                await new Promise(r => setTimeout(r, 50));
+            }
+
+            $('#batch-current-file').textContent = 'All done!';
+            $('#batch-results').classList.remove('hidden');
+            showToast(`Converted ${batchResults.length} files!`, 'success');
+        });
+
+        $('#download-all-btn').addEventListener('click', async () => {
+            if (batchResults.length === 0) return;
+            showOverlay('Creating ZIP', 'Packaging files...');
+
+            const zip = new JSZip();
+            for (let i = 0; i < batchResults.length; i++) {
+                zip.file(batchResults[i].name, batchResults[i].blob);
+                updateProgressThrottled($('#progress-bar'), $('#progress-text'), ((i+1)/batchResults.length)*100);
+                await new Promise(r => setTimeout(r, 0));
+            }
+
+            const zipBlob = await zip.generateAsync({ type: 'blob' });
+            hideOverlay();
+
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(zipBlob);
+            a.download = `converted_${Date.now()}.zip`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(a.href), 100);
+            showToast('ZIP download started!', 'success');
+        });
+
+        window.addEventListener('load', () => {
+            $('#toast').style.transform = 'translateY(200px)';
+        });
+    </script>
+</body>
+</html>

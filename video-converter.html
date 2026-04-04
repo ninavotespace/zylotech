@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Video Converter - Convert MP4, WebM, MOV Online | ZyloTech</title>
+    <meta name="description" content="Free online video converter. Convert MP4, WebM, MOV. Trim, resize, adjust bitrate, speed & volume. Batch processing. 100% browser-based, no upload required.">
+    <meta name="keywords" content="free video converter, convert mp4 to webm, webm to mp4, video converter online, trim video, resize video">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Video Converter - Convert MP4, WebM, MOV | ZyloTech">
+    <meta property="og:description" content="Free online video converter. Convert MP4, WebM, MOV. Trim, resize, adjust bitrate, speed & volume. Batch processing. 100% browser-based.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/video-converter.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Video Converter - ZyloTech">
+    <meta name="twitter:description" content="Convert videos online for free. Trim, resize, adjust speed & volume. Batch convert MP4, WebM, MOV.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/video-converter.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="js/include.js"></script>
+
+    <style>
+        :root { --primary: #3b82f6; --primary-hover: #2563eb; --accent: #8b5cf6; --handle-start: #10b981; --handle-end: #ef4444; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: #f1f5f9; min-height: 100vh; }
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: #1f2937; }
+        .drop-zone { border: 3px dashed #475569; transition: all 0.2s ease; cursor: pointer; }
+        .drop-zone:hover, .drop-zone.drag-over { border-color: var(--primary); background: rgba(59,130,246,0.1); }
+        .handle { position: absolute; top: 0; bottom: 0; width: 4px; cursor: ew-resize; z-index: 20; transition: background 0.2s, width 0.1s; box-sizing: border-box; }
+        .handle:hover, .handle.dragging { width: 6px; margin-left: -1px; }
+        .handle-start { background: var(--handle-start); left: 0; border-radius: 2px 0 0 2px; }
+        .handle-end { background: var(--handle-end); right: 0; border-radius: 0 2px 2px 0; }
+        .handle::after { content: ''; position: absolute; top: 50%; transform: translateY(-50%); width: 16px; height: 24px; background: white; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); left: 50%; margin-left: -8px; }
+        .timeline-container { position: relative; height: 70px; background: #f8fafc; border-radius: 8px; overflow: hidden; cursor: text; border: 1px solid #e2e8f0; contain: layout style; }
+        .timeline-canvas { display: block; width: 100%; height: 100%; }
+        .selection-overlay { position: absolute; top: 0; height: 100%; background: rgba(59,130,246,0.15); pointer-events: none; border-top: 2px solid var(--primary); border-bottom: 2px solid var(--primary); transition: left 0.05s linear, width 0.05s linear; }
+        .progress-track { background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; position: relative; }
+        .progress-fill { background: linear-gradient(90deg, var(--primary), var(--accent)); height: 100%; width: 0%; transition: width 0.15s ease-out; will-change: width; }
+        .progress-text { position: absolute; right: 8px; top: -18px; font-size: 11px; font-weight: bold; color: #4b5563; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(4px); }
+        .overlay-card { background: white; padding: 2rem; border-radius: 1rem; width: 90%; max-width: 440px; text-align: center; animation: pop 0.3s cubic-bezier(0.34,1.56,0.64,1); color: #1f2937; }
+        @keyframes pop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .hidden { display: none !important; }
+        input[type="range"] { accent-color: var(--primary); }
+        input[type="number"], select { background: white; }
+        #toast { pointer-events: none; }
+        .video-preview { background: #0f172a; border-radius: 12px; overflow: hidden; position: relative; }
+        .video-preview video { width: 100%; max-height: 320px; display: block; }
+        .file-item { transition: all 0.2s ease; cursor: pointer; border-radius: 12px; }
+        .file-item:hover { background: rgba(255,255,255,0.1); transform: translateX(4px); }
+        .tab-btn { position: relative; padding: 12px 24px; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s ease; color: #94a3b8; cursor: pointer; }
+        .tab-btn.active { border-bottom-color: var(--primary); color: white; }
+        .audio-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 999px; font-size: 10px; font-weight: 600; background: rgba(16,185,129,0.15); color: #10b981; }
+        @media (max-width: 768px) { .grid-cols-2 { grid-template-columns: 1fr; } }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #3b82f6;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #2563eb; transform: scale(1.1); }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <div id="overlay" class="overlay hidden">
+        <div class="overlay-card">
+            <div class="animate-spin w-10 h-10 border-4 border-blue-200 border-t-blue-500 rounded-full mx-auto mb-4"></div>
+            <h3 id="overlay-title" class="text-xl font-bold mb-2">Converting Video...</h3>
+            <p id="overlay-msg" class="text-sm text-gray-500 mb-6">Processing in real-time</p>
+            <div class="progress-track mb-1">
+                <div id="progress-bar" class="progress-fill" style="width: 0%"></div>
+                <span id="progress-text" class="progress-text">0%</span>
+            </div>
+            <button id="cancel-btn" class="mt-4 text-sm text-red-500 hover:text-red-700 font-medium hidden">Cancel</button>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 transition-transform duration-300 z-50 flex items-center gap-3">
+        <i id="toast-icon" class="fas fa-info-circle text-blue-400"></i>
+        <span id="toast-msg">Notification</span>
+    </div>
+
+    <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-4">
+                <i class="fas fa-shield-alt text-green-400"></i>
+                <span class="text-sm text-gray-200">Free • Browser-Based • Guaranteed Audio • Private</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-2">
+                <i class="fas fa-exchange-alt mr-2 text-blue-400"></i>Free Video Converter
+            </h1>
+            <p class="text-gray-300 max-w-2xl mx-auto">Trim, resize, adjust bitrate, speed & volume. Convert MP4, WebM, MOV. 100% Free.</p>
+            <div class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full shadow-lg">
+                <i class="fas fa-chart-simple"></i>
+                <span id="view-counter" class="font-bold">0</span>
+                <span class="text-sm">videos converted</span>
+            </div>
+        </div>
+
+        <div class="glass rounded-2xl p-2 mb-6 inline-flex">
+            <button id="tabSingle" class="tab-btn active rounded-xl px-6 py-3"><i class="fas fa-video mr-2"></i>Single Video</button>
+            <button id="tabBatch" class="tab-btn rounded-xl px-6 py-3"><i class="fas fa-layer-group mr-2"></i>Batch Convert</button>
+        </div>
+
+        <div id="singleMode">
+            <div id="upload-area" class="glass p-8 md:p-12 text-center mb-6 drop-zone">
+                <i class="fas fa-cloud-upload-alt text-6xl text-blue-400 mb-4"></i>
+                <h3 class="text-xl font-bold mb-2">Drop Video File Here</h3>
+                <p class="text-gray-400 mb-4">or click to browse</p>
+                <p class="text-sm text-gray-500">Best: MP4, WebM, MOV (H.264/AAC)</p>
+                <input type="file" id="file-input" class="hidden" accept="video/*,.mp4,.webm,.ogg,.mov">
+                <button id="browse-btn" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">Browse Videos</button>
+            </div>
+
+            <div id="editor" class="hidden space-y-6">
+                <div class="glass p-6">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="md:w-3/5">
+                            <label class="text-xs font-bold text-gray-500 uppercase mb-2 block">Video Preview</label>
+                            <div class="video-preview"><video id="video-preview" controls class="w-full"></video></div>
+                            <div class="mt-2"><span class="audio-badge"><i class="fas fa-volume-up"></i> Audio Captured</span></div>
+                        </div>
+                        <div class="md:w-2/5 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center"><i class="fas fa-film text-white text-xl"></i></div>
+                                    <div><p id="file-name" class="font-bold truncate max-w-xs">video.mp4</p><p id="file-meta" class="text-xs text-gray-400">0.0 MB • 00:00</p></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div><p class="text-gray-400">Duration</p><p id="vid-duration" class="font-mono font-bold">--:--</p></div>
+                                    <div><p class="text-gray-400">Resolution</p><p id="vid-res" class="font-mono font-bold">--</p></div>
+                                    <div><p class="text-gray-400">Output Size</p><p id="est-size" class="font-mono font-bold text-blue-600">--</p></div>
+                                    <div><p class="text-gray-400">Status</p><p id="status-text" class="font-bold text-green-600">Ready</p></div>
+                                </div>
+                            </div>
+                            <button id="reset-btn" class="mt-4 text-red-500 hover:text-red-700 text-sm font-medium self-start"><i class="fas fa-trash-alt mr-1"></i> Remove</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass p-6">
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-gray-500 mb-2"><span>Start: <b id="lbl-start" class="text-green-600">0.00s</b></span><span>End: <b id="lbl-end" class="text-red-600">0.00s</b></span></div>
+                        <div class="timeline-container" id="timeline-box">
+                            <canvas id="timeline-canvas" class="timeline-canvas"></canvas>
+                            <div id="selection-overlay" class="selection-overlay" style="left: 0%; width: 100%;"></div>
+                            <div id="handle-start" class="handle handle-start" style="left: 0%;"></div>
+                            <div id="handle-end" class="handle handle-end" style="left: 100%;"></div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1 text-center">Drag handles to trim • Click to seek</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass p-6">
+                        <h3 class="font-bold mb-4 border-b pb-2"><i class="fas fa-cog mr-2 text-blue-500"></i>Conversion Settings</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Output Format</label>
+                                <select id="out-format" class="w-full p-2 border rounded-lg">
+                                    <option value="video/webm;codecs=vp9,opus">WebM (VP9+Opus) ✅ Guaranteed Audio</option>
+                                    <option value="video/webm;codecs=vp8,opus">WebM (VP8+Opus) ✅ Compatible</option>
+                                    <option value="video/mp4">MP4 (H.264) ⚠️ Browser Dependent</option>
+                                </select>
+                                <p class="text-xs text-gray-400 mt-1"><i class="fas fa-info-circle mr-1"></i> MP4 audio support varies. Auto-fallback to WebM if needed.</p>
+                            </div>
+                            <div><div class="flex justify-between text-sm mb-1"><span>Width (px)</span><span id="width-val" class="font-bold text-blue-600">640</span></div><input type="range" id="width-slider" min="240" max="1080" step="10" value="640" class="w-full"><p class="text-xs text-gray-400 mt-1">Height auto-scaled</p></div>
+                            <div><div class="flex justify-between text-sm mb-1"><span>Bitrate (Mbps)</span><span id="bitrate-val" class="font-bold text-blue-600">2.5</span></div><input type="range" id="bitrate-slider" min="0.5" max="10" step="0.5" value="2.5" class="w-full"><p class="text-xs text-gray-400 mt-1">Higher = better quality</p></div>
+                        </div>
+                    </div>
+                    <div class="glass p-6">
+                        <h3 class="font-bold mb-4 border-b pb-2"><i class="fas fa-sliders-h mr-2 text-blue-500"></i>Audio & Speed</h3>
+                        <div class="space-y-4">
+                            <div><div class="flex justify-between text-sm mb-1"><span>Output Speed</span><span id="speed-val" class="font-bold text-blue-600">1.0x</span></div><input type="range" id="speed-slider" min="0.25" max="4" step="0.25" value="1" class="w-full"><p class="text-xs text-gray-400 mt-1">Faster = shorter output</p></div>
+                            <div><div class="flex justify-between text-sm mb-1"><span>Volume</span><span id="vol-val" class="font-bold text-blue-600">100%</span></div><input type="range" id="vol-slider" min="0" max="200" step="5" value="100" class="w-full"></div>
+                            <div class="p-3 bg-blue-50 rounded-lg text-xs text-blue-700 border border-blue-200"><i class="fas fa-info-circle mr-1"></i><strong>Audio guaranteed</strong> with WebM. MP4 may fall back to WebM if browser doesn't support MP4 muxing.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="convert-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2"><i class="fas fa-exchange-alt"></i> Convert Video</button>
+                <div id="download-area" class="hidden text-center"><button id="download-btn" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition flex items-center justify-center gap-2"><i class="fas fa-download"></i> Download Converted Video</button></div>
+            </div>
+        </div>
+
+        <div id="batchMode" class="hidden">
+            <div id="batch-drop-zone" class="glass p-8 md:p-12 text-center mb-6 drop-zone">
+                <i class="fas fa-cloud-upload-alt text-6xl text-blue-400 mb-4"></i>
+                <h3 class="text-xl font-bold mb-2">Drop Multiple Videos</h3>
+                <p class="text-gray-400 mb-4">Up to 10 files at once (MP4, WebM, MOV)</p>
+                <input type="file" id="batch-file-input" class="hidden" accept="video/*,.mp4,.webm,.ogg,.mov" multiple>
+                <button id="batch-browse-btn" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">Select Videos</button>
+            </div>
+
+            <div id="batch-file-list" class="hidden glass p-6 mb-6">
+                <div class="flex justify-between items-center mb-4"><h3 class="font-bold"><i class="fas fa-list mr-2 text-blue-500"></i>Videos (<span id="batch-count">0</span>)</h3><button id="clear-batch-btn" class="text-red-500 text-sm hover:text-red-700"><i class="fas fa-trash"></i> Clear All</button></div>
+                <div id="batch-files-container" class="max-h-80 overflow-y-auto space-y-2 mb-6"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div><label class="text-sm text-gray-600 block mb-1">Output Format</label><select id="batch-format" class="w-full p-2 border rounded-lg"><option value="video/webm;codecs=vp9,opus">WebM (VP9)</option><option value="video/webm;codecs=vp8,opus">WebM (VP8)</option><option value="video/mp4">MP4 (H.264)</option></select></div>
+                    <div><label class="text-sm text-gray-600 block mb-1">Width (px)</label><select id="batch-width" class="w-full p-2 border rounded-lg"><option value="360">360px</option><option value="480">480px</option><option value="640" selected>640px</option><option value="854">854px</option><option value="1080">1080px</option></select></div>
+                    <div><label class="text-sm text-gray-600 block mb-1">Bitrate (Mbps)</label><select id="batch-bitrate" class="w-full p-2 border rounded-lg"><option value="0.5">0.5</option><option value="1.5">1.5</option><option value="2.5" selected>2.5</option><option value="5">5</option><option value="10">10</option></select></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div><label class="text-sm text-gray-600 block mb-1">Speed</label><select id="batch-speed" class="w-full p-2 border rounded-lg"><option value="0.25">0.25x</option><option value="0.5">0.5x</option><option value="1" selected>1.0x</option><option value="1.5">1.5x</option><option value="2">2.0x</option></select></div>
+                    <div><label class="text-sm text-gray-600 block mb-1">Volume</label><select id="batch-volume" class="w-full p-2 border rounded-lg"><option value="50">50%</option><option value="100" selected>100%</option><option value="150">150%</option></select></div>
+                </div>
+
+                <button id="batch-convert-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-bold hover:from-blue-700 hover:to-indigo-700 transition flex items-center justify-center gap-2"><i class="fas fa-play"></i> Convert All (<span id="batch-convert-count">0</span>)</button>
+
+                <div id="batch-progress" class="hidden mt-4">
+                    <div class="flex justify-between text-sm mb-1"><span><i class="fas fa-spinner fa-spin mr-1"></i> Processing...</span><span id="batch-progress-text" class="font-semibold text-blue-600">0/0</span></div>
+                    <div class="progress-track mb-1"><div id="batch-progress-bar" class="progress-fill" style="width: 0%"></div><span id="batch-progress-percent" class="progress-text">0%</span></div>
+                    <p id="batch-current-file" class="text-xs text-gray-400 truncate"></p>
+                </div>
+
+                <div id="batch-results" class="hidden mt-4 p-4 bg-green-50 rounded-xl border border-green-200">
+                    <div class="flex items-center gap-3 mb-3"><i class="fas fa-check-circle text-green-500 text-2xl"></i><div><p class="font-bold text-green-800">Batch Complete!</p><p class="text-sm text-green-600"><span id="batch-success-count">0</span> files converted</p></div></div>
+                    <button id="download-all-btn" class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2"><i class="fas fa-download"></i> Download All as ZIP</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Section for SEO -->
+        <div class="mt-8 p-6 bg-white/5 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-3 text-center">Free Video Converter Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div><i class="fas fa-film text-blue-400 mr-2"></i> <strong>MP4, WebM, MOV</strong> - Support for major formats</div>
+                <div><i class="fas fa-cut text-blue-400 mr-2"></i> <strong>Trim Video</strong> - Select start/end points</div>
+                <div><i class="fas fa-arrows-alt-h text-blue-400 mr-2"></i> <strong>Resize Video</strong> - Adjust resolution</div>
+                <div><i class="fas fa-tachometer-alt text-blue-400 mr-2"></i> <strong>Adjust Speed</strong> - 0.25x to 4x speed</div>
+                <div><i class="fas fa-volume-up text-blue-400 mr-2"></i> <strong>Volume Control</strong> - Boost or reduce audio</div>
+                <div><i class="fas fa-layer-group text-blue-400 mr-2"></i> <strong>Batch Convert</strong> - Process multiple videos</div>
+                <div><i class="fas fa-shield-alt text-blue-400 mr-2"></i> <strong>100% Private</strong> - No uploads, all local</div>
+                <div><i class="fas fa-music text-blue-400 mr-2"></i> <strong>Guaranteed Audio</strong> - Audio preserved</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // ==================== UTILITIES ====================
+        const $ = sel => document.querySelector(sel);
+        const $$ = sel => document.querySelectorAll(sel);
+        const formatTime = s => { if (!isFinite(s) || isNaN(s) || s < 0) return '00:00'; return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`; };
+        const formatBytes = b => { if (!isFinite(b) || isNaN(b) || b == null) return '0 B'; if (b === 0) return '0 B'; const k = 1024, sizes = ['Bytes','KB','MB','GB']; return parseFloat((b / Math.pow(k, Math.floor(Math.log(b)/Math.log(k)))).toFixed(1)) + ' ' + sizes[Math.floor(Math.log(b)/Math.log(k))]; };
+        const triggerClick = el => { if(el) el.click(); };
+
+        // Download Counter
+        let conversionCount = localStorage.getItem('videoConverterCount') || 0;
+        document.getElementById('view-counter').textContent = conversionCount;
+        function incrementCounter() { conversionCount++; localStorage.setItem('videoConverterCount', conversionCount); document.getElementById('view-counter').textContent = conversionCount; }
+
+        let lastProgressUpdate = 0;
+        const updateProgress = (p, min=150) => { if(performance.now()-lastProgressUpdate>=min){ const v=Math.min(100,Math.max(0,Math.round(p))); $('#progress-bar').style.width=v+'%'; $('#progress-text').textContent=v+'%'; lastProgressUpdate=performance.now(); } };
+
+        let toastTimeout;
+        const showToast = (m,t='info') => {
+            const icon=t==='success'?'fa-check-circle text-green-400':t==='error'?'fa-exclamation-circle text-red-400':t==='warning'?'fa-exclamation-triangle text-yellow-400':'fa-info-circle text-blue-400';
+            $('#toast-icon').className=`fas mr-2 ${icon}`; $('#toast-msg').textContent=m;
+            $('#toast').style.transform='translateY(0)'; clearTimeout(toastTimeout);
+            toastTimeout=setTimeout(()=>$('#toast').style.transform='translateY(200px)', 3000);
+        };
+
+        const showOverlay = (t,m) => { $('#overlay').classList.remove('hidden'); $('#overlay-title').textContent=t; $('#overlay-msg').textContent=m; $('#cancel-btn').classList.remove('hidden'); updateProgress(0); };
+        const hideOverlay = () => $('#overlay').classList.add('hidden');
+        const yieldToBrowser = () => new Promise(r => setTimeout(r, 0));
+
+        // ==================== STATE ====================
+        const state = { file:null, duration:0, outWidth:640, outBitrate:2500000, speed:1, volume:1, trimStart:0, trimEnd:0, resultBlob:null, isProcessing:false, shouldCancel:false };
+        let batchFiles = [], batchResults = [];
+
+        const els = {
+            uploadArea:$('#upload-area'), fileInput:$('#file-input'), browseBtn:$('#browse-btn'),
+            editor:$('#editor'), resetBtn:$('#reset-btn'), fileName:$('#file-name'), fileMeta:$('#file-meta'),
+            videoEl:$('#video-preview'), vidDuration:$('#vid-duration'), vidRes:$('#vid-res'), estSize:$('#est-size'), statusText:$('#status-text'),
+            timelineBox:$('#timeline-box'), selOverlay:$('#selection-overlay'), hStart:$('#handle-start'), hEnd:$('#handle-end'), lblStart:$('#lbl-start'), lblEnd:$('#lbl-end'), timelineCanvas:$('#timeline-canvas'),
+            outFormat:$('#out-format'), widthSlider:$('#width-slider'), widthVal:$('#width-val'), bitrateSlider:$('#bitrate-slider'), bitrateVal:$('#bitrate-val'), speedSlider:$('#speed-slider'), speedVal:$('#speed-val'), volSlider:$('#vol-slider'), volVal:$('#vol-val'),
+            convertBtn:$('#convert-btn'), downloadArea:$('#download-area'), downloadBtn:$('#download-btn'), cancelBtn:$('#cancel-btn'),
+            batchDropZone:$('#batch-drop-zone'), batchFileInput:$('#batch-file-input'), batchBrowseBtn:$('#batch-browse-btn'),
+            batchFileList:$('#batch-file-list'), batchFilesContainer:$('#batch-files-container'), batchCount:$('#batch-count'), clearBatchBtn:$('#clear-batch-btn'),
+            batchFormat:$('#batch-format'), batchWidth:$('#batch-width'), batchBitrate:$('#batch-bitrate'), batchSpeed:$('#batch-speed'), batchVolume:$('#batch-volume'),
+            batchConvertBtn:$('#batch-convert-btn'), batchConvertCount:$('#batch-convert-count'), batchProgress:$('#batch-progress'), batchProgressText:$('#batch-progress-text'), batchProgressBar:$('#batch-progress-bar'), batchProgressPercent:$('#batch-progress-percent'), batchCurrentFile:$('#batch-current-file'), batchResultsDiv:$('#batch-results'), batchSuccessCount:$('#batch-success-count'), downloadAllBtn:$('#download-all-btn')
+        };
+
+        // ==================== INIT & EVENTS ====================
+        els.browseBtn.addEventListener('click', () => triggerClick(els.fileInput));
+        els.batchBrowseBtn.addEventListener('click', () => triggerClick(els.batchFileInput));
+
+        els.fileInput.addEventListener('change', e => { if(e.target.files[0]) loadVideo(e.target.files[0]); e.target.value=''; });
+        els.uploadArea.addEventListener('dragover', e => { e.preventDefault(); els.uploadArea.classList.add('drag-over'); });
+        els.uploadArea.addEventListener('dragleave', () => els.uploadArea.classList.remove('drag-over'));
+        els.uploadArea.addEventListener('drop', e => { e.preventDefault(); els.uploadArea.classList.remove('drag-over'); if(e.dataTransfer.files[0]) loadVideo(e.dataTransfer.files[0]); });
+        els.resetBtn.addEventListener('click', () => location.reload());
+
+        els.widthSlider.addEventListener('input', () => { state.outWidth=+els.widthSlider.value; els.widthVal.textContent=state.outWidth; updateEstimates(); });
+        els.bitrateSlider.addEventListener('input', () => { state.outBitrate=+els.bitrateSlider.value*1e6; els.bitrateVal.textContent=els.bitrateSlider.value; updateEstimates(); });
+        els.speedSlider.addEventListener('input', () => { state.speed=+els.speedSlider.value; els.speedVal.textContent=state.speed+'x'; updateEstimates(); });
+        els.volSlider.addEventListener('input', () => { state.volume=+els.volSlider.value/100; els.volVal.textContent=els.volSlider.value+'%'; });
+
+        els.convertBtn.addEventListener('click', startConversion);
+        els.cancelBtn.addEventListener('click', () => state.shouldCancel=true);
+        els.downloadBtn.addEventListener('click', downloadResult);
+
+        $('#tabSingle').addEventListener('click', () => toggleTab(true));
+        $('#tabBatch').addEventListener('click', () => toggleTab(false));
+        const toggleTab = s => {
+            $('#tabSingle').classList.toggle('active', s); $('#tabBatch').classList.toggle('active', !s);
+            $('#singleMode').classList.toggle('hidden', !s); $('#batchMode').classList.toggle('hidden', s);
+        };
+
+        els.batchFileInput.addEventListener('change', e => { if(e.target.files.length) addBatchFiles(Array.from(e.target.files)); e.target.value=''; });
+        els.batchDropZone.addEventListener('dragover', e => { e.preventDefault(); els.batchDropZone.classList.add('drag-over'); });
+        els.batchDropZone.addEventListener('dragleave', () => els.batchDropZone.classList.remove('drag-over'));
+        els.batchDropZone.addEventListener('drop', e => {
+            e.preventDefault(); els.batchDropZone.classList.remove('drag-over');
+            const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('video/'));
+            if(files.length) addBatchFiles(files.slice(0,10)); else showToast('Please drop video files', 'error');
+        });
+        els.clearBatchBtn.addEventListener('click', () => { batchFiles=[]; batchResults=[]; renderBatchList(); els.batchFileList.classList.add('hidden'); els.batchResultsDiv.classList.add('hidden'); });
+        els.batchConvertBtn.addEventListener('click', startBatchConversion);
+        els.downloadAllBtn.addEventListener('click', downloadBatchAsZip);
+
+        // ==================== VIDEO LOADING ====================
+        async function loadVideo(file) {
+            if(!file||!file.type.startsWith('video/')) return showToast('Please drop a video file', 'error');
+            state.file = file; showOverlay('Loading Video', `Reading ${file.name}...`);
+            try {
+                const url = URL.createObjectURL(file);
+                els.videoEl.src = url; els.videoEl.load();
+                await new Promise((r, j) => {
+                    els.videoEl.onloadedmetadata = () => {
+                        let dur = els.videoEl.duration;
+                        state.duration = isFinite(dur) && dur > 0 ? dur : Math.min(600, file.size / 100000);
+                        r();
+                    };
+                    els.videoEl.onerror = () => j(new Error('Browser cannot decode this video.'));
+                });
+                state.trimStart = 0; state.trimEnd = state.duration;
+                els.fileName.textContent = file.name;
+                els.fileMeta.textContent = `${formatBytes(file.size)} • ${formatTime(state.duration)}`;
+                els.vidDuration.textContent = formatTime(state.duration);
+                els.vidRes.textContent = `${els.videoEl.videoWidth||'?'}×${els.videoEl.videoHeight||'?'}`;
+                els.statusText.textContent = 'Loaded'; els.statusText.className = 'font-bold text-green-600';
+                updateEstimates(); drawTimeline(); updateProgress(100); hideOverlay();
+                els.uploadArea.classList.add('hidden'); els.editor.classList.remove('hidden');
+                showToast('Video loaded!', 'success');
+            } catch(e) { hideOverlay(); showToast(e.message, 'error'); els.statusText.textContent='Error'; els.statusText.className='font-bold text-red-600'; }
+        }
+
+        function updateEstimates() {
+            const dur = Math.max(0.1, Math.min(3600, state.trimEnd - state.trimStart));
+            const outDur = dur / Math.max(0.1, state.speed);
+            els.estSize.textContent = formatBytes(state.outBitrate * outDur * 0.12);
+            els.lblStart.textContent = formatTime(state.trimStart);
+            els.lblEnd.textContent = formatTime(state.trimEnd);
+        }
+
+        // ==================== TIMELINE ====================
+        function drawTimeline() {
+            if(!els.timelineCanvas) return;
+            const c=els.timelineCanvas, ctx=c.getContext('2d'), w=els.timelineBox.clientWidth, h=els.timelineBox.clientHeight;
+            c.width=w; c.height=h; ctx.fillStyle='#f8fafc'; ctx.fillRect(0,0,w,h); ctx.fillStyle='#94a3b8';
+            for(let i=0;i<w;i++){ const hh=Math.random()*h*0.6+2; ctx.fillRect(i,(h-hh)/2,1,hh); }
+        }
+
+        function updateHandles() {
+            if(!state.duration || !isFinite(state.duration)) return;
+            state.trimStart = Math.max(0, Math.min(state.trimStart, state.duration - 0.1));
+            state.trimEnd = Math.max(state.trimStart + 0.1, Math.min(state.trimEnd, state.duration));
+            const pS=(state.trimStart/state.duration)*100, pE=(state.trimEnd/state.duration)*100;
+            els.hStart.style.left=pS+'%'; els.hEnd.style.left=pE+'%';
+            els.selOverlay.style.left=pS+'%'; els.selOverlay.style.width=(pE-pS)+'%';
+            updateEstimates();
+        }
+
+        let dragTarget=null, startX=0, sL=0, sR=0;
+        const startDrag=(e,t)=>{ e.preventDefault(); e.stopPropagation(); dragTarget=t; startX=e.touches?.[0].clientX??e.clientX; sL=parseFloat(els.hStart.style.left)||0; sR=parseFloat(els.hEnd.style.left)||100; window.addEventListener('mousemove',onDrag,{passive:false}); window.addEventListener('touchmove',onDrag,{passive:false}); window.addEventListener('mouseup',stopDrag); window.addEventListener('touchend',stopDrag); };
+        const onDrag=(e)=>{ if(!dragTarget||!state.duration)return; e.preventDefault(); const r=els.timelineBox.getBoundingClientRect(), dx=(e.touches?.[0].clientX??e.clientX)-startX, dp=dx/r.width*100, d=state.duration; if(dragTarget==='start') state.trimStart=Math.max(0,Math.min(((sL+dp)/100)*d, state.trimEnd-0.1)); else state.trimEnd=Math.max(state.trimStart+0.1,Math.min(((sR+dp)/100)*d, d)); updateHandles(); };
+        const stopDrag=()=>{ dragTarget=null; window.removeEventListener('mousemove',onDrag); window.removeEventListener('touchmove',onDrag); window.removeEventListener('mouseup',stopDrag); window.removeEventListener('touchend',stopDrag); };
+        els.hStart.addEventListener('mousedown',e=>startDrag(e,'start')); els.hStart.addEventListener('touchstart',e=>startDrag(e,'start'),{passive:false});
+        els.hEnd.addEventListener('mousedown',e=>startDrag(e,'end')); els.hEnd.addEventListener('touchstart',e=>startDrag(e,'end'),{passive:false});
+        els.timelineBox.addEventListener('click',e=>{ if(!dragTarget&&els.videoEl){ const r=els.timelineBox.getBoundingClientRect(); els.videoEl.currentTime=Math.max(0,Math.min((e.clientX-r.left)/r.width,1))*state.duration; } });
+        window.addEventListener('resize', () => { drawTimeline(); updateHandles(); });
+        setTimeout(() => { drawTimeline(); updateHandles(); }, 200);
+
+        // ==================== RELIABLE AUDIO + MIME HANDLING ====================
+        function resolveMimeType(preferred) {
+            if (preferred.includes('mp4')) {
+                const mp4Aac = 'video/mp4;codecs=avc1.4D401E,mp4a.40.2';
+                if (MediaRecorder.isTypeSupported(mp4Aac)) return mp4Aac;
+                if (MediaRecorder.isTypeSupported('video/mp4')) {
+                    showToast('MP4 selected, but browser may drop audio. Falling back to WebM to guarantee audio.', 'warning');
+                    return 'video/webm;codecs=vp9,opus';
+                }
+                showToast('MP4 not supported. Using WebM (guaranteed audio).', 'info');
+                return 'video/webm;codecs=vp8,opus';
+            }
+            return MediaRecorder.isTypeSupported(preferred) ? preferred : 'video/webm;codecs=vp8,opus';
+        }
+
+        // ==================== STABLE CONVERSION WITH AUDIO ====================
+        async function convertVideoFile(file, settings, onProgress, onCancel) {
+            return new Promise(async (resolve, reject) => {
+                const { format, width, bitrate, speed, volume, trimStart, trimEnd } = settings;
+                const video = document.createElement('video');
+                video.muted = false; video.preload = 'auto'; video.src = URL.createObjectURL(file);
+
+                await new Promise((r, j) => {
+                    video.onloadedmetadata = () => {
+                        let dur = video.duration;
+                        if(!isFinite(dur)||isNaN(dur)||dur<=0) dur = 10; // fallback duration
+                        video._dur = dur; r();
+                    };
+                    video.onerror = () => j(new Error('Cannot decode video'));
+                });
+
+                const dur = video._dur;
+                const tStart = Math.max(0, trimStart);
+                const tEnd = Math.min(isFinite(trimEnd) && trimEnd > 0 ? trimEnd : dur, dur);
+                if(tEnd - tStart <= 0.1) { reject(new Error('Invalid trim range')); return; }
+
+                const aspect = (video.videoHeight && video.videoWidth) ? video.videoHeight/video.videoWidth : 0.75;
+                const cH = Math.max(2, Math.round(width * aspect));
+                const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = cH;
+                const ctx = canvas.getContext('2d', { alpha: false });
+
+                let stream;
+                if(video.captureStream) stream = video.captureStream(30);
+                else if(video.mozCaptureStream) stream = video.mozCaptureStream();
+                else reject(new Error('Stream capture not supported'));
+
+                let finalStream = stream;
+                if(volume !== 1 && stream.getAudioTracks().length > 0) {
+                    try {
+                        const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+                        const src = audioCtx.createMediaStreamSource(new MediaStream(stream.getAudioTracks()));
+                        const gain = audioCtx.createGain(); gain.gain.value = volume;
+                        const dest = audioCtx.createMediaStreamDestination();
+                        src.connect(gain).connect(dest);
+                        finalStream = new MediaStream([stream.getVideoTracks()[0], ...dest.stream.getAudioTracks()]);
+                        await audioCtx.resume();
+                    } catch(e) { console.warn('Volume adjustment failed'); }
+                }
+
+                const finalMime = resolveMimeType(format);
+                const recorder = new MediaRecorder(finalStream, { mimeType: finalMime, videoBitsPerSecond: bitrate, audioBitsPerSecond: 128000 });
+                const chunks = [];
+                recorder.ondataavailable = e => { if(e.data.size > 0) chunks.push(e.data); };
+                const blobPromise = new Promise(res => recorder.onstop = () => res(new Blob(chunks, { type: finalMime })));
+
+                video.playbackRate = speed;
+                video.currentTime = tStart;
+                await new Promise(r => { if(video.readyState >= 2) r(); else video.addEventListener('seeked', r, {once:true}); });
+
+                recorder.start(100);
+                video.play();
+
+                let frameCount = 0;
+                const totalFrames = Math.ceil((tEnd - tStart) * 30);
+                let animationId;
+
+                const drawFrame = () => {
+                    if(onCancel && onCancel()) { recorder.stop(); video.pause(); reject(new Error('Cancelled')); return; }
+                    if(video.paused || video.ended) { recorder.stop(); return; }
+
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    frameCount++;
+                    if(onProgress) onProgress(Math.min(95, (frameCount / totalFrames) * 100));
+
+                    if(video.currentTime < tEnd && !video.ended) {
+                        animationId = requestAnimationFrame(drawFrame);
+                    } else {
+                        recorder.stop();
+                    }
+                };
+
+                animationId = requestAnimationFrame(drawFrame);
+
+                video.onended = () => { recorder.stop(); };
+
+                try {
+                    const blob = await blobPromise;
+                    cancelAnimationFrame(animationId);
+                    video.src = '';
+                    URL.revokeObjectURL(video.src);
+                    resolve(blob);
+                } catch(e) { reject(e); }
+            });
+        }
+
+        async function startConversion() {
+            if(state.isProcessing) return;
+            state.isProcessing=true; state.shouldCancel=false;
+            els.downloadArea.classList.add('hidden'); els.convertBtn.classList.add('hidden');
+            showOverlay('Converting Video', `Recording at ${state.speed}x speed...`); updateProgress(2);
+
+            try {
+                state.resultBlob = await convertVideoFile(state.file, {
+                    format: els.outFormat.value, width: state.outWidth, bitrate: state.outBitrate,
+                    speed: state.speed, volume: state.volume, trimStart: state.trimStart, trimEnd: state.trimEnd
+                }, p => updateProgress(p), () => state.shouldCancel);
+                updateProgress(100); els.downloadArea.classList.remove('hidden');
+                incrementCounter();
+                showToast('✅ Conversion complete with audio!', 'success');
+            } catch(e) {
+                if(e.message!=='Cancelled') showToast('❌ ' + e.message, 'error');
+            } finally {
+                state.isProcessing=false; hideOverlay(); els.convertBtn.classList.remove('hidden');
+            }
+        }
+
+        function downloadResult() {
+            if(!state.resultBlob) return;
+            const ext = els.outFormat.value.includes('mp4') && MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.4D401E,mp4a.40.2') ? 'mp4' : 'webm';
+            const a=document.createElement('a'); a.href=URL.createObjectURL(state.resultBlob);
+            a.download=state.file.name.replace(/\.[^/.]+$/,'')+'_converted.'+ext;
+            a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 100); showToast('Download started!', 'success');
+        }
+
+        // ==================== BATCH LOGIC (FIXED) ====================
+        function addBatchFiles(files) {
+            batchFiles = [...batchFiles, ...files].slice(0,10);
+            renderBatchList();
+            els.batchFileList.classList.remove('hidden');
+            els.batchConvertCount.textContent = batchFiles.length;
+            els.batchConvertBtn.innerHTML = `<i class="fas fa-play"></i> Convert All (${batchFiles.length})`;
+            // Reset results when new files added
+            batchResults = [];
+            els.batchResultsDiv.classList.add('hidden');
+        }
+
+        function renderBatchList() {
+            els.batchFilesContainer.innerHTML = '';
+            els.batchCount.textContent = batchFiles.length;
+            batchFiles.forEach((file, i) => {
+                const div = document.createElement('div');
+                div.className='file-item flex justify-between items-center p-3 bg-gray-50 rounded-lg';
+                div.innerHTML=`<div class="flex items-center gap-3 min-w-0"><i class="fas fa-video text-blue-400"></i><div><p class="text-sm font-medium text-gray-700 truncate">${file.name}</p><p class="text-xs text-gray-400">${formatBytes(file.size)}</p></div></div><button class="remove-batch text-red-400 hover:text-red-600 p-1" data-i="${i}"><i class="fas fa-times"></i></button>`;
+                els.batchFilesContainer.appendChild(div);
+            });
+            $$('.remove-batch').forEach(b=>{
+                b.onclick=()=>{
+                    batchFiles.splice(+b.dataset.i,1);
+                    renderBatchList();
+                    if(batchFiles.length===0) els.batchFileList.classList.add('hidden');
+                    els.batchConvertCount.textContent = batchFiles.length;
+                    els.batchConvertBtn.innerHTML = `<i class="fas fa-play"></i> Convert All (${batchFiles.length})`;
+                    batchResults = [];
+                    els.batchResultsDiv.classList.add('hidden');
+                };
+            });
+        }
+
+        async function startBatchConversion() {
+            if(!batchFiles.length) {
+                showToast('No files to convert! Add videos first.', 'error');
+                return;
+            }
+            if(state.isProcessing) {
+                showToast('Conversion already in progress!', 'warning');
+                return;
+            }
+
+            batchResults = [];
+            els.batchProgress.classList.remove('hidden');
+            els.batchResultsDiv.classList.add('hidden');
+            els.batchProgressBar.style.width = '0%';
+            els.batchProgressPercent.textContent = '0%';
+
+            const batchSettings = {
+                format: els.batchFormat.value,
+                width: parseInt(els.batchWidth.value),
+                bitrate: parseFloat(els.batchBitrate.value) * 1e6,
+                speed: parseFloat(els.batchSpeed.value),
+                volume: parseFloat(els.batchVolume.value) / 100,
+                trimStart: 0,
+                trimEnd: null
+            };
+
+            showOverlay('Batch Converting', `Processing ${batchFiles.length} files...`);
+            state.shouldCancel = false;
+
+            let successCount = 0;
+
+            for(let i = 0; i < batchFiles.length; i++){
+                if(state.shouldCancel) break;
+
+                const file = batchFiles[i];
+                const overallProgress = ((i + 1) / batchFiles.length) * 100;
+
+                els.batchProgressText.textContent = `${i + 1}/${batchFiles.length}`;
+                els.batchProgressBar.style.width = `${overallProgress}%`;
+                els.batchProgressPercent.textContent = `${Math.round(overallProgress)}%`;
+                els.batchCurrentFile.textContent = `Converting: ${file.name}`;
+                updateProgress(overallProgress);
+
+                try {
+                    const blob = await convertVideoFile(file, batchSettings,
+                        (prog) => {
+                            // Update sub-progress within current file
+                            const subProgress = ((i + (prog/100)) / batchFiles.length) * 100;
+                            updateProgress(subProgress);
+                        },
+                        () => state.shouldCancel
+                    );
+
+                    const ext = batchSettings.format.includes('mp4') && MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.4D401E,mp4a.40.2') ? 'mp4' : 'webm';
+                    batchResults.push({name: file.name.replace(/\.[^/.]+$/,'') + '_converted.' + ext, blob: blob});
+                    successCount++;
+                    els.batchCurrentFile.textContent = `✅ Done: ${file.name}`;
+
+                } catch(e) {
+                    console.error('Batch conversion error for', file.name, e);
+                    els.batchCurrentFile.textContent = `❌ Failed: ${file.name} - ${e.message}`;
+                }
+                await yieldToBrowser();
+            }
+
+            hideOverlay();
+            els.batchCurrentFile.textContent = `✅ Complete! ${successCount}/${batchFiles.length} files converted`;
+            els.batchSuccessCount.textContent = successCount;
+
+            if(successCount > 0) {
+                els.batchResultsDiv.classList.remove('hidden');
+                incrementCounter(); // Increment once for batch completion
+                showToast(`Converted ${successCount}/${batchFiles.length} files!`, 'success');
+            } else {
+                showToast('No files were converted successfully. Check video formats.', 'error');
+            }
+
+            els.batchProgress.classList.add('hidden');
+        }
+
+        async function downloadBatchAsZip() {
+            if(!batchResults.length) {
+                showToast('No converted files to download!', 'error');
+                return;
+            }
+            showOverlay('Creating ZIP', `Packaging ${batchResults.length} files...`);
+            try {
+                const zip = new JSZip();
+                batchResults.forEach(r => zip.file(r.name, r.blob));
+                const blob = await zip.generateAsync({type:'blob', streamFiles: true});
+                hideOverlay();
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `converted_videos_${Date.now()}.zip`;
+                a.click();
+                setTimeout(() => URL.revokeObjectURL(a.href), 100);
+                showToast('ZIP download started!', 'success');
+            } catch(e) {
+                hideOverlay();
+                showToast('Error creating ZIP: ' + e.message, 'error');
+            }
+        }
+
+        window.addEventListener('load', () => {
+            $('#toast').style.transform='translateY(200px)';
+            drawTimeline();
+            updateHandles();
+
+            // Re-attach batch button listener if needed
+            if(els.batchConvertBtn) {
+                const oldBtn = els.batchConvertBtn;
+                const newBtn = oldBtn.cloneNode(true);
+                oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+                els.batchConvertBtn = newBtn;
+                els.batchConvertBtn.addEventListener('click', startBatchConversion);
+            }
+        });
+    </script>
+</body>
+</html>

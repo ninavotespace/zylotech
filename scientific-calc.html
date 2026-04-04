@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculators - Percentage, Fraction, Ratio, VAT, Tip, Discount, Loan, BMI, Fuel Economy</title>
+    <meta name="description" content="9 scientific calculators: Percentage calculator, Fraction simplifier, Ratio calculator, VAT/Tax, Tip calculator, Discount calculator, Loan calculator, BMI calculator, Fuel economy converter.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #06b6d4; --primary-hover: #0891b2; --accent: #22d3ee; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #164e63 100%); color: #f1f5f9; min-height: 100vh; }
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: #1f2937; }
+        .calculator-card { transition: all 0.2s ease; cursor: pointer; }
+        .calculator-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px -4px rgba(0,0,0,0.2); }
+        .tab-btn { position: relative; padding: 12px 24px; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s ease; color: #94a3b8; cursor: pointer; }
+        .tab-btn.active { border-bottom-color: var(--primary); color: white; }
+        .result-box { background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 16px; border-radius: 12px; text-align: center; }
+        .result-number { font-size: 2rem; font-weight: bold; color: var(--primary); }
+        .copy-btn { background: #e2e8f0; border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+        .copy-btn:hover { background: var(--primary); color: white; }
+        input, select { transition: all 0.2s; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); ring: 2px solid var(--primary); }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .hidden { display: none !important; }
+        .calc-panel { max-height: 600px; overflow-y: auto; }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-4">
+                <i class="fas fa-calculator text-cyan-400"></i>
+                <span class="text-sm text-gray-200">100% Browser-Based • Instant • Free</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-2">
+                <i class="fas fa-square-root-alt mr-2 text-cyan-400"></i>Scientific Calculators
+            </h1>
+            <p class="text-gray-300 max-w-2xl mx-auto">Percentage, Fraction, Ratio, VAT, Tip, Discount, Loan, BMI, Fuel Economy</p>
+            <div class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-cyan-600 to-teal-600 text-white rounded-full shadow-lg">
+                <i class="fas fa-chart-simple"></i>
+                <span id="view-counter" class="font-bold">0</span>
+                <span class="text-sm">calculations done</span>
+            </div>
+        </div>
+
+        <!-- Calculator Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-8">
+            <div class="calculator-card glass p-3 rounded-xl text-center cursor-pointer" data-calc="percentage">
+                <i class="fas fa-percent text-cyan-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Percentage</p>
+            </div>
+            <div class="calculator-card glass p-3 rounded-xl text-center cursor-pointer" data-calc="fraction">
+                <i class="fas fa-divide text-cyan-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Fraction</p>
+            </div>
+            <div class="calculator-card glass p-3 rounded-xl text-center cursor-pointer" data-calc="ratio">
+                <i class="fas fa-chart-line text-cyan-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Ratio</p>
+            </div>
+            <div class="calculator-card glass p-3 rounded-xl text-center cursor-pointer" data-calc="vat">
+                <i class="fas fa-receipt text-cyan-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">VAT/Tax</p>
+            </div>
+            <div class="calculator-card glass p-3 rounded-xl text-center cursor-pointer" data-calc="tip">
+                <i class="fas fa-coffee text-cyan-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Tip</p>
+            </div>
+            <div class="calculator-card glass p-3 rounded-xl text-center cursor-pointer" data-calc="discount">
+                <i class="fas fa-tags text-cyan-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Discount</p>
+            </div>
+            <div class="calculator-card glass p-3 rounded-xl text-center cursor-pointer" data-calc="loan">
+                <i class="fas fa-home text-cyan-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Loan</p>
+            </div>
+            <div class="calculator-card glass p-3 rounded-xl text-center cursor-pointer" data-calc="bmi">
+                <i class="fas fa-heartbeat text-cyan-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">BMI</p>
+            </div>
+            <div class="calculator-card glass p-3 rounded-xl text-center cursor-pointer" data-calc="fuel">
+                <i class="fas fa-gas-pump text-cyan-500 text-2xl mb-1"></i>
+                <p class="font-semibold text-sm">Fuel Economy</p>
+            </div>
+        </div>
+
+        <!-- ==================== PERCENTAGE CALCULATOR ==================== -->
+        <div id="percentage-calc" class="calc-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-percent text-cyan-500"></i>Percentage Calculator</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-600 mb-1">What is % of?</label>
+                    <div class="flex gap-2 mb-3">
+                        <input type="number" id="pct-value" placeholder="%" class="w-1/3 p-2 border rounded">
+                        <span class="text-lg">of</span>
+                        <input type="number" id="pct-of" placeholder="number" class="w-1/2 p-2 border rounded">
+                    </div>
+                    <button id="calc-percentage" class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition w-full">Calculate</button>
+                </div>
+                <div class="result-box">
+                    <p class="text-sm text-gray-500">Result:</p>
+                    <div class="result-number" id="percentage-result">0</div>
+                    <button id="copy-percentage" class="copy-btn mt-2">Copy</button>
+                </div>
+            </div>
+            <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                <p class="text-sm"><strong>Other calculations:</strong></p>
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    <button id="pct-increase" class="text-sm bg-gray-100 p-1 rounded hover:bg-cyan-100">% Increase</button>
+                    <button id="pct-decrease" class="text-sm bg-gray-100 p-1 rounded hover:bg-cyan-100">% Decrease</button>
+                    <button id="pct-diff" class="text-sm bg-gray-100 p-1 rounded hover:bg-cyan-100">% Difference</button>
+                    <button id="pct-change" class="text-sm bg-gray-100 p-1 rounded hover:bg-cyan-100">Change Between</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== FRACTION SIMPLIFIER ==================== -->
+        <div id="fraction-calc" class="calc-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-divide text-cyan-500"></i>Fraction Simplifier</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <input type="number" id="frac-num" placeholder="Numerator" class="w-1/2 p-2 border rounded">
+                        <span class="text-xl">/</span>
+                        <input type="number" id="frac-den" placeholder="Denominator" class="w-1/2 p-2 border rounded">
+                    </div>
+                    <button id="simplify-fraction" class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition w-full">Simplify</button>
+                </div>
+                <div class="result-box">
+                    <p class="text-sm text-gray-500">Simplified:</p>
+                    <div class="result-number" id="fraction-result">—</div>
+                    <p class="text-sm text-gray-500 mt-2">Decimal: <span id="fraction-decimal">—</span></p>
+                    <button id="copy-fraction" class="copy-btn mt-2">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== RATIO CALCULATOR ==================== -->
+        <div id="ratio-calc" class="calc-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-chart-line text-cyan-500"></i>Ratio Calculator</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <input type="number" id="ratio-a" placeholder="A" class="w-1/3 p-2 border rounded">
+                        <span class="text-xl">:</span>
+                        <input type="number" id="ratio-b" placeholder="B" class="w-1/3 p-2 border rounded">
+                    </div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-sm">Total parts:</span>
+                        <input type="number" id="ratio-total" placeholder="Total" class="w-1/2 p-2 border rounded">
+                    </div>
+                    <button id="calc-ratio" class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition w-full">Calculate Ratio</button>
+                </div>
+                <div class="result-box">
+                    <p class="text-sm text-gray-500">Simplified Ratio:</p>
+                    <div class="result-number" id="ratio-result">—</div>
+                    <p class="text-sm text-gray-500 mt-2">Individual values: <span id="ratio-values">—</span></p>
+                    <button id="copy-ratio" class="copy-btn mt-2">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VAT/TAX CALCULATOR ==================== -->
+        <div id="vat-calc" class="calc-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-receipt text-cyan-500"></i>VAT / Sales Tax Calculator</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-600 mb-1">Amount ($)</label>
+                    <input type="number" id="vat-amount" placeholder="0.00" class="w-full p-2 border rounded mb-3">
+                    <label class="block text-sm font-bold text-gray-600 mb-1">Tax Rate (%)</label>
+                    <input type="number" id="vat-rate" value="20" class="w-full p-2 border rounded mb-3">
+                    <button id="calc-vat" class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition w-full">Calculate VAT</button>
+                </div>
+                <div class="result-box">
+                    <p class="text-sm text-gray-500">Net Amount (excl. tax): <span id="vat-net" class="font-bold">0.00</span></p>
+                    <p class="text-sm text-gray-500">Tax Amount: <span id="vat-tax" class="font-bold">0.00</span></p>
+                    <p class="text-sm text-gray-500">Gross Amount (incl. tax): <span id="vat-gross" class="font-bold">0.00</span></p>
+                    <button id="copy-vat" class="copy-btn mt-2">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TIP CALCULATOR ==================== -->
+        <div id="tip-calc" class="calc-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-coffee text-cyan-500"></i>Tip Calculator</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-600 mb-1">Bill Amount ($)</label>
+                    <input type="number" id="tip-bill" placeholder="0.00" class="w-full p-2 border rounded mb-3">
+                    <label class="block text-sm font-bold text-gray-600 mb-1">Tip Percentage (%)</label>
+                    <div class="flex gap-2 mb-3">
+                        <input type="number" id="tip-percent" value="15" class="w-1/2 p-2 border rounded">
+                        <div class="flex gap-1">
+                            <button class="tip-preset bg-gray-100 px-2 rounded" data-tip="10">10%</button>
+                            <button class="tip-preset bg-gray-100 px-2 rounded" data-tip="15">15%</button>
+                            <button class="tip-preset bg-gray-100 px-2 rounded" data-tip="18">18%</button>
+                            <button class="tip-preset bg-gray-100 px-2 rounded" data-tip="20">20%</button>
+                        </div>
+                    </div>
+                    <label class="block text-sm font-bold text-gray-600 mb-1">Number of People</label>
+                    <input type="number" id="tip-people" value="1" class="w-full p-2 border rounded mb-3">
+                    <button id="calc-tip" class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition w-full">Calculate Tip</button>
+                </div>
+                <div class="result-box">
+                    <p class="text-sm text-gray-500">Tip Amount: <span id="tip-amount" class="font-bold">0.00</span></p>
+                    <p class="text-sm text-gray-500">Total Bill: <span id="tip-total" class="font-bold">0.00</span></p>
+                    <p class="text-sm text-gray-500">Per Person: <span id="tip-per-person" class="font-bold">0.00</span></p>
+                    <button id="copy-tip" class="copy-btn mt-2">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== DISCOUNT CALCULATOR ==================== -->
+        <div id="discount-calc" class="calc-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-tags text-cyan-500"></i>Discount Calculator</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-600 mb-1">Original Price ($)</label>
+                    <input type="number" id="discount-original" placeholder="0.00" class="w-full p-2 border rounded mb-3">
+                    <label class="block text-sm font-bold text-gray-600 mb-1">Discount Percentage (%)</label>
+                    <input type="number" id="discount-percent" value="10" class="w-full p-2 border rounded mb-3">
+                    <button id="calc-discount" class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition w-full">Calculate Discount</button>
+                </div>
+                <div class="result-box">
+                    <p class="text-sm text-gray-500">Discount Amount: <span id="discount-amount" class="font-bold">0.00</span></p>
+                    <p class="text-sm text-gray-500">Sale Price: <span id="sale-price" class="font-bold">0.00</span></p>
+                    <p class="text-sm text-gray-500">You Save: <span id="you-save" class="font-bold">0.00</span></p>
+                    <button id="copy-discount" class="copy-btn mt-2">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== LOAN CALCULATOR ==================== -->
+        <div id="loan-calc" class="calc-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-home text-cyan-500"></i>Loan Calculator</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-600 mb-1">Loan Amount ($)</label>
+                    <input type="number" id="loan-amount" placeholder="0" class="w-full p-2 border rounded mb-3">
+                    <label class="block text-sm font-bold text-gray-600 mb-1">Annual Interest Rate (%)</label>
+                    <input type="number" id="loan-rate" value="5" step="0.1" class="w-full p-2 border rounded mb-3">
+                    <label class="block text-sm font-bold text-gray-600 mb-1">Loan Term (years)</label>
+                    <input type="number" id="loan-years" value="30" class="w-full p-2 border rounded mb-3">
+                    <button id="calc-loan" class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition w-full">Calculate Loan</button>
+                </div>
+                <div class="result-box">
+                    <p class="text-sm text-gray-500">Monthly Payment: <span id="monthly-payment" class="font-bold">0.00</span></p>
+                    <p class="text-sm text-gray-500">Total Payment: <span id="total-payment" class="font-bold">0.00</span></p>
+                    <p class="text-sm text-gray-500">Total Interest: <span id="total-interest" class="font-bold">0.00</span></p>
+                    <button id="copy-loan" class="copy-btn mt-2">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== BMI CALCULATOR ==================== -->
+        <div id="bmi-calc" class="calc-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-heartbeat text-cyan-500"></i>BMI Calculator</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-600 mb-1">Weight</label>
+                    <div class="flex gap-2 mb-3">
+                        <input type="number" id="bmi-weight" placeholder="70" class="w-1/2 p-2 border rounded">
+                        <select id="bmi-weight-unit" class="w-1/2 p-2 border rounded">
+                            <option value="kg">kg</option>
+                            <option value="lb">lb</option>
+                        </select>
+                    </div>
+                    <label class="block text-sm font-bold text-gray-600 mb-1">Height</label>
+                    <div class="flex gap-2 mb-3">
+                        <input type="number" id="bmi-height" placeholder="170" class="w-1/2 p-2 border rounded">
+                        <select id="bmi-height-unit" class="w-1/2 p-2 border rounded">
+                            <option value="cm">cm</option>
+                            <option value="m">m</option>
+                            <option value="ft">ft</option>
+                        </select>
+                    </div>
+                    <button id="calc-bmi" class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition w-full">Calculate BMI</button>
+                </div>
+                <div class="result-box">
+                    <div class="result-number" id="bmi-value">—</div>
+                    <p class="text-sm text-gray-500" id="bmi-category">—</p>
+                    <div class="mt-2 text-xs text-gray-400">
+                        <p>Underweight: &lt; 18.5</p>
+                        <p>Normal: 18.5 - 24.9</p>
+                        <p>Overweight: 25 - 29.9</p>
+                        <p>Obese: ≥ 30</p>
+                    </div>
+                    <button id="copy-bmi" class="copy-btn mt-2">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== FUEL ECONOMY CALCULATOR ==================== -->
+        <div id="fuel-calc" class="calc-panel glass p-6 rounded-2xl mb-6 hidden">
+            <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-gas-pump text-cyan-500"></i>Fuel Economy Converter</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-600 mb-1">Value</label>
+                    <input type="number" id="fuel-value" placeholder="0" class="w-full p-2 border rounded mb-3">
+                    <label class="block text-sm font-bold text-gray-600 mb-1">From</label>
+                    <select id="fuel-from" class="w-full p-2 border rounded mb-3">
+                        <option value="mpg">MPG (US)</option>
+                        <option value="mpgUK">MPG (UK)</option>
+                        <option value="l100km">L/100km</option>
+                        <option value="kml">km/L</option>
+                    </select>
+                    <label class="block text-sm font-bold text-gray-600 mb-1">To</label>
+                    <select id="fuel-to" class="w-full p-2 border rounded mb-3">
+                        <option value="mpg">MPG (US)</option>
+                        <option value="mpgUK">MPG (UK)</option>
+                        <option value="l100km">L/100km</option>
+                        <option value="kml">km/L</option>
+                    </select>
+                    <button id="calc-fuel" class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition w-full">Convert</button>
+                </div>
+                <div class="result-box">
+                    <p class="text-sm text-gray-500">Converted Value:</p>
+                    <div class="result-number" id="fuel-result">0</div>
+                    <button id="copy-fuel" class="copy-btn mt-2">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="text-center text-gray-400 text-sm mt-12 pt-8 border-t border-gray-700">
+            <p>🔒 All calculations happen instantly in your browser. No data is sent to any server.</p>
+            <p>© 2024 Scientific Calculators | 9 Essential Calculators</p>
+        </footer>
+    </div>
+
+    <script>
+        // Counter
+        let calculationCount = localStorage.getItem('scientificCalcCount') || 0;
+        document.getElementById('view-counter').textContent = calculationCount;
+        function incrementCounter() { calculationCount++; localStorage.setItem('scientificCalcCount', calculationCount); document.getElementById('view-counter').textContent = calculationCount; }
+
+        // Toast
+        let toastTimeout;
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas fa-check-circle mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        // Tab switching
+        function showCalculator(calcName) {
+            const panels = ['percentage', 'fraction', 'ratio', 'vat', 'tip', 'discount', 'loan', 'bmi', 'fuel'];
+            panels.forEach(p => {
+                const panel = document.getElementById(`${p}-calc`);
+                if (panel) panel.classList.add('hidden');
+            });
+            document.getElementById(`${calcName}-calc`).classList.remove('hidden');
+        }
+
+        document.querySelectorAll('.calculator-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const calc = card.dataset.calc;
+                showCalculator(calc);
+            });
+        });
+
+        // ==================== PERCENTAGE CALCULATOR ====================
+        document.getElementById('calc-percentage').addEventListener('click', () => {
+            const pct = parseFloat(document.getElementById('pct-value').value) || 0;
+            const of = parseFloat(document.getElementById('pct-of').value) || 0;
+            const result = (pct / 100) * of;
+            document.getElementById('percentage-result').textContent = result.toFixed(2);
+            incrementCounter();
+        });
+        document.getElementById('pct-increase').addEventListener('click', () => {
+            const from = parseFloat(document.getElementById('pct-of').value) || 0;
+            const to = parseFloat(document.getElementById('pct-value').value) || 0;
+            const result = ((to - from) / from) * 100;
+            document.getElementById('percentage-result').textContent = result.toFixed(2) + '%';
+            incrementCounter();
+        });
+        document.getElementById('pct-decrease').addEventListener('click', () => {
+            const from = parseFloat(document.getElementById('pct-of').value) || 0;
+            const to = parseFloat(document.getElementById('pct-value').value) || 0;
+            const result = ((from - to) / from) * 100;
+            document.getElementById('percentage-result').textContent = result.toFixed(2) + '%';
+            incrementCounter();
+        });
+        document.getElementById('pct-diff').addEventListener('click', () => {
+            const a = parseFloat(document.getElementById('pct-of').value) || 0;
+            const b = parseFloat(document.getElementById('pct-value').value) || 0;
+            const result = Math.abs((a - b) / ((a + b) / 2)) * 100;
+            document.getElementById('percentage-result').textContent = result.toFixed(2) + '%';
+            incrementCounter();
+        });
+
+        // ==================== FRACTION SIMPLIFIER ====================
+        function gcd(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b !== 0) { const t = b; b = a % b; a = t; }
+            return a;
+        }
+        document.getElementById('simplify-fraction').addEventListener('click', () => {
+            let num = parseInt(document.getElementById('frac-num').value) || 0;
+            let den = parseInt(document.getElementById('frac-den').value) || 1;
+            if (den === 0) den = 1;
+            const divisor = gcd(num, den);
+            const simpNum = num / divisor;
+            const simpDen = den / divisor;
+            document.getElementById('fraction-result').textContent = `${simpNum}/${simpDen}`;
+            document.getElementById('fraction-decimal').textContent = (num / den).toFixed(4);
+            incrementCounter();
+        });
+
+        // ==================== RATIO CALCULATOR ====================
+        document.getElementById('calc-ratio').addEventListener('click', () => {
+            let a = parseFloat(document.getElementById('ratio-a').value) || 0;
+            let b = parseFloat(document.getElementById('ratio-b').value) || 0;
+            const total = parseFloat(document.getElementById('ratio-total').value) || 0;
+            const divisor = gcd(a, b);
+            a /= divisor; b /= divisor;
+            document.getElementById('ratio-result').textContent = `${a}:${b}`;
+            if (total > 0) {
+                const sum = a + b;
+                const valA = (a / sum) * total;
+                const valB = (b / sum) * total;
+                document.getElementById('ratio-values').textContent = `${valA.toFixed(2)} : ${valB.toFixed(2)}`;
+            }
+            incrementCounter();
+        });
+
+        // ==================== VAT CALCULATOR ====================
+        document.getElementById('calc-vat').addEventListener('click', () => {
+            const amount = parseFloat(document.getElementById('vat-amount').value) || 0;
+            const rate = parseFloat(document.getElementById('vat-rate').value) || 0;
+            const net = amount / (1 + rate / 100);
+            const tax = amount - net;
+            document.getElementById('vat-net').textContent = net.toFixed(2);
+            document.getElementById('vat-tax').textContent = tax.toFixed(2);
+            document.getElementById('vat-gross').textContent = amount.toFixed(2);
+            incrementCounter();
+        });
+
+        // ==================== TIP CALCULATOR ====================
+        function calculateTip() {
+            const bill = parseFloat(document.getElementById('tip-bill').value) || 0;
+            const percent = parseFloat(document.getElementById('tip-percent').value) || 0;
+            const people = parseInt(document.getElementById('tip-people').value) || 1;
+            const tip = bill * (percent / 100);
+            const total = bill + tip;
+            document.getElementById('tip-amount').textContent = tip.toFixed(2);
+            document.getElementById('tip-total').textContent = total.toFixed(2);
+            document.getElementById('tip-per-person').textContent = (total / people).toFixed(2);
+            incrementCounter();
+        }
+        document.getElementById('calc-tip').addEventListener('click', calculateTip);
+        document.querySelectorAll('.tip-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('tip-percent').value = btn.dataset.tip;
+                calculateTip();
+            });
+        });
+
+        // ==================== DISCOUNT CALCULATOR ====================
+        document.getElementById('calc-discount').addEventListener('click', () => {
+            const original = parseFloat(document.getElementById('discount-original').value) || 0;
+            const percent = parseFloat(document.getElementById('discount-percent').value) || 0;
+            const discount = original * (percent / 100);
+            const sale = original - discount;
+            document.getElementById('discount-amount').textContent = discount.toFixed(2);
+            document.getElementById('sale-price').textContent = sale.toFixed(2);
+            document.getElementById('you-save').textContent = discount.toFixed(2);
+            incrementCounter();
+        });
+
+        // ==================== LOAN CALCULATOR ====================
+        document.getElementById('calc-loan').addEventListener('click', () => {
+            const principal = parseFloat(document.getElementById('loan-amount').value) || 0;
+            const annualRate = parseFloat(document.getElementById('loan-rate').value) || 0;
+            const years = parseFloat(document.getElementById('loan-years').value) || 0;
+            const monthlyRate = annualRate / 100 / 12;
+            const payments = years * 12;
+            let monthly;
+            if (monthlyRate === 0) monthly = principal / payments;
+            else monthly = principal * monthlyRate * Math.pow(1 + monthlyRate, payments) / (Math.pow(1 + monthlyRate, payments) - 1);
+            const total = monthly * payments;
+            const interest = total - principal;
+            document.getElementById('monthly-payment').textContent = monthly.toFixed(2);
+            document.getElementById('total-payment').textContent = total.toFixed(2);
+            document.getElementById('total-interest').textContent = interest.toFixed(2);
+            incrementCounter();
+        });
+
+        // ==================== BMI CALCULATOR ====================
+        document.getElementById('calc-bmi').addEventListener('click', () => {
+            let weight = parseFloat(document.getElementById('bmi-weight').value) || 0;
+            let height = parseFloat(document.getElementById('bmi-height').value) || 0;
+            const weightUnit = document.getElementById('bmi-weight-unit').value;
+            const heightUnit = document.getElementById('bmi-height-unit').value;
+            if (weightUnit === 'lb') weight *= 0.453592;
+            if (heightUnit === 'm') height *= 100;
+            if (heightUnit === 'ft') height *= 30.48;
+            const heightM = height / 100;
+            const bmi = weight / (heightM * heightM);
+            document.getElementById('bmi-value').textContent = bmi.toFixed(1);
+            let category = '';
+            if (bmi < 18.5) category = 'Underweight';
+            else if (bmi < 25) category = 'Normal weight';
+            else if (bmi < 30) category = 'Overweight';
+            else category = 'Obese';
+            document.getElementById('bmi-category').textContent = category;
+            incrementCounter();
+        });
+
+        // ==================== FUEL ECONOMY ====================
+        document.getElementById('calc-fuel').addEventListener('click', () => {
+            let value = parseFloat(document.getElementById('fuel-value').value) || 0;
+            const from = document.getElementById('fuel-from').value;
+            const to = document.getElementById('fuel-to').value;
+            let result = value;
+            const conversions = {
+                mpg: { toL100km: 235.214583 / value, toKmL: value * 0.425143707, toMpgUK: value * 1.20095 },
+                mpgUK: { toL100km: 282.480936 / value, toKmL: value * 0.354006, toMpg: value / 1.20095 },
+                l100km: { toMpg: 235.214583 / value, toMpgUK: 282.480936 / value, toKmL: 100 / value },
+                kml: { toMpg: value * 2.3521458, toMpgUK: value * 2.82481, toL100km: 100 / value }
+            };
+            if (from === to) result = value;
+            else if (from === 'mpg' && to === 'l100km') result = 235.214583 / value;
+            else if (from === 'mpg' && to === 'kml') result = value * 0.425143707;
+            else if (from === 'mpg' && to === 'mpgUK') result = value * 1.20095;
+            else if (from === 'mpgUK' && to === 'l100km') result = 282.480936 / value;
+            else if (from === 'mpgUK' && to === 'kml') result = value * 0.354006;
+            else if (from === 'mpgUK' && to === 'mpg') result = value / 1.20095;
+            else if (from === 'l100km' && to === 'mpg') result = 235.214583 / value;
+            else if (from === 'l100km' && to === 'mpgUK') result = 282.480936 / value;
+            else if (from === 'l100km' && to === 'kml') result = 100 / value;
+            else if (from === 'kml' && to === 'mpg') result = value * 2.3521458;
+            else if (from === 'kml' && to === 'mpgUK') result = value * 2.82481;
+            else if (from === 'kml' && to === 'l100km') result = 100 / value;
+            document.getElementById('fuel-result').textContent = result.toFixed(2);
+            incrementCounter();
+        });
+
+        // Copy buttons
+        const copyIds = ['percentage', 'fraction', 'ratio', 'vat', 'tip', 'discount', 'loan', 'bmi', 'fuel'];
+        copyIds.forEach(id => {
+            const btn = document.getElementById(`copy-${id}`);
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    const resultElem = document.getElementById(`${id}-result`) || document.getElementById(`${id}-value`) || document.getElementById(`monthly-payment`);
+                    if (resultElem) {
+                        navigator.clipboard.writeText(resultElem.textContent);
+                        showToast('Copied!');
+                    }
+                });
+            }
+        });
+
+        // Default show percentage calculator
+        showCalculator('percentage');
+    </script>
+</body>
+</html>

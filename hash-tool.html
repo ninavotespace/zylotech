@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Hash & Encode Tool - MD5, SHA1, SHA256, Base64, Hex | ZyloTech</title>
+    <meta name="description" content="Free online hash and encode tool. Generate MD5, SHA1, SHA256 hashes. Convert text to Base64 and Hex. 100% browser-based, no server required.">
+    <meta name="keywords" content="free hash generator, md5 generator, sha1 generator, sha256 generator, base64 encoder, hex converter, online hash tool">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Hash & Encode Tool - MD5, SHA1, SHA256, Base64, Hex | ZyloTech">
+    <meta property="og:description" content="Free online hash and encode tool. Generate MD5, SHA1, SHA256 hashes. Convert text to Base64 and Hex.">
+    <meta property="og:url" content="https://www.zylotechstudios.space/hash-tool.html">
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Hash & Encode Tool - ZyloTech">
+    <meta name="twitter:description" content="Generate MD5, SHA1, SHA256 hashes, encode Base64 and Hex online for free.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.zylotechstudios.space/hash-tool.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <script src="js/include.js"></script>
+
+    <style>
+        :root { --primary: #f59e0b; --primary-hover: #d97706; --accent: #fbbf24; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #451a03 100%); color: #f1f5f9; min-height: 100vh; }
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: #1f2937; }
+        .glass-dark { background: rgba(15,23,42,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        .drop-zone { border: 3px dashed #475569; transition: all 0.2s ease; cursor: pointer; }
+        .drop-zone:hover, .drop-zone.drag-over { border-color: var(--primary); background: rgba(245,158,11,0.1); }
+        .tab-btn { position: relative; padding: 12px 24px; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s ease; color: #94a3b8; cursor: pointer; }
+        .tab-btn.active { border-bottom-color: var(--primary); color: white; }
+        .copy-btn { background: #e2e8f0; border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+        .copy-btn:hover { background: var(--primary); color: white; }
+        .hash-card { transition: all 0.2s ease; }
+        .hash-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px -4px rgba(0,0,0,0.2); }
+        .output-area { position: relative; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        textarea { font-family: 'Monaco', 'Menlo', 'Courier New', monospace; font-size: 13px; line-height: 1.5; resize: vertical; }
+        pre { white-space: pre-wrap; word-wrap: break-word; font-family: monospace; font-size: 12px; background: #f8fafc; padding: 12px; border-radius: 8px; max-height: 200px; overflow: auto; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(4px); }
+        .overlay-card { background: white; padding: 2rem; border-radius: 1rem; width: 90%; max-width: 400px; text-align: center; color: #1f2937; }
+        .hidden { display: none !important; }
+        .file-info { font-size: 11px; color: #64748b; margin-top: 4px; }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #f59e0b;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .back-to-top.show { opacity: 1; }
+        .back-to-top:hover { background: #d97706; transform: scale(1.1); }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <!-- Include Header -->
+    <div data-include="components/header.html"></div>
+
+    <!-- Processing Overlay -->
+    <div id="overlay" class="overlay hidden">
+        <div class="overlay-card">
+            <div class="spinner"></div>
+            <h3 id="overlay-title" class="text-xl font-bold mb-2">Processing...</h3>
+            <p id="overlay-msg" class="text-sm text-gray-500 mb-4">Please wait</p>
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                <div id="overlay-progress" class="bg-amber-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p id="overlay-percent" class="text-xs text-gray-400">0%</p>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-4">
+                <i class="fas fa-shield-alt text-amber-400"></i>
+                <span class="text-sm text-gray-200">Free • Browser-Based • No Server • Private</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-2">
+                <i class="fas fa-fingerprint mr-2 text-amber-400"></i>Free Hash & Encode Tool
+            </h1>
+            <p class="text-gray-300 max-w-2xl mx-auto">Generate MD5, SHA1, SHA256 hashes • Base64 Encode/Decode • Hex Convert. 100% Free.</p>
+            <div class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-full shadow-lg">
+                <i class="fas fa-chart-simple"></i>
+                <span id="view-counter" class="font-bold">0</span>
+                <span class="text-sm">operations completed</span>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="glass rounded-2xl p-2 mb-6 inline-flex">
+            <button id="tab-hash" class="tab-btn active rounded-xl px-6 py-3"><i class="fas fa-hashtag mr-2"></i>Hash Generator</button>
+            <button id="tab-base64" class="tab-btn rounded-xl px-6 py-3"><i class="fas fa-lock mr-2"></i>Base64</button>
+            <button id="tab-hex" class="tab-btn rounded-xl px-6 py-3"><i class="fas fa-code mr-2"></i>Hex</button>
+        </div>
+
+        <!-- ==================== HASH GENERATOR ==================== -->
+        <div id="hash-tool">
+            <div class="glass p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-fingerprint text-amber-500"></i>Text to Hash</h2>
+                <p class="text-sm text-gray-500 mb-4">Generate MD5, SHA1, and SHA256 hashes from any text</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="output-area">
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Input Text</label>
+                        <textarea id="hash-input" rows="6" class="w-full p-3 border rounded-lg font-mono text-sm" placeholder="Enter text to hash..."></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="hash-clear" class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+                            <button id="hash-example" class="text-xs text-amber-600 hover:text-amber-700">Load Example</button>
+                            <button id="hash-file-btn" class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200">📁 Hash File</button>
+                            <input type="file" id="hash-file-input" class="hidden">
+                        </div>
+                        <div id="hash-file-info" class="file-info hidden"></div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="hash-card bg-gray-50 p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-sm font-bold text-gray-600"><i class="fab fa-md text-amber-500 mr-1"></i>MD5</label>
+                                <button id="copy-md5" class="copy-btn text-xs">Copy</button>
+                            </div>
+                            <pre id="md5-output" class="text-xs bg-white p-2 rounded border">Enter text above</pre>
+                        </div>
+                        <div class="hash-card bg-gray-50 p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-sm font-bold text-gray-600"><i class="fas fa-shield-alt text-blue-500 mr-1"></i>SHA1</label>
+                                <button id="copy-sha1" class="copy-btn text-xs">Copy</button>
+                            </div>
+                            <pre id="sha1-output" class="text-xs bg-white p-2 rounded border">Enter text above</pre>
+                        </div>
+                        <div class="hash-card bg-gray-50 p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-sm font-bold text-gray-600"><i class="fas fa-shield-alt text-green-500 mr-1"></i>SHA256</label>
+                                <button id="copy-sha256" class="copy-btn text-xs">Copy</button>
+                            </div>
+                            <pre id="sha256-output" class="text-xs bg-white p-2 rounded border">Enter text above</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== BASE64 TOOL ==================== -->
+        <div id="base64-tool" class="hidden">
+            <div class="glass p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-lock text-blue-500"></i>Base64 Encode / Decode</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="output-area">
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Input Text</label>
+                        <textarea id="base64-input" rows="8" class="w-full p-3 border rounded-lg font-mono text-sm" placeholder="Enter text to encode to Base64..."></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="base64-clear" class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+                            <button id="base64-example" class="text-xs text-blue-600 hover:text-blue-700">Load Example</button>
+                            <button id="base64-file-btn" class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200">📁 Encode File</button>
+                            <input type="file" id="base64-file-input" class="hidden">
+                        </div>
+                        <div id="base64-file-info" class="file-info hidden"></div>
+                    </div>
+                    <div class="output-area">
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Base64 Output</label>
+                        <textarea id="base64-output" rows="8" class="w-full p-3 border rounded-lg font-mono text-sm bg-gray-50" readonly placeholder="Base64 encoded output will appear here..."></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="base64-copy" class="copy-btn text-xs">Copy</button>
+                            <button id="base64-download" class="text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700">Download .txt</button>
+                        </div>
+                    </div>
+                </div>
+                <button id="base64-encode-btn" class="w-full mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-bold hover:from-blue-700 hover:to-indigo-700 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-arrow-right"></i> Encode to Base64
+                </button>
+            </div>
+
+            <div class="glass p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-unlock-alt text-green-500"></i>Base64 Decode</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="output-area">
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Base64 Input</label>
+                        <textarea id="base64-decode-input" rows="6" class="w-full p-3 border rounded-lg font-mono text-sm" placeholder="Paste Base64 string here..."></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="base64-decode-clear" class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+                            <button id="base64-paste" class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200">Paste</button>
+                        </div>
+                    </div>
+                    <div class="output-area">
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Decoded Text</label>
+                        <textarea id="base64-decode-output" rows="6" class="w-full p-3 border rounded-lg font-mono text-sm bg-gray-50" readonly placeholder="Decoded text will appear here..."></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="base64-decode-copy" class="copy-btn text-xs">Copy</button>
+                            <button id="base64-decode-download" class="text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700">Download .txt</button>
+                        </div>
+                    </div>
+                </div>
+                <button id="base64-decode-btn" class="w-full mt-4 bg-gradient-to-r from-green-600 to-teal-600 text-white py-3 rounded-lg font-bold hover:from-green-700 hover:to-teal-700 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-arrow-left"></i> Decode from Base64
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== HEX TOOL ==================== -->
+        <div id="hex-tool" class="hidden">
+            <div class="glass p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-code text-purple-500"></i>Text to Hex</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="output-area">
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Input Text</label>
+                        <textarea id="hex-input" rows="6" class="w-full p-3 border rounded-lg font-mono text-sm" placeholder="Enter text to convert to Hex..."></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="hex-clear" class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+                            <button id="hex-example" class="text-xs text-purple-600 hover:text-purple-700">Load Example</button>
+                        </div>
+                    </div>
+                    <div class="output-area">
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Hex Output</label>
+                        <textarea id="hex-output" rows="6" class="w-full p-3 border rounded-lg font-mono text-sm bg-gray-50" readonly placeholder="Hex output will appear here..."></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="hex-copy" class="copy-btn text-xs">Copy</button>
+                        </div>
+                    </div>
+                </div>
+                <button id="hex-encode-btn" class="w-full mt-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-arrow-right"></i> Text → Hex
+                </button>
+            </div>
+
+            <div class="glass p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-terminal text-orange-500"></i>Hex to Text</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="output-area">
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Hex Input</label>
+                        <textarea id="hex-decode-input" rows="6" class="w-full p-3 border rounded-lg font-mono text-sm" placeholder="Enter hex string (e.g., 48656c6c6f)"></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="hex-decode-clear" class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+                            <button id="hex-paste" class="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200">Paste</button>
+                        </div>
+                    </div>
+                    <div class="output-area">
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Decoded Text</label>
+                        <textarea id="hex-decode-output" rows="6" class="w-full p-3 border rounded-lg font-mono text-sm bg-gray-50" readonly placeholder="Decoded text will appear here..."></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <button id="hex-decode-copy" class="copy-btn text-xs">Copy</button>
+                        </div>
+                    </div>
+                </div>
+                <button id="hex-decode-btn" class="w-full mt-4 bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 rounded-lg font-bold hover:from-orange-700 hover:to-red-700 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-arrow-left"></i> Hex → Text
+                </button>
+            </div>
+        </div>
+
+        <!-- Feature Section for SEO -->
+        <div class="mt-8 p-6 bg-white/5 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-3 text-center">Free Hash & Encode Tool Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div><i class="fas fa-fingerprint text-amber-400 mr-2"></i> <strong>MD5, SHA1, SHA256</strong> - Generate secure hashes</div>
+                <div><i class="fas fa-lock text-amber-400 mr-2"></i> <strong>Base64 Encode/Decode</strong> - Convert text to Base64</div>
+                <div><i class="fas fa-code text-amber-400 mr-2"></i> <strong>Hex Convert</strong> - Convert text to hex and back</div>
+                <div><i class="fas fa-upload text-amber-400 mr-2"></i> <strong>File Upload</strong> - Hash files directly</div>
+                <div><i class="fas fa-copy text-amber-400 mr-2"></i> <strong>Copy to Clipboard</strong> - One-click copy</div>
+                <div><i class="fas fa-download text-amber-400 mr-2"></i> <strong>Download Results</strong> - Save as text files</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <div data-include="components/footer.html"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up text-white"></i>
+    </div>
+
+    <script>
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('show');
+            else backToTop.classList.remove('show');
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Counter
+        let operationCount = localStorage.getItem('hashEncodeCount') || 0;
+        document.getElementById('view-counter').textContent = operationCount;
+        function incrementCounter() { operationCount++; localStorage.setItem('hashEncodeCount', operationCount); document.getElementById('view-counter').textContent = operationCount; }
+
+        // Show/Hide Overlay
+        function showOverlay(title, msg) {
+            document.getElementById('overlay').classList.remove('hidden');
+            document.getElementById('overlay-title').textContent = title;
+            document.getElementById('overlay-msg').textContent = msg;
+            document.getElementById('overlay-progress').style.width = '0%';
+            document.getElementById('overlay-percent').textContent = '0%';
+        }
+        function hideOverlay() { document.getElementById('overlay').classList.add('hidden'); }
+        function updateOverlayProgress(percent) {
+            document.getElementById('overlay-progress').style.width = percent + '%';
+            document.getElementById('overlay-percent').textContent = Math.round(percent) + '%';
+        }
+
+        // Toast
+        let toastTimeout;
+        function showToast(message, type = 'success') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Tab switching
+        const tabHash = document.getElementById('tab-hash');
+        const tabBase64 = document.getElementById('tab-base64');
+        const tabHex = document.getElementById('tab-hex');
+        const hashTool = document.getElementById('hash-tool');
+        const base64Tool = document.getElementById('base64-tool');
+        const hexTool = document.getElementById('hex-tool');
+
+        tabHash.addEventListener('click', () => {
+            tabHash.classList.add('active'); tabBase64.classList.remove('active'); tabHex.classList.remove('active');
+            hashTool.classList.remove('hidden'); base64Tool.classList.add('hidden'); hexTool.classList.add('hidden');
+        });
+        tabBase64.addEventListener('click', () => {
+            tabBase64.classList.add('active'); tabHash.classList.remove('active'); tabHex.classList.remove('active');
+            base64Tool.classList.remove('hidden'); hashTool.classList.add('hidden'); hexTool.classList.add('hidden');
+        });
+        tabHex.addEventListener('click', () => {
+            tabHex.classList.add('active'); tabHash.classList.remove('active'); tabBase64.classList.remove('active');
+            hexTool.classList.remove('hidden'); hashTool.classList.add('hidden'); base64Tool.classList.add('hidden');
+        });
+
+        // ==================== HASH GENERATOR ====================
+        const hashInput = document.getElementById('hash-input');
+        const md5Output = document.getElementById('md5-output');
+        const sha1Output = document.getElementById('sha1-output');
+        const sha256Output = document.getElementById('sha256-output');
+        const hashClear = document.getElementById('hash-clear');
+        const hashExample = document.getElementById('hash-example');
+        const hashFileBtn = document.getElementById('hash-file-btn');
+        const hashFileInput = document.getElementById('hash-file-input');
+        const hashFileInfo = document.getElementById('hash-file-info');
+
+        function updateHashes() {
+            const text = hashInput.value;
+            if (!text.trim()) {
+                md5Output.textContent = 'Enter text above';
+                sha1Output.textContent = 'Enter text above';
+                sha256Output.textContent = 'Enter text above';
+                return;
+            }
+            try {
+                md5Output.textContent = CryptoJS.MD5(text).toString();
+                sha1Output.textContent = CryptoJS.SHA1(text).toString();
+                sha256Output.textContent = CryptoJS.SHA256(text).toString();
+                incrementCounter();
+            } catch(e) {
+                md5Output.textContent = 'Error';
+                sha1Output.textContent = 'Error';
+                sha256Output.textContent = 'Error';
+            }
+        }
+
+        hashInput.addEventListener('input', updateHashes);
+        hashClear.addEventListener('click', () => { hashInput.value = ''; updateHashes(); });
+        hashExample.addEventListener('click', () => {
+            hashInput.value = 'The quick brown fox jumps over the lazy dog';
+            updateHashes();
+        });
+
+        hashFileBtn.addEventListener('click', () => hashFileInput.click());
+        hashFileInput.addEventListener('change', async (e) => {
+            if (!e.target.files[0]) return;
+            const file = e.target.files[0];
+            hashFileInfo.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+            hashFileInfo.classList.remove('hidden');
+            showOverlay('Hashing File', `Processing ${file.name}...`);
+            try {
+                const text = await file.text();
+                hashInput.value = text;
+                updateHashes();
+                hideOverlay();
+                showToast(`Hashed ${file.name} successfully!`, 'success');
+            } catch(e) {
+                hideOverlay();
+                showToast('Error reading file', 'error');
+            }
+            hashFileInput.value = '';
+        });
+
+        document.getElementById('copy-md5').addEventListener('click', () => {
+            navigator.clipboard.writeText(md5Output.textContent);
+            showToast('MD5 copied!');
+        });
+        document.getElementById('copy-sha1').addEventListener('click', () => {
+            navigator.clipboard.writeText(sha1Output.textContent);
+            showToast('SHA1 copied!');
+        });
+        document.getElementById('copy-sha256').addEventListener('click', () => {
+            navigator.clipboard.writeText(sha256Output.textContent);
+            showToast('SHA256 copied!');
+        });
+
+        // ==================== BASE64 ENCODE ====================
+        const base64Input = document.getElementById('base64-input');
+        const base64Output = document.getElementById('base64-output');
+        const base64Clear = document.getElementById('base64-clear');
+        const base64Example = document.getElementById('base64-example');
+        const base64EncodeBtn = document.getElementById('base64-encode-btn');
+        const base64Copy = document.getElementById('base64-copy');
+        const base64Download = document.getElementById('base64-download');
+        const base64FileBtn = document.getElementById('base64-file-btn');
+        const base64FileInput = document.getElementById('base64-file-input');
+        const base64FileInfo = document.getElementById('base64-file-info');
+
+        function encodeBase64() {
+            const text = base64Input.value;
+            if (!text) { base64Output.value = ''; return; }
+            try {
+                base64Output.value = btoa(unescape(encodeURIComponent(text)));
+                incrementCounter();
+            } catch(e) {
+                base64Output.value = 'Error: Cannot encode (possible non-latin characters)';
+            }
+        }
+
+        base64EncodeBtn.addEventListener('click', encodeBase64);
+        base64Clear.addEventListener('click', () => { base64Input.value = ''; base64Output.value = ''; });
+        base64Example.addEventListener('click', () => {
+            base64Input.value = 'Hello World! This is a test string for Base64 encoding.';
+            encodeBase64();
+        });
+        base64Copy.addEventListener('click', () => {
+            navigator.clipboard.writeText(base64Output.value);
+            showToast('Base64 copied!');
+        });
+        base64Download.addEventListener('click', () => {
+            if (!base64Output.value) { showToast('Nothing to download', 'error'); return; }
+            const blob = new Blob([base64Output.value], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `base64_${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Downloaded!');
+        });
+
+        base64FileBtn.addEventListener('click', () => base64FileInput.click());
+        base64FileInput.addEventListener('change', async (e) => {
+            if (!e.target.files[0]) return;
+            const file = e.target.files[0];
+            base64FileInfo.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+            base64FileInfo.classList.remove('hidden');
+            showOverlay('Encoding File', `Converting ${file.name} to Base64...`);
+            try {
+                const text = await file.text();
+                base64Input.value = text;
+                encodeBase64();
+                hideOverlay();
+                showToast(`Encoded ${file.name} to Base64!`, 'success');
+            } catch(e) {
+                hideOverlay();
+                showToast('Error reading file', 'error');
+            }
+            base64FileInput.value = '';
+        });
+
+        // ==================== BASE64 DECODE ====================
+        const base64DecodeInput = document.getElementById('base64-decode-input');
+        const base64DecodeOutput = document.getElementById('base64-decode-output');
+        const base64DecodeClear = document.getElementById('base64-decode-clear');
+        const base64DecodeBtn = document.getElementById('base64-decode-btn');
+        const base64DecodeCopy = document.getElementById('base64-decode-copy');
+        const base64DecodeDownload = document.getElementById('base64-decode-download');
+        const base64Paste = document.getElementById('base64-paste');
+
+        function decodeBase64() {
+            const b64 = base64DecodeInput.value.trim();
+            if (!b64) { base64DecodeOutput.value = ''; return; }
+            try {
+                base64DecodeOutput.value = decodeURIComponent(escape(atob(b64)));
+                incrementCounter();
+            } catch(e) {
+                base64DecodeOutput.value = 'Error: Invalid Base64 string';
+            }
+        }
+
+        base64DecodeBtn.addEventListener('click', decodeBase64);
+        base64DecodeClear.addEventListener('click', () => { base64DecodeInput.value = ''; base64DecodeOutput.value = ''; });
+        base64DecodeCopy.addEventListener('click', () => {
+            navigator.clipboard.writeText(base64DecodeOutput.value);
+            showToast('Decoded text copied!');
+        });
+        base64DecodeDownload.addEventListener('click', () => {
+            if (!base64DecodeOutput.value) { showToast('Nothing to download', 'error'); return; }
+            const blob = new Blob([base64DecodeOutput.value], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `decoded_${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Downloaded!');
+        });
+        base64Paste.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                base64DecodeInput.value = text;
+                decodeBase64();
+                showToast('Pasted from clipboard!');
+            } catch(e) { showToast('Could not paste', 'error'); }
+        });
+
+        // ==================== HEX ENCODE ====================
+        const hexInput = document.getElementById('hex-input');
+        const hexOutput = document.getElementById('hex-output');
+        const hexClear = document.getElementById('hex-clear');
+        const hexExample = document.getElementById('hex-example');
+        const hexEncodeBtn = document.getElementById('hex-encode-btn');
+        const hexCopy = document.getElementById('hex-copy');
+
+        function encodeHex() {
+            const text = hexInput.value;
+            if (!text) { hexOutput.value = ''; return; }
+            try {
+                let hex = '';
+                for (let i = 0; i < text.length; i++) {
+                    hex += text.charCodeAt(i).toString(16).padStart(2, '0');
+                }
+                hexOutput.value = hex;
+                incrementCounter();
+            } catch(e) {
+                hexOutput.value = 'Error encoding to hex';
+            }
+        }
+
+        hexEncodeBtn.addEventListener('click', encodeHex);
+        hexClear.addEventListener('click', () => { hexInput.value = ''; hexOutput.value = ''; });
+        hexExample.addEventListener('click', () => {
+            hexInput.value = 'Hello World!';
+            encodeHex();
+        });
+        hexCopy.addEventListener('click', () => {
+            navigator.clipboard.writeText(hexOutput.value);
+            showToast('Hex copied!');
+        });
+
+        // ==================== HEX DECODE ====================
+        const hexDecodeInput = document.getElementById('hex-decode-input');
+        const hexDecodeOutput = document.getElementById('hex-decode-output');
+        const hexDecodeClear = document.getElementById('hex-decode-clear');
+        const hexDecodeBtn = document.getElementById('hex-decode-btn');
+        const hexDecodeCopy = document.getElementById('hex-decode-copy');
+        const hexPaste = document.getElementById('hex-paste');
+
+        function decodeHex() {
+            const hex = hexDecodeInput.value.trim();
+            if (!hex) { hexDecodeOutput.value = ''; return; }
+            try {
+                let text = '';
+                for (let i = 0; i < hex.length; i += 2) {
+                    text += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+                }
+                hexDecodeOutput.value = text;
+                incrementCounter();
+            } catch(e) {
+                hexDecodeOutput.value = 'Error: Invalid hex string';
+            }
+        }
+
+        hexDecodeBtn.addEventListener('click', decodeHex);
+        hexDecodeClear.addEventListener('click', () => { hexDecodeInput.value = ''; hexDecodeOutput.value = ''; });
+        hexDecodeCopy.addEventListener('click', () => {
+            navigator.clipboard.writeText(hexDecodeOutput.value);
+            showToast('Decoded text copied!');
+        });
+        hexPaste.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                hexDecodeInput.value = text;
+                decodeHex();
+                showToast('Pasted from clipboard!');
+            } catch(e) { showToast('Could not paste', 'error'); }
+        });
+
+        // Initialize with example
+        hashInput.value = 'Hello World!';
+        updateHashes();
+    </script>
+</body>
+</html>
