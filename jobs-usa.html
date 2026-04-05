@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title id="pageTitle">ZyloTech Jobs | Global Job Board</title>
+    <meta name="description" id="metaDescription" content="Find jobs worldwide. Search thousands of opportunities from USA, UK, Canada, Australia, Germany, France, India, South Africa, and remote positions.">
+    <meta name="keywords" content="jobs, career, employment, remote jobs, USA jobs, UK jobs, Canada jobs, work from home">
+    <meta name="author" content="ZyloTech Studios">
+    <meta name="robots" content="index, follow">
+
+
+      <!-- Favicon & Icons -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="msapplication-TileColor" content="#ec4899">
+    <meta name="theme-color" content="#0f172a">
+
+    <link rel="canonical" href="https://zylotechstudios.space/joblistings.html">
+    <link rel="icon" href="https://zylotechstudios.space/favicon.ico" type="image/x-icon">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J9KFEHGYK5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-J9KFEHGYK5');
+</script>
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .job-card { transition: all 0.2s ease; border: 1px solid #e5e7eb; background: white; }
+        .job-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border-color: #3b82f6; }
+        .filter-chip { transition: all 0.2s; cursor: pointer; }
+        .filter-chip.active { background: #3b82f6; color: white; }
+        .salary-badge { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; }
+        .remote-badge { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; }
+        .hero-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%); }
+        .loading-spinner { border: 3px solid #e5e7eb; border-top: 3px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 0.8s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .footer-link:hover { color: #3b82f6; transform: translateX(3px); transition: all 0.2s; }
+        .country-select { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="%234b5563"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>'); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; appearance: none; }
+        .tab-active { border-bottom: 3px solid #3b82f6; color: #3b82f6; font-weight: 600; }
+        .tab-inactive { color: #6b7280; border-bottom: 3px solid transparent; }
+        .source-tag { font-size: 0.6rem; padding: 2px 6px; border-radius: 12px; background: #f3f4f6; color: #4b5563; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-md">
+                        <i class="fas fa-briefcase text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold text-gray-800">ZyloTech<span class="text-blue-600">Jobs</span></span>
+                        <p class="text-xs text-gray-500 hidden sm:block">7+ Job APIs • 50+ Countries</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex items-center gap-6">
+                    <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Home</a>
+                    <a href="#jobs" class="text-gray-700 hover:text-blue-600 transition">Browse Jobs</a>
+                    <a href="#cv-submit" class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition shadow-sm">
+                        <i class="fas fa-paper-plane mr-1"></i> Submit CV
+                    </a>
+                </nav>
+                <button id="mobileMenuBtn" class="md:hidden text-gray-600 text-2xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div id="mobileMenu" class="hidden md:hidden mt-4 pb-3 flex flex-col gap-3 border-t border-gray-100 pt-4">
+                <a href="#" class="text-gray-700 hover:text-blue-600 py-1">Home</a>
+                <a href="#jobs" class="text-gray-700 hover:text-blue-600 py-1">Browse Jobs</a>
+                <a href="#cv-submit" class="bg-blue-600 text-white px-5 py-2 rounded-lg text-center font-semibold">Submit CV</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero-gradient text-white py-12 md:py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-3" id="heroTitle">Global Job Board</h1>
+            <p class="text-lg opacity-90 max-w-2xl mx-auto mb-6" id="heroDesc">Powered by 7+ job APIs • Real-time listings from around the world</p>
+
+            <!-- Tab Selector -->
+            <div class="max-w-md mx-auto mb-4">
+                <div class="flex gap-2 bg-white/10 backdrop-blur-sm rounded-xl p-1">
+                    <button id="tabCountry" class="flex-1 py-2 rounded-lg text-sm font-semibold transition tab-active">🌍 Jobs by Country</button>
+                    <button id="tabRemote" class="flex-1 py-2 rounded-lg text-sm font-semibold transition tab-inactive">🏠 Remote Jobs</button>
+                </div>
+            </div>
+
+            <!-- Country Selector -->
+            <div id="countrySelector" class="max-w-md mx-auto">
+                <select id="countrySelect" class="country-select w-full px-5 py-3 rounded-xl text-gray-800 font-medium focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white shadow-md">
+                    <option value="us">🇺🇸 United States (Adzuna)</option>
+                    <option value="gb">🇬🇧 United Kingdom (Adzuna)</option>
+                    <option value="ca">🇨🇦 Canada (Adzuna)</option>
+                    <option value="au">🇦🇺 Australia (Adzuna)</option>
+                    <option value="de">🇩🇪 Germany (Adzuna)</option>
+                    <option value="fr">🇫🇷 France (Adzuna)</option>
+                    <option value="in">🇮🇳 India (Adzuna)</option>
+                    <option value="za">🇿🇦 South Africa (Adzuna)</option>
+                </select>
+            </div>
+
+            <!-- Remote Selector Info -->
+            <div id="remoteSelector" class="max-w-md mx-auto hidden">
+                <div class="bg-white/20 backdrop-blur-sm rounded-xl p-3">
+                    <p class="text-white font-medium"><i class="fas fa-globe mr-2"></i> Fetching from: Himalayas • Arbeitnow • RemoteOK • Jobicy • TheirStack</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters Bar -->
+    <div class="sticky top-[73px] z-40 bg-white border-b border-gray-200 py-3 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-wrap gap-2">
+                    <button data-filter="all" class="filter-chip active bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-medium">All Jobs</button>
+                    <button data-filter="Full Time" class="filter-chip bg-gray-100 text-gray-700 px-4 py-1.5 rounded-full text-sm font-medium">Full Time</button>
+                    <button data-filter="Part Time" class="filter-chip bg-gray-100 text-gray-700 px-4 py-1.5 rounded-full text-sm font-medium">Part Time</button>
+                    <button data-filter="Contract" class="filter-chip bg-gray-100 text-gray-700 px-4 py-1.5 rounded-full text-sm font-medium">Contract</button>
+                    <button data-filter="Internship" class="filter-chip bg-gray-100 text-gray-700 px-4 py-1.5 rounded-full text-sm font-medium">Internship</button>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-briefcase text-blue-600"></i>
+                    <span class="font-semibold text-gray-700 text-sm" id="jobCount">Select a country</span>
+                    <input type="text" id="searchInput" placeholder="Search jobs..." class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm w-48 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button onclick="refreshJobs()" class="text-blue-600 hover:text-blue-800 text-sm">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Jobs Container -->
+    <main id="jobs" class="container mx-auto px-4 py-8">
+        <div id="jobsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div class="col-span-full text-center py-12">
+                <div class="loading-spinner"></div>
+                <p class="text-gray-500">Select a country or remote jobs to see listings...</p>
+            </div>
+        </div>
+        <div id="noResults" class="hidden text-center py-12">
+            <i class="fas fa-search text-gray-300 text-5xl mb-3"></i>
+            <p class="text-gray-500">No jobs match your criteria</p>
+            <button onclick="resetFilters()" class="mt-3 text-blue-600 hover:text-blue-700 text-sm">Clear filters</button>
+        </div>
+    </main>
+
+    <!-- CV Submission -->
+    <section id="cv-submit" class="bg-gradient-to-r from-blue-50 to-indigo-50 py-12 mt-8">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-file-alt text-white text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Submit Your CV</h2>
+                <p class="text-gray-600 mb-6">Send us your resume and we'll help match you with relevant opportunities.</p>
+                <form action="mailto:zylotechstudios@gmail.com" method="post" enctype="text/plain" class="bg-white rounded-xl p-6 shadow-md">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <input type="text" placeholder="Full Name" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <input type="email" placeholder="Email Address" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <input type="tel" placeholder="Phone Number" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option>Select Job Category</option>
+                            <option>Technology / IT</option>
+                            <option>Finance / Accounting</option>
+                            <option>Engineering</option>
+                            <option>Sales / Marketing</option>
+                            <option>Healthcare</option>
+                            <option>Education</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition" id="uploadArea">
+                            <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                            <p class="text-sm text-gray-500">Click to upload CV (PDF, DOC, DOCX)</p>
+                            <input type="file" id="cvFile" class="hidden" accept=".pdf,.doc,.docx">
+                        </div>
+                    </div>
+                    <textarea placeholder="Tell us about your experience and career goals..." rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"></textarea>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md">
+                        <i class="fas fa-paper-plane mr-2"></i> Submit Application
+                    </button>
+                </form>
+                <p class="text-xs text-gray-400 mt-4">Your CV will be shared with potential employers matching your profile.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-12 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-briefcase text-white text-sm"></i>
+                        </div>
+                        <span class="text-lg font-bold">ZyloTech<span class="text-blue-400">Jobs</span></span>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">Your trusted partner for global career opportunities. Connecting job seekers with verified employers worldwide.</p>
+                    <div class="flex gap-3 mt-4">
+                        <a href="#" class="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition"><i class="fab fa-facebook-f text-sm"></i></a>
+                        <a href="#" class="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition"><i class="fab fa-twitter text-sm"></i></a>
+                        <a href="#" class="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition"><i class="fab fa-linkedin-in text-sm"></i></a>
+                        <a href="#" class="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition"><i class="fab fa-instagram text-sm"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#jobs" class="text-gray-400 hover:text-blue-400 transition footer-link inline-block"><i class="fas fa-chevron-right text-xs mr-2"></i> Browse Jobs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition footer-link inline-block"><i class="fas fa-chevron-right text-xs mr-2"></i> Cruise Jobs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition footer-link inline-block"><i class="fas fa-chevron-right text-xs mr-2"></i> Career Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition footer-link inline-block"><i class="fas fa-chevron-right text-xs mr-2"></i> Interview Guide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Job Sources</h3>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li>📌 Adzuna (12 countries)</li>
+                        <li>📌 Himalayas (Remote)</li>
+                        <li>📌 Arbeitnow (Remote)</li>
+                        <li>📌 RemoteOK (Remote)</li>
+                        <li>📌 Jobicy (Remote)</li>
+                        <li>📌 TheirStack (Aggregator)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Get in Touch</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start gap-3 text-gray-400">
+                            <i class="fas fa-envelope mt-0.5 text-blue-400"></i>
+                            <a href="mailto:zylotechstudios@gmail.com" class="hover:text-blue-400">zylotechstudios@gmail.com</a>
+                        </li>
+                        <li class="flex items-start gap-3 text-gray-400">
+                            <i class="fas fa-map-marker-alt mt-0.5 text-blue-400"></i>
+                            <span>Nairobi, Kenya</span>
+                        </li>
+                    </ul>
+                    <div class="mt-4">
+                        <h4 class="font-medium text-sm mb-2">Job Alerts</h4>
+                        <div class="flex">
+                            <input type="email" placeholder="Your email" class="flex-1 px-3 py-2 rounded-l-lg text-sm text-gray-800 focus:outline-none">
+                            <button class="bg-blue-600 px-3 py-2 rounded-r-lg text-sm hover:bg-blue-700 transition">Subscribe</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-6 text-center text-gray-500 text-xs">
+                <p>&copy; 2026 ZyloTech Studios. All rights reserved. Powered by Adzuna, Himalayas, Arbeitnow, RemoteOK, Jobicy & TheirStack APIs.</p>
+                <div class="flex justify-center gap-4 mt-2">
+                    <a href="#" class="hover:text-blue-400 transition">Privacy Policy</a>
+                    <a href="#" class="hover:text-blue-400 transition">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script type="application/ld+json" id="schemaJson">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "ZyloTech Jobs",
+        "url": "https://zylotechstudios.space/joblistings.html",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://zylotechstudios.space/joblistings.html?search={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+
+    <script>
+        // ============================================================
+        // ALL FREE JOB APIS CONFIGURATION
+        // Adzuna, Himalayas, Arbeitnow, RemoteOK, Jobicy, TheirStack
+        // ============================================================
+
+        const ADZUNA_APP_ID = "e60e144a";
+        const ADZUNA_API_KEY = "f232b11d3a42faf3beba47d2103d0665";
+
+        const COUNTRIES = {
+            us: { name: "United States", currency: "$", flag: "🇺🇸" },
+            gb: { name: "United Kingdom", currency: "£", flag: "🇬🇧" },
+            ca: { name: "Canada", currency: "C$", flag: "🇨🇦" },
+            au: { name: "Australia", currency: "A$", flag: "🇦🇺" },
+            de: { name: "Germany", currency: "€", flag: "🇩🇪" },
+            fr: { name: "France", currency: "€", flag: "🇫🇷" },
+            in: { name: "India", currency: "₹", flag: "🇮🇳" },
+            za: { name: "South Africa", currency: "R", flag: "🇿🇦" }
+        };
+
+        // Remote Job APIs (all free, no keys needed)
+        const REMOTE_APIS = {
+            himalayas: "https://himalayas.app/jobs/api?limit=25&offset=0",
+            arbeitnow: "https://arbeitnow.com/api/job-board-api",
+            remoteok: "https://remoteok.com/api",
+            jobicy: "https://jobicy.com/api/v2/remote-jobs?count=25",
+            theirstack: "https://api.theirstack.com/v1/jobs/search"
+        };
+
+        // State
+        let isRemoteMode = false;
+        let currentCountry = "us";
+        let allJobs = [];
+        let currentJobs = [];
+        let activeFilter = "all";
+        let searchTerm = "";
+
+        // ============================================================
+        // UI FUNCTIONS
+        // ============================================================
+        function switchToCountry() {
+            isRemoteMode = false;
+            document.getElementById("tabCountry").classList.add("tab-active");
+            document.getElementById("tabCountry").classList.remove("tab-inactive");
+            document.getElementById("tabRemote").classList.add("tab-inactive");
+            document.getElementById("tabRemote").classList.remove("tab-active");
+            document.getElementById("countrySelector").classList.remove("hidden");
+            document.getElementById("remoteSelector").classList.add("hidden");
+            loadCountryJobs();
+        }
+
+        function switchToRemote() {
+            isRemoteMode = true;
+            document.getElementById("tabRemote").classList.add("tab-active");
+            document.getElementById("tabRemote").classList.remove("tab-inactive");
+            document.getElementById("tabCountry").classList.add("tab-inactive");
+            document.getElementById("tabCountry").classList.remove("tab-active");
+            document.getElementById("countrySelector").classList.add("hidden");
+            document.getElementById("remoteSelector").classList.remove("hidden");
+            loadAllRemoteJobs();
+        }
+
+        function updateSEO(countryName, isRemote) {
+            if (isRemote) {
+                document.title = "Remote Jobs Worldwide | Work From Anywhere | ZyloTech Jobs";
+                document.getElementById("metaDescription").setAttribute("content", "Find the best remote jobs from Himalayas, Arbeitnow, RemoteOK, Jobicy & TheirStack. Work from home, full-time and contract positions available.");
+                document.getElementById("heroTitle").innerText = "Remote Jobs Worldwide";
+                document.getElementById("heroDesc").innerText = "Powered by 5 remote job APIs • Real-time listings from around the world";
+            } else {
+                document.title = `Jobs in ${countryName} | Latest Career Opportunities | ZyloTech Jobs`;
+                document.getElementById("metaDescription").setAttribute("content", `Find the latest job vacancies in ${countryName} across technology, finance, healthcare, engineering, and more. Updated daily from Adzuna API.`);
+                document.getElementById("heroTitle").innerText = `Jobs in ${countryName}`;
+                document.getElementById("heroDesc").innerText = `Browse thousands of opportunities from top employers across ${countryName}. Powered by Adzuna API.`;
+            }
+
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": isRemote ? "JobPosting" : "WebSite",
+                "name": isRemote ? "Remote Jobs" : `Jobs in ${countryName}`,
+                "url": "https://zylotechstudios.space/joblistings.html"
+            };
+            document.getElementById("schemaJson").innerHTML = JSON.stringify(schema);
+        }
+
+        // ============================================================
+        // ADZUNA API (Country Jobs)
+        // ============================================================
+        async function loadCountryJobs() {
+            const countryInfo = COUNTRIES[currentCountry];
+            updateSEO(countryInfo.name, false);
+
+            const container = document.getElementById("jobsGrid");
+            container.innerHTML = `
+                <div class="col-span-full text-center py-12">
+                    <div class="loading-spinner"></div>
+                    <p class="text-gray-500">Loading jobs from Adzuna API for ${countryInfo.name}...</p>
+                </div>
+            `;
+
+            try {
+                const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                const apiUrl = `https://api.adzuna.com/v1/api/jobs/${currentCountry}/search/1?app_id=${ADZUNA_APP_ID}&app_key=${ADZUNA_API_KEY}&results_per_page=50&content-type=application/json`;
+
+                const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
+                const data = await response.json();
+
+                if (data.results && data.results.length > 0) {
+                    allJobs = data.results.map(job => ({
+                        id: `adz_${job.id}`,
+                        title: job.title,
+                        company: job.company?.display_name || "Top Employer",
+                        location: job.location?.display_name || countryInfo.name,
+                        salary: job.salary_min ? `${countryInfo.currency}${job.salary_min.toLocaleString()} - ${job.salary_max.toLocaleString()}` : "Competitive",
+                        description: stripHtml(job.description || "Apply now for this exciting opportunity."),
+                        applyUrl: job.redirect_url,
+                        postedDate: job.created,
+                        contractType: mapContractType(job.contract_type),
+                        source: "Adzuna"
+                    }));
+
+                    renderJobs();
+                    document.getElementById("jobCount").innerHTML = `<i class="fas fa-database mr-1"></i> ${allJobs.length} jobs from Adzuna`;
+                } else {
+                    loadFallbackCountryJobs();
+                }
+            } catch (error) {
+                console.error("Adzuna error:", error);
+                loadFallbackCountryJobs();
+            }
+        }
+
+        // ============================================================
+        // ALL REMOTE APIS (Himalayas, Arbeitnow, RemoteOK, Jobicy, TheirStack)
+        // ============================================================
+        async function loadAllRemoteJobs() {
+            updateSEO("", true);
+
+            const container = document.getElementById("jobsGrid");
+            container.innerHTML = `
+                <div class="col-span-full text-center py-12">
+                    <div class="loading-spinner"></div>
+                    <p class="text-gray-500">Fetching remote jobs from Himalayas, Arbeitnow, RemoteOK, Jobicy & TheirStack...</p>
+                </div>
+            `;
+
+            let allRemoteJobs = [];
+
+            // 1. Himalayas API
+            try {
+                const response = await fetch(REMOTE_APIS.himalayas);
+                const data = await response.json();
+
+                if (Array.isArray(data) && data.length > 0) {
+                    const jobs = data.map(job => ({
+                        id: `him_${job.guid || Math.random()}`,
+                        title: job.title || "Remote Position",
+                        company: job.companyName || "Tech Company",
+                        location: getRemoteLocation(job.locationRestrictions, job.timezoneRestrictions),
+                        salary: formatSalary(job.minSalary, job.maxSalary, job.currency),
+                        description: stripHtml(job.description || job.excerpt || "Join a remote-first team with great benefits."),
+                        applyUrl: job.applicationLink || "#",
+                        postedDate: job.pubDate ? new Date(job.pubDate).toISOString() : new Date().toISOString(),
+                        contractType: mapContractType(job.employmentType),
+                        source: "Himalayas"
+                    }));
+                    allRemoteJobs.push(...jobs);
+                }
+            } catch (error) {
+                console.error("Himalayas error:", error);
+            }
+
+            // 2. Arbeitnow API
+            try {
+                const response = await fetch(REMOTE_APIS.arbeitnow);
+                const data = await response.json();
+
+                if (data.data && Array.isArray(data.data)) {
+                    const jobs = data.data.map(job => ({
+                        id: `arb_${job.slug || Math.random()}`,
+                        title: job.title || "Position",
+                        company: job.company_name || "Company",
+                        location: job.location || "Remote",
+                        salary: job.salary || "Competitive",
+                        description: stripHtml(job.description || "Apply now for this opportunity."),
+                        applyUrl: job.url || "#",
+                        postedDate: job.created_at || new Date().toISOString(),
+                        contractType: mapContractType(job.employment_type),
+                        source: "Arbeitnow"
+                    }));
+                    allRemoteJobs.push(...jobs);
+                }
+            } catch (error) {
+                console.error("Arbeitnow error:", error);
+            }
+
+            // 3. RemoteOK API
+            try {
+                const response = await fetch(REMOTE_APIS.remoteok);
+                const data = await response.json();
+
+                if (Array.isArray(data) && data.length > 1) {
+                    const jobs = data.slice(1, 26).map(job => ({
+                        id: `rok_${job.id || Math.random()}`,
+                        title: job.position || job.title,
+                        company: job.company || "Company",
+                        location: job.location || "Worldwide Remote",
+                        salary: job.salary_min ? `$${job.salary_min} - $${job.salary_max}` : "Competitive",
+                        description: stripHtml(job.description || "Remote opportunity available."),
+                        applyUrl: job.url || "#",
+                        postedDate: job.date ? new Date(job.date).toISOString() : new Date().toISOString(),
+                        contractType: "Full Time",
+                        source: "RemoteOK"
+                    }));
+                    allRemoteJobs.push(...jobs);
+                }
+            } catch (error) {
+                console.error("RemoteOK error:", error);
+            }
+
+            // 4. Jobicy API
+            try {
+                const response = await fetch(REMOTE_APIS.jobicy);
+                const data = await response.json();
+
+                if (data.jobs && Array.isArray(data.jobs)) {
+                    const jobs = data.jobs.map(job => ({
+                        id: `jcy_${job.id || Math.random()}`,
+                        title: job.jobTitle || "Remote Position",
+                        company: job.companyName || "Global Company",
+                        location: job.jobGeo || "Worldwide Remote",
+                        salary: formatSalary(job.annualSalaryMin, job.annualSalaryMax, job.salaryCurrency),
+                        description: stripHtml(job.jobDescription || job.jobExcerpt || "Exciting remote opportunity with flexible hours."),
+                        applyUrl: job.url || "#",
+                        postedDate: job.pubDate || new Date().toISOString(),
+                        contractType: mapContractType(job.jobType),
+                        source: "Jobicy"
+                    }));
+                    allRemoteJobs.push(...jobs);
+                }
+            } catch (error) {
+                console.error("Jobicy error:", error);
+            }
+
+            // 5. TheirStack API (requires CORS proxy)
+            try {
+                const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                const theirstackUrl = 'https://api.theirstack.com/v1/jobs/search?limit=20';
+                const response = await fetch(proxiedUrl + encodeURIComponent(theirstackUrl));
+                const data = await response.json();
+
+                if (data.data && Array.isArray(data.data)) {
+                    const jobs = data.data.map(job => ({
+                        id: `ths_${job.id || Math.random()}`,
+                        title: job.title || "Position",
+                        company: job.company_name || "Company",
+                        location: job.location || "Remote",
+                        salary: job.salary_range || "Competitive",
+                        description: stripHtml(job.description || "Apply for this position."),
+                        applyUrl: job.url || "#",
+                        postedDate: job.posted_date || new Date().toISOString(),
+                        contractType: mapContractType(job.employment_type),
+                        source: "TheirStack"
+                    }));
+                    allRemoteJobs.push(...jobs);
+                }
+            } catch (error) {
+                console.error("TheirStack error:", error);
+            }
+
+            // Deduplicate jobs by title+company
+            const uniqueJobs = [];
+            const seen = new Set();
+            for (const job of allRemoteJobs) {
+                const key = `${job.title}|${job.company}`;
+                if (!seen.has(key) && job.title && job.title.length > 3 && job.company && job.company.length > 1) {
+                    seen.add(key);
+                    uniqueJobs.push(job);
+                }
+            }
+
+            if (uniqueJobs.length > 0) {
+                allJobs = uniqueJobs.slice(0, 60);
+                renderJobs();
+                document.getElementById("jobCount").innerHTML = `<i class="fas fa-database mr-1"></i> ${allJobs.length} remote jobs (5 APIs)`;
+            } else {
+                loadFallbackRemoteJobs();
+            }
+        }
+
+        // ============================================================
+        // HELPER FUNCTIONS
+        // ============================================================
+        function getRemoteLocation(locationRestrictions, timezoneRestrictions) {
+            if (locationRestrictions && locationRestrictions.length > 0) {
+                const countries = locationRestrictions.map(loc => loc.name || loc.alpha2).filter(Boolean);
+                if (countries.length > 0) return countries.join(", ");
+            }
+            if (timezoneRestrictions && timezoneRestrictions.length > 0) {
+                return `Timezone: ${timezoneRestrictions.join(", ")}`;
+            }
+            return "Worldwide Remote";
+        }
+
+        function formatSalary(min, max, currency) {
+            if (min && max && currency) {
+                return `${currency} ${min.toLocaleString()} - ${max.toLocaleString()}`;
+            }
+            if (min && currency) return `${currency} ${min.toLocaleString()}+`;
+            if (max && currency) return `Up to ${currency} ${max.toLocaleString()}`;
+            return "Competitive";
+        }
+
+        function stripHtml(html) {
+            if (!html) return "";
+            const tmp = document.createElement("div");
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || "";
+        }
+
+        function mapContractType(type) {
+            if (!type) return "Full Time";
+            const lowerType = type.toLowerCase();
+            if (lowerType.includes("part")) return "Part Time";
+            if (lowerType.includes("contract")) return "Contract";
+            if (lowerType.includes("intern")) return "Internship";
+            return "Full Time";
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return "Recently";
+            try {
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            } catch {
+                return "Recently";
+            }
+        }
+
+        function loadFallbackCountryJobs() {
+            const countryInfo = COUNTRIES[currentCountry];
+            allJobs = [
+                { id: 1, title: "Software Engineer", company: "Tech Corp", location: countryInfo.name, salary: `${countryInfo.currency}80,000 - 120,000`, description: "Join our growing engineering team. Experience with modern frameworks required.", applyUrl: "#", postedDate: new Date().toISOString(), contractType: "Full Time", source: "Featured" },
+                { id: 2, title: "Marketing Manager", company: "Global Brands Inc", location: countryInfo.name, salary: `${countryInfo.currency}70,000 - 90,000`, description: "Lead marketing campaigns for major clients. 5+ years experience required.", applyUrl: "#", postedDate: new Date().toISOString(), contractType: "Full Time", source: "Featured" },
+                { id: 3, title: "Data Analyst", company: "Data Solutions", location: countryInfo.name, salary: `${countryInfo.currency}65,000 - 85,000`, description: "Analyze complex data sets and provide insights. SQL and Python skills required.", applyUrl: "#", postedDate: new Date().toISOString(), contractType: "Full Time", source: "Featured" }
+            ];
+            renderJobs();
+            document.getElementById("jobCount").innerHTML = `<i class="fas fa-database mr-1"></i> ${allJobs.length} jobs (Sample Data)`;
+        }
+
+        function loadFallbackRemoteJobs() {
+            allJobs = [
+                { id: 1, title: "Senior Software Engineer", company: "GitLab", location: "Worldwide Remote", salary: "$90,000 - $140,000", description: "Work on the leading DevSecOps platform from anywhere. 100% remote culture.", applyUrl: "https://about.gitlab.com/jobs", postedDate: new Date().toISOString(), contractType: "Full Time", source: "Featured" },
+                { id: 2, title: "Product Manager", company: "Automattic", location: "Worldwide Remote", salary: "$80,000 - $120,000", description: "Lead product development for WordPress.com. Remote-first company with global team.", applyUrl: "https://automattic.com/work-with-us", postedDate: new Date().toISOString(), contractType: "Full Time", source: "Featured" },
+                { id: 3, title: "Customer Success Manager", company: "HubSpot", location: "Remote - EMEA", salary: "€50,000 - €70,000", description: "Help customers succeed with CRM platform. Experience in SaaS required.", applyUrl: "https://www.hubspot.com/careers", postedDate: new Date().toISOString(), contractType: "Full Time", source: "Featured" }
+            ];
+            renderJobs();
+            document.getElementById("jobCount").innerHTML = `<i class="fas fa-database mr-1"></i> ${allJobs.length} remote jobs (Sample Data)`;
+        }
+
+        function renderJobs() {
+            let filtered = [...allJobs];
+
+            if (activeFilter !== "all") {
+                filtered = filtered.filter(job => job.contractType === activeFilter);
+            }
+
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filtered = filtered.filter(job =>
+                    (job.title && job.title.toLowerCase().includes(term)) ||
+                    (job.company && job.company.toLowerCase().includes(term)) ||
+                    (job.location && job.location.toLowerCase().includes(term))
+                );
+            }
+
+            currentJobs = filtered;
+
+            const container = document.getElementById("jobsGrid");
+            const noResults = document.getElementById("noResults");
+
+            if (filtered.length === 0) {
+                container.innerHTML = "";
+                noResults.classList.remove("hidden");
+                return;
+            }
+
+            noResults.classList.add("hidden");
+
+            container.innerHTML = filtered.map(job => `
+                <div class="job-card rounded-xl overflow-hidden">
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">${escapeHtml(job.title)}</h3>
+                                <p class="text-blue-600 font-medium text-sm">${escapeHtml(job.company)}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                ${job.salary ? `<span class="salary-badge text-xs px-2 py-1 rounded-full">${escapeHtml(job.salary)}</span>` : ''}
+                                ${isRemoteMode ? `<span class="remote-badge text-xs px-2 py-1 rounded-full"><i class="fas fa-globe mr-1"></i>Remote</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-3 text-sm text-gray-500 mb-3">
+                            <span><i class="fas fa-map-marker-alt w-3 text-blue-500"></i> ${escapeHtml(job.location)}</span>
+                            <span><i class="far fa-clock w-3"></i> ${formatDate(job.postedDate)}</span>
+                            <span><i class="fas fa-tag w-3 text-gray-400"></i> ${job.contractType}</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">${escapeHtml(job.description.substring(0, 200))}${job.description.length > 200 ? '...' : ''}</p>
+                        <div class="flex justify-between items-center pt-2 border-t border-gray-100">
+                            <span class="source-tag"><i class="fas fa-code-branch mr-1"></i> ${job.source || "API"}</span>
+                            <a href="${job.applyUrl}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                                Apply Now <i class="fas fa-arrow-right text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function filterJobs(category) {
+            activeFilter = category;
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                if (chip.dataset.filter === category) {
+                    chip.classList.add('active', 'bg-blue-600', 'text-white');
+                    chip.classList.remove('bg-gray-100', 'text-gray-700');
+                } else {
+                    chip.classList.remove('active', 'bg-blue-600', 'text-white');
+                    chip.classList.add('bg-gray-100', 'text-gray-700');
+                }
+            });
+            renderJobs();
+        }
+
+        function resetFilters() {
+            activeFilter = "all";
+            searchTerm = "";
+            document.getElementById("searchInput").value = "";
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                if (chip.dataset.filter === "all") {
+                    chip.classList.add('active', 'bg-blue-600', 'text-white');
+                    chip.classList.remove('bg-gray-100', 'text-gray-700');
+                } else {
+                    chip.classList.remove('active', 'bg-blue-600', 'text-white');
+                    chip.classList.add('bg-gray-100', 'text-gray-700');
+                }
+            });
+            renderJobs();
+        }
+
+        function refreshJobs() {
+            if (isRemoteMode) {
+                loadAllRemoteJobs();
+            } else {
+                loadCountryJobs();
+            }
+        }
+
+        // ============================================================
+        // EVENT LISTENERS & INIT
+        // ============================================================
+        document.getElementById("countrySelect").addEventListener("change", (e) => {
+            currentCountry = e.target.value;
+            if (!isRemoteMode) {
+                loadCountryJobs();
+            }
+        });
+
+        document.getElementById("tabCountry").addEventListener("click", switchToCountry);
+        document.getElementById("tabRemote").addEventListener("click", switchToRemote);
+
+        document.getElementById("searchInput").addEventListener("input", (e) => {
+            searchTerm = e.target.value;
+            renderJobs();
+        });
+
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => filterJobs(chip.dataset.filter));
+        });
+
+        document.getElementById("mobileMenuBtn").addEventListener("click", () => {
+            const menu = document.getElementById("mobileMenu");
+            menu.classList.toggle("hidden");
+        });
+
+        document.getElementById("uploadArea").addEventListener("click", () => {
+            document.getElementById("cvFile").click();
+        });
+
+        window.selectCountry = (code) => {
+            document.getElementById("countrySelect").value = code;
+            currentCountry = code;
+            if (!isRemoteMode) loadCountryJobs();
+        };
+        window.switchToRemote = switchToRemote;
+        window.resetFilters = resetFilters;
+        window.refreshJobs = refreshJobs;
+
+        // Load default country jobs on page load
+        loadCountryJobs();
+    </script>
+</body>
+</html>

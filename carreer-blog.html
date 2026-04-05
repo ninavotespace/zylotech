@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title id="pageTitle">Career Blog | Job Search Tips, Interview Advice & Professional Growth | ZyloTech Studios</title>
+    <meta name="description" id="metaDescription" content="Expert career advice, job search strategies, interview tips, resume writing guides, and professional development insights. Timeless content to advance your career.">
+    <meta name="keywords" content="career blog, job search tips, interview advice, resume writing, professional development, career growth, job hunting strategies, workplace success">
+    <meta name="author" content="ZyloTech Studios">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" id="canonicalUrl" href="https://zylotechstudios.space/career-blog.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" id="ogTitle" content="Career Blog | Expert Job Search & Career Advice">
+    <meta property="og:description" id="ogDescription" content="Timeless career advice, job search strategies, and professional development insights to help you succeed.">
+    <meta property="og:url" content="https://zylotechstudios.space/career-blog.html">
+    <meta property="og:site_name" content="ZyloTech Studios">
+    <meta property="og:image" content="https://zylotechstudios.space/og-blog.jpg">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="twitterTitle" content="Career Blog | Expert Job Search & Career Advice">
+    <meta name="twitter:description" id="twitterDescription" content="Timeless career advice, job search strategies, and professional development insights.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J9KFEHGYK5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-J9KFEHGYK5');
+</script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+        }
+
+        .blog-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1);
+            border-color: #3b82f6;
+        }
+
+        .category-badge {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 500;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #3b82f6 100%);
+        }
+
+        .footer-link {
+            transition: all 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: #3b82f6;
+            transform: translateX(4px);
+        }
+
+        .prose {
+            max-width: 100%;
+        }
+
+        .prose h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #0f172a;
+        }
+
+        .prose h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #1e293b;
+        }
+
+        .prose h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: #334155;
+        }
+
+        .prose p {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+            color: #334155;
+        }
+
+        .prose ul, .prose ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            color: #334155;
+        }
+
+        .prose li {
+            margin-bottom: 0.5rem;
+        }
+
+        .prose blockquote {
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+            color: #475569;
+            background: #f1f5f9;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .prose strong {
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .author-card {
+            background: #f1f5f9;
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .table-of-contents {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .table-of-contents a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .table-of-contents a:hover {
+            text-decoration: underline;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #3b82f6;
+            color: white;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 40;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+        }
+
+        .back-to-top:hover {
+            background: #2563eb;
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <!-- Back to Top Button -->
+    <div id="backToTop" class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- ========== HEADER ========== -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-md">
+                        <i class="fas fa-briefcase text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-extrabold text-gray-800">ZyloTech<span class="text-blue-600">Blog</span></span>
+                        <p class="text-xs text-gray-500 hidden sm:block">Career Insights & Advice</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="joblistings.html" class="text-gray-700 hover:text-blue-600 transition">Jobs</a>
+                    <a href="career-blog.html" class="text-blue-600 font-medium transition">Blog</a>
+                    <a href="#newsletter" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition shadow-md">
+                        <i class="fas fa-envelope mr-2"></i> Subscribe
+                    </a>
+                </nav>
+                <button id="mobileMenuBtn" class="md:hidden text-gray-600 text-2xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div id="mobileMenu" class="hidden md:hidden mt-4 pb-3 flex flex-col gap-3 border-t border-gray-100 pt-4">
+                <a href="joblistings.html" class="text-gray-700 hover:text-blue-600 py-2">Jobs</a>
+                <a href="career-blog.html" class="text-blue-600 font-medium py-2">Blog</a>
+                <a href="#newsletter" class="bg-blue-600 text-white px-5 py-2 rounded-lg text-center font-semibold">Subscribe</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========== MAIN CONTENT CONTAINER ========== -->
+    <main id="mainContent" class="container mx-auto px-4 py-12">
+        <!-- Dynamic content will be injected here -->
+    </main>
+
+    <!-- ========== NEWSLETTER SECTION ========== -->
+    <section id="newsletter" class="bg-gradient-to-r from-blue-50 to-indigo-50 py-16 mt-8">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg">
+                    <i class="fas fa-envelope text-white text-3xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-3">Subscribe to Our Newsletter</h2>
+                <p class="text-gray-600 mb-8 text-lg">Get the latest career advice and job search tips delivered to your inbox weekly.</p>
+
+                <form action="mailto:zylotechstudios@gmail.com" method="post" enctype="text/plain" class="bg-white rounded-2xl p-8 shadow-xl">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <input type="email" name="email" placeholder="Your Email Address" class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition shadow-md">
+                            Subscribe Now <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-4">No spam. Unsubscribe anytime.</p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="bg-gray-900 text-white pt-12 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-briefcase text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">ZyloTech<span class="text-blue-400">Blog</span></span>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">Expert career advice, job search strategies, and professional development insights to help you succeed.</p>
+                    <div class="flex gap-4 mt-5">
+                        <a href="#" class="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="joblistings.html" class="text-gray-400 hover:text-blue-400 transition footer-link inline-block"><i class="fas fa-chevron-right text-xs mr-2"></i> Browse Jobs</a></li>
+                        <li><a href="career-blog.html" class="text-gray-400 hover:text-blue-400 transition footer-link inline-block"><i class="fas fa-chevron-right text-xs mr-2"></i> Career Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition footer-link inline-block"><i class="fas fa-chevron-right text-xs mr-2"></i> Resume Templates</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition footer-link inline-block"><i class="fas fa-chevron-right text-xs mr-2"></i> Interview Guide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Categories</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" onclick="filterByCategory('Job Search'); return false;" class="text-gray-400 hover:text-blue-400 transition footer-link inline-block">Job Search Strategies</a></li>
+                        <li><a href="#" onclick="filterByCategory('Resume Tips'); return false;" class="text-gray-400 hover:text-blue-400 transition footer-link inline-block">Resume & Cover Letter</a></li>
+                        <li><a href="#" onclick="filterByCategory('Interview Prep'); return false;" class="text-gray-400 hover:text-blue-400 transition footer-link inline-block">Interview Preparation</a></li>
+                        <li><a href="#" onclick="filterByCategory('Career Growth'); return false;" class="text-gray-400 hover:text-blue-400 transition footer-link inline-block">Career Advancement</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Get in Touch</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start gap-3 text-gray-400">
+                            <i class="fas fa-envelope mt-0.5 text-blue-400"></i>
+                            <a href="mailto:zylotechstudios@gmail.com" class="hover:text-blue-400">zylotechstudios@gmail.com</a>
+                        </li>
+                        <li class="flex items-start gap-3 text-gray-400">
+                            <i class="fas fa-map-marker-alt mt-0.5 text-blue-400"></i>
+                            <span>Nairobi, Kenya</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-6 text-center text-gray-500 text-xs">
+                <p>&copy; 2026 ZyloTech Studios. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ============================================================
+        // COMPLETE BLOG DATA - 5 TIMELESS ARTICLES WITH FULL CONTENT
+        // ============================================================
+
+        const blogPosts = [
+            {
+                id: 1,
+                title: "10 Proven Strategies to Land Your Dream Job",
+                excerpt: "Discover actionable job search strategies that actually work. From networking to interview preparation, learn how to stand out in today's competitive market.",
+                category: "Job Search",
+                readTime: "8 min read",
+                date: "2024-01-15",
+                author: "Sarah Johnson",
+                authorRole: "Career Coach",
+                authorBio: "Sarah is a certified career coach with over 10 years of experience helping professionals land their dream jobs. She has placed over 500 candidates at companies like Google, Microsoft, and Amazon.",
+                authorImage: "SJ",
+                content: `
+                    <h2>Introduction</h2>
+                    <p>Finding your dream job isn't just about luck—it's about strategy. In today's competitive job market, you need a systematic approach to stand out from hundreds of other qualified candidates. This comprehensive guide will walk you through 10 proven strategies that successful job seekers use to land offers at top companies.</p>
+
+                    <div class="table-of-contents">
+                        <h3 class="font-bold text-gray-800 mb-3">What You'll Learn:</h3>
+                        <ul class="space-y-1">
+                            <li><a href="#strategy1">1. Define Your Target Clearly</a></li>
+                            <li><a href="#strategy2">2. Optimize Your LinkedIn Profile</a></li>
+                            <li><a href="#strategy3">3. Master the Art of Networking</a></li>
+                            <li><a href="#strategy4">4. Tailor Every Application</a></li>
+                            <li><a href="#strategy5">5. Build a Portfolio of Work</a></li>
+                            <li><a href="#strategy6">6. Prepare for Behavioral Interviews</a></li>
+                            <li><a href="#strategy7">7. Follow Up Strategically</a></li>
+                            <li><a href="#strategy8">8. Develop In-Demand Skills</a></li>
+                            <li><a href="#strategy9">9. Work with Recruiters</a></li>
+                            <li><a href="#strategy10">10. Stay Organized and Persistent</a></li>
+                        </ul>
+                    </div>
+
+                    <h2 id="strategy1">1. Define Your Target Clearly</h2>
+                    <p>Before you start applying, get crystal clear on what you want. What industries excite you? What role would you love to wake up to every morning? What company culture aligns with your values? The more specific you are, the more targeted and effective your search will be.</p>
+                    <p><strong>Action Step:</strong> Write down your ideal job title, target companies, preferred location, and must-have benefits. Use this as your filter when evaluating opportunities. This clarity will save you hundreds of hours applying to jobs that aren't right for you.</p>
+
+                    <h2 id="strategy2">2. Optimize Your LinkedIn Profile</h2>
+                    <p>Recruiters use LinkedIn daily to find candidates. Your profile needs to be complete, professional, and keyword-optimized. Think of your LinkedIn profile as your 24/7 online resume that works for you while you sleep.</p>
+                    <p><strong>Action Step:</strong> Add a professional headshot, write a compelling headline (not just your job title), and fill out every section with relevant keywords from job descriptions you want. Aim for "All-Star" profile strength.</p>
+
+                    <h2 id="strategy3">3. Master the Art of Networking</h2>
+                    <p>Over 70% of jobs are never publicly advertised. They're filled through referrals and networking. Building genuine relationships with people in your target industry is the most powerful job search strategy available.</p>
+                    <p><strong>Action Step:</strong> Send 5-10 personalized connection requests daily on LinkedIn. Attend industry events, join professional groups, and always follow up after conversations with a thank-you note.</p>
+
+                    <h2 id="strategy4">4. Tailor Every Application</h2>
+                    <p>Generic applications rarely succeed. Hiring managers can spot a template from a mile away. Each application should be customized to show you've done your research and understand the company's needs.</p>
+                    <p><strong>Action Step:</strong> Spend 30-45 minutes customizing each resume and cover letter. Reference specific projects, values, or initiatives from the target company. Mention the hiring manager's name if possible.</p>
+
+                    <h2 id="strategy5">5. Build a Portfolio of Work</h2>
+                    <p>In many fields, what you've done matters more than what you say you can do. A portfolio of your best work provides concrete evidence of your skills and accomplishments.</p>
+                    <p><strong>Action Step:</strong> Create a simple website or use platforms like GitHub, Behance, or Contently to showcase 3-5 of your best projects with clear explanations of your role and measurable results.</p>
+
+                    <h2 id="strategy6">6. Prepare for Behavioral Interviews</h2>
+                    <p>Behavioral questions like "Tell me about a time you faced a challenge" are standard in most interviews. Using the STAR method (Situation, Task, Action, Result) ensures you give structured, compelling answers.</p>
+                    <p><strong>Action Step:</strong> Prepare 5-7 STAR stories covering common scenarios: leadership, problem-solving, teamwork, conflict resolution, and failure recovery. Practice them until they feel natural.</p>
+
+                    <h2 id="strategy7">7. Follow Up Strategically</h2>
+                    <p>Most candidates never follow up after an interview. A thoughtful thank-you note can set you apart and keep you top-of-mind for hiring managers.</p>
+                    <p><strong>Action Step:</strong> Send a thank-you email within 24 hours of each interview. Mention something specific from your conversation to show you were engaged and listening. If you haven't heard back in a week, send a polite follow-up.</p>
+
+                    <h2 id="strategy8">8. Develop In-Demand Skills</h2>
+                    <p>The job market evolves constantly. Stay relevant by continuously learning new skills that employers value. Online courses make it easier than ever to upskill.</p>
+                    <p><strong>Action Step:</strong> Identify 2-3 skills frequently mentioned in job descriptions you want. Complete a certification or course in those areas within the next 3 months. Add them to your resume immediately.</p>
+
+                    <h2 id="strategy9">9. Work with Recruiters</h2>
+                    <p>Recruiters have access to jobs that never appear on public job boards. Building relationships with agency and internal recruiters can open doors you didn't know existed.</p>
+                    <p><strong>Action Step:</strong> Research recruiters who specialize in your industry. Send them a brief, professional introduction email with your resume attached. Follow up every few months to stay on their radar.</p>
+
+                    <h2 id="strategy10">10. Stay Organized and Persistent</h2>
+                    <p>Job searching can take 3-6 months or longer. Staying organized helps you track applications, follow-ups, and interviews so nothing falls through the cracks.</p>
+                    <p><strong>Action Step:</strong> Create a spreadsheet or use a CRM tool to track every application, contact, and next step. Set daily or weekly goals to maintain momentum. Celebrate small wins along the way.</p>
+
+                    <blockquote>"The secret of getting ahead is getting started. The secret of getting started is breaking your complex overwhelming tasks into small manageable tasks, and then starting on the first one." — Mark Twain</blockquote>
+
+                    <h2>Conclusion</h2>
+                    <p>Landing your dream job requires strategy, persistence, and a willingness to step outside your comfort zone. Implement these 10 strategies consistently, and you'll dramatically improve your chances of success. Remember: every "no" brings you closer to a "yes." Start today with just one strategy, and build from there.</p>
+                `
+            },
+            {
+                id: 2,
+                title: "How to Write a Resume That Gets Past ATS Filters",
+                excerpt: "Learn the secrets of applicant tracking systems and how to optimize your resume to get noticed by both AI and human recruiters.",
+                category: "Resume Tips",
+                readTime: "10 min read",
+                date: "2024-02-10",
+                author: "Michael Chen",
+                authorRole: "HR Technology Specialist",
+                authorBio: "Michael has helped over 5,000 job seekers optimize their resumes for ATS systems and get more interviews. He previously worked as an HR tech consultant for Fortune 500 companies.",
+                authorImage: "MC",
+                content: `
+                    <h2>Introduction</h2>
+                    <p>Did you know that over 75% of resumes are never seen by a human? They're filtered out by Applicant Tracking Systems (ATS) before they reach a recruiter's desk. If you're not optimizing your resume for these systems, you're applying in vain. This guide will teach you exactly how to beat the bots and get your resume in front of real people.</p>
+
+                    <h2>What Is an ATS and Why Does It Matter?</h2>
+                    <p>An Applicant Tracking System is software that companies use to manage job applications. It scans, ranks, and filters resumes based on keywords, formatting, and relevance. Understanding how these systems work is the first step to beating them.</p>
+                    <p>ATS software is used by over 98% of Fortune 500 companies and a majority of mid-sized businesses. If you're applying online, your resume is almost certainly being processed by an ATS.</p>
+
+                    <h2>Keyword Optimization</h2>
+                    <p>ATS systems rank resumes by how well they match the job description. The more relevant keywords from the job posting appear on your resume, the higher you'll rank.</p>
+                    <p><strong>Action Step:</strong> Copy the job description into a word cloud generator to identify the most important keywords. Then naturally incorporate those keywords throughout your resume, especially in skills and experience sections. Don't just list keywords—use them in context.</p>
+
+                    <h2>Formatting That Works (and What to Avoid)</h2>
+                    <p>ATS systems struggle with complex formatting. Simple, clean resumes always perform better. Avoid tables, columns, graphics, headers/footers, and unusual fonts.</p>
+                    <p><strong>Action Step:</strong> Use a single-column layout with standard section headings (Experience, Education, Skills). Save your resume as a .docx file, not PDF, for maximum ATS compatibility. Use standard fonts like Arial, Calibri, or Times New Roman.</p>
+
+                    <h2>The Right File Type</h2>
+                    <p>While PDFs look nice, many older ATS systems can't read them properly. DOCX files are universally accepted and parsed more accurately.</p>
+                    <p><strong>Action Step:</strong> Always submit your resume as a .docx file unless the job posting specifically requests PDF. If you must use PDF, ensure it's text-based (not scanned). Test your PDF by trying to select and copy text—if you can't, the ATS can't read it.</p>
+
+                    <h2>Section Headings Matter</h2>
+                    <p>ATS systems look for standard section headings to categorize your information. Creative headings like "Where I've Been" instead of "Experience" can confuse the system.</p>
+                    <p><strong>Action Step:</strong> Use standard headings: Professional Summary, Work Experience, Education, Skills, Certifications, and Projects. Avoid graphics, icons, or unusual formatting around these headings.</p>
+
+                    <h2>Quantify Your Achievements</h2>
+                    <p>Numbers stand out to both ATS systems and human recruiters. Whenever possible, quantify your accomplishments with percentages, dollar amounts, or time saved.</p>
+                    <p><strong>Action Step:</strong> Review each bullet point on your resume. Can you add a number? For example, instead of "Improved sales," write "Increased sales by 35% within 6 months." Instead of "Managed a team," write "Led a team of 8 engineers to deliver project 2 weeks ahead of schedule."</p>
+
+                    <h2>Common ATS Mistakes to Avoid</h2>
+                    <p>Many candidates unknowingly sabotage their applications with these common errors: using images or logos, embedding charts or graphs, including a photo, using fancy fonts, saving as a JPG or PNG, using headers and footers, and using columns or tables.</p>
+
+                    <h2>Test Your Resume Before Submitting</h2>
+                    <p>Before you send your resume, test it. Several free tools can analyze your resume and tell you how ATS-friendly it is.</p>
+                    <p><strong>Action Step:</strong> Run your resume through free ATS checkers like Jobscan or ResyMatch.io. They'll give you specific recommendations for improvement. Also, try copying your resume text into a plain text editor—if the formatting looks scrambled, the ATS will struggle too.</p>
+
+                    <h2>Tailor for Each Application</h2>
+                    <p>The same resume won't work for every job. Each application deserves a tailored version that prioritizes the skills and experience most relevant to that specific role.</p>
+                    <p><strong>Action Step:</strong> Create a master resume with all your experience, then create tailored versions for each job application by reordering sections and adjusting keywords to match each job description.</p>
+
+                    <blockquote>"The difference between ordinary and extraordinary is that little extra." — Jimmy Johnson</blockquote>
+
+                    <h2>Conclusion</h2>
+                    <p>Beating ATS systems isn't about tricking the software—it's about understanding how it works and giving it exactly what it's looking for. Follow these guidelines, and you'll dramatically increase your chances of getting your resume in front of human eyes. Remember: your resume only needs to pass the ATS once to get to a human—make sure it does.</p>
+                `
+            },
+            {
+                id: 3,
+                title: "Mastering the Job Interview: 25 Questions You Must Prepare For",
+                excerpt: "Comprehensive interview preparation guide covering the most common questions and how to answer them with confidence.",
+                category: "Interview Prep",
+                readTime: "12 min read",
+                date: "2024-03-05",
+                author: "Jessica Williams",
+                authorRole: "Interview Coach",
+                authorBio: "Jessica has conducted over 2,000 interviews and coached hundreds of candidates to successful job offers at top tech companies. She specializes in behavioral interview preparation.",
+                authorImage: "JW",
+                content: `
+                    <h2>Introduction</h2>
+                    <p>Interviews are nerve-wracking for even the most experienced professionals. But with proper preparation, you can walk into any interview with confidence. This guide covers the 25 most common interview questions and provides proven frameworks for answering each one effectively.</p>
+
+                    <h2>The Foundation: Research and Preparation</h2>
+                    <p>Before you answer a single question, you need to do your homework. Research the company, understand their products or services, know their mission and values, and study the job description in detail.</p>
+                    <p><strong>Action Step:</strong> Spend at least 2 hours researching before every interview. Review the company's website, LinkedIn page, recent news, and employee reviews on Glassdoor. Prepare 5-7 thoughtful questions to ask the interviewer.</p>
+
+                    <h2>Tell Me About Yourself</h2>
+                    <p>This is almost always the first question. Don't recite your resume. Instead, give a concise 60-90 second story about your professional journey and why you're excited about this role.</p>
+                    <p><strong>Sample Framework:</strong> "I've been working in [industry] for [X] years, specializing in [skill]. Most recently at [Company], I [achievement]. I'm now looking to [career goal], which is why I'm excited about this opportunity at [Target Company]."</p>
+
+                    <h2>Why Do You Want to Work Here?</h2>
+                    <p>This question tests your research and genuine interest. Generic answers like "because you're a great company" won't impress anyone.</p>
+                    <p><strong>Action Step:</strong> Identify 2-3 specific things about the company that genuinely excite you—their mission, recent product launch, company culture, or impact in the industry. Be specific and passionate.</p>
+
+                    <h2>What Are Your Greatest Strengths?</h2>
+                    <p>Choose strengths that are directly relevant to the job. For each strength, provide a specific example that demonstrates it in action.</p>
+                    <p><strong>Action Step:</strong> Prepare 3 key strengths with STAR-format examples. For example: "My greatest strength is problem-solving. When our team faced [situation], I [action], which resulted in [result]."</p>
+
+                    <h2>What Are Your Weaknesses?</h2>
+                    <p>Honesty is important, but don't sabotage yourself. Choose a real weakness that isn't core to the job, and explain what you're doing to improve.</p>
+                    <p><strong>Action Step:</strong> Pick a weakness like "public speaking" or "delegating" and share specific steps you've taken to get better, such as joining Toastmasters or taking leadership courses. Show growth and self-awareness.</p>
+
+                    <h2>Behavioral Questions (STAR Method)</h2>
+                    <p>Questions starting with "Tell me about a time when..." are behavioral questions. The STAR method (Situation, Task, Action, Result) is the proven framework for answering them effectively.</p>
+
+                    <h3>Common Behavioral Questions:</h3>
+                    <ul>
+                        <li>Tell me about a time you faced a challenge at work.</li>
+                        <li>Describe a situation where you had to work with a difficult colleague.</li>
+                        <li>Give an example of a goal you achieved and how you accomplished it.</li>
+                        <li>Tell me about a time you made a mistake and how you handled it.</li>
+                        <li>Describe a situation where you showed leadership.</li>
+                        <li>Tell me about a time you had to learn something quickly.</li>
+                        <li>Describe a time you went above and beyond for a customer.</li>
+                    </ul>
+
+                    <h2>Questions You Should Ask the Interviewer</h2>
+                    <p>Interviews are two-way conversations. Not asking questions can signal disinterest. Prepare 5-7 thoughtful questions in advance.</p>
+                    <ul>
+                        <li>What does success look like in this role in the first 90 days?</li>
+                        <li>Can you tell me about the team I'd be working with?</li>
+                        <li>What are the biggest challenges facing the department right now?</li>
+                        <li>How would you describe the company culture?</li>
+                        <li>What opportunities for professional development does the company offer?</li>
+                        <li>What do you enjoy most about working here?</li>
+                    </ul>
+
+                    <h2>Salary Negotiation Questions</h2>
+                    <p>If asked about salary expectations, avoid giving a specific number early. Instead, ask about the budgeted range for the role.</p>
+                    <p><strong>Sample Response:</strong> "I'm flexible based on the total compensation package. Could you share the budgeted range for this role?" This puts the ball back in their court.</p>
+
+                    <h2>Virtual Interview Tips</h2>
+                    <p>Remote interviews require additional preparation. Test your technology, choose a quiet background, dress professionally, and maintain eye contact by looking at the camera, not the screen.</p>
+                    <p><strong>Action Step:</strong> Test your camera, microphone, and internet connection 30 minutes before the interview. Close unnecessary tabs and applications. Have water nearby and a notepad for taking notes.</p>
+
+                    <blockquote>"Success is where preparation and opportunity meet." — Bobby Unser</blockquote>
+
+                    <h2>Conclusion</h2>
+                    <p>Preparation transforms anxiety into confidence. Use this guide to prepare for your next interview, and you'll be ready to answer any question they throw at you. Practice out loud, record yourself, and ask a friend to do a mock interview. Good luck!</p>
+                `
+            },
+            {
+                id: 4,
+                title: "The Ultimate Guide to Remote Work Success",
+                excerpt: "Master the art of working from home with productivity tips, communication strategies, and work-life balance techniques.",
+                category: "Career Growth",
+                readTime: "9 min read",
+                date: "2024-04-12",
+                author: "David Kim",
+                authorRole: "Remote Work Consultant",
+                authorBio: "David has worked remotely for 8+ years and now helps companies build effective distributed teams. He's consulted for remote-first companies like GitLab and Zapier.",
+                authorImage: "DK",
+                content: `
+                    <h2>Introduction</h2>
+                    <p>Remote work is here to stay. But working from home successfully requires different skills than working in an office. This guide covers everything you need to know to thrive as a remote employee—from setting up your workspace to maintaining work-life balance and advancing your career without face-to-face facetime.</p>
+
+                    <h2>Setting Up Your Home Office</h2>
+                    <p>Your environment dramatically impacts your productivity. A dedicated workspace signals to your brain that it's time to work, not relax.</p>
+                    <p><strong>Action Step:</strong> Create a dedicated workspace away from your bedroom if possible. Invest in an ergonomic chair, external monitor, and noise-canceling headphones. Good lighting and plants can also boost mood and productivity. Keep your workspace clean and organized.</p>
+
+                    <h2>Establishing a Routine</h2>
+                    <p>Without a commute and office structure, it's easy for work to bleed into all hours. A consistent daily routine creates boundaries and signals to your brain when it's time to work and when it's time to rest.</p>
+                    <p><strong>Action Step:</strong> Wake up at the same time daily, get dressed (not pajamas!), have a morning ritual, and set clear start and end times for your workday. Block a lunch break and step away from your screen. Create a shutdown ritual to transition out of work mode.</p>
+
+                    <h2>Mastering Remote Communication</h2>
+                    <p>In an office, you can tap someone on the shoulder. Remotely, you need to be intentional about communication. Over-communication is better than under-communication when you're not in the same room.</p>
+                    <p><strong>Action Step:</strong> Use the right tool for each message: Slack/Teams for quick questions, email for formal communication, video calls for complex discussions. Always assume positive intent and write clearly. Use emoji and reactions to add tone when appropriate.</p>
+
+                    <h2>Staying Visible and Advancing Your Career</h2>
+                    <p>Out of sight shouldn't mean out of mind. To advance remotely, you need to proactively showcase your work and build relationships with colleagues and leadership.</p>
+                    <p><strong>Action Step:</strong> Send weekly updates on your accomplishments, volunteer for visible projects, schedule regular 1-on-1s with your manager, and participate actively in team meetings and company events. Share your wins in team channels.</p>
+
+                    <h2>Combating Loneliness and Isolation</h2>
+                    <p>Remote work can be lonely. Humans are social creatures, and lack of social interaction can lead to burnout and decreased motivation.</p>
+                    <p><strong>Action Step:</strong> Schedule virtual coffee chats with colleagues, join remote work communities, use coworking spaces occasionally, or consider a work-from-home buddy system to check in with each other daily. Join Slack communities for remote workers.</p>
+
+                    <h2>Managing Distractions at Home</h2>
+                    <p>Home is full of distractions: laundry, dishes, TV, family members, pets. Left unmanaged, these can destroy your productivity.</p>
+                    <p><strong>Action Step:</strong> Use noise-canceling headphones, set boundaries with family members, close unnecessary browser tabs, and use productivity techniques like Pomodoro (25 minutes focused work, 5 minutes break). Use website blockers during work hours.</p>
+
+                    <h2>Health and Ergonomics</h2>
+                    <p>Sitting at a laptop all day can wreck your body. Poor posture leads to back, neck, and wrist pain that accumulates over time.</p>
+                    <p><strong>Action Step:</strong> Invest in an external keyboard and mouse. Position your screen at eye level. Take a 5-minute movement break every hour. Stretch, walk, or do quick exercises throughout the day. Consider a standing desk converter.</p>
+
+                    <h2>Time Zone Management</h2>
+                    <p>Distributed teams often span multiple time zones. Managing across time differences requires planning and flexibility.</p>
+                    <p><strong>Action Step:</strong> Use world clock apps to track team time zones. Establish core overlap hours when everyone is available. Record meetings for those who can't attend live. Be respectful of others' off-hours.</p>
+
+                    <blockquote>"The key to remote work success isn't working more—it's working smarter, with clear boundaries and intentional habits."</blockquote>
+
+                    <h2>Conclusion</h2>
+                    <p>Remote work offers incredible flexibility and freedom, but it requires discipline and intentionality. By implementing these strategies, you'll not only survive remote work—you'll thrive in it. Start with one or two changes this week, and build from there.</p>
+                `
+            },
+            {
+                id: 5,
+                title: "Career Change at Any Age: A Practical Roadmap",
+                excerpt: "It's never too late to pivot. This guide provides a step-by-step roadmap for successfully changing careers, regardless of your age or experience level.",
+                category: "Career Growth",
+                readTime: "11 min read",
+                date: "2024-05-20",
+                author: "Patricia Martinez",
+                authorRole: "Career Transition Coach",
+                authorBio: "Patricia changed careers twice herself before becoming a certified coach helping others navigate career transitions. She's helped over 1,000 professionals successfully pivot to new fields.",
+                authorImage: "PM",
+                content: `
+                    <h2>Introduction</h2>
+                    <p>The average person changes careers 3-7 times in their lifetime. Yet the idea of switching careers—especially later in life—can feel terrifying. This guide provides a practical, step-by-step roadmap for successfully changing careers at any age, with actionable advice you can implement starting today.</p>
+
+                    <h2>Why People Change Careers</h2>
+                    <p>People change careers for many reasons: burnout, lack of growth, misaligned values, desire for more flexibility, higher income potential, or simply outgrowing their current path. Whatever your reason, know that you're not alone—and it's never too late.</p>
+
+                    <h2>Step 1: Self-Assessment</h2>
+                    <p>Before you jump into a new career, get clear on what you actually want. What energizes you? What skills do you enjoy using? What kind of work environment suits you best?</p>
+                    <p><strong>Action Step:</strong> Complete a skills inventory. List everything you're good at—both hard skills (technical abilities) and soft skills (communication, leadership, problem-solving). Then identify what you genuinely enjoy doing. Take career assessments if helpful.</p>
+
+                    <h2>Step 2: Research Your Target Career</h2>
+                    <p>Don't romanticize a career you know nothing about. Talk to people actually doing the work to understand the day-to-day reality, challenges, and rewards.</p>
+                    <p><strong>Action Step:</strong> Conduct 10-15 informational interviews with people in your target field. Ask about their typical day, what they wish they'd known before starting, and advice for newcomers. Follow up with thank-you notes.</p>
+
+                    <h2>Step 3: Identify Skill Gaps</h2>
+                    <p>Compare your current skills to what your target career requires. The gap between these two is your learning roadmap.</p>
+                    <p><strong>Action Step:</strong> Review 20+ job descriptions for roles you want. Create a spreadsheet of frequently requested skills, then highlight which you already have and which you need to develop. This becomes your study plan.</p>
+
+                    <h2>Step 4: Bridge the Gap (Upskilling)</h2>
+                    <p>Online courses, bootcamps, certifications, and side projects can help you build missing skills. Many are free or low-cost.</p>
+                    <p><strong>Action Step:</strong> Choose 2-3 skills to develop first. Complete a certification or build a portfolio project demonstrating those skills within 3-6 months. Use platforms like Coursera, edX, Udemy, or LinkedIn Learning.</p>
+
+                    <h2>Step 5: Translate Your Experience</h2>
+                    <p>Your previous experience isn't irrelevant—it just needs reframing. Focus on transferable skills and achievements that apply to your new field.</p>
+                    <p><strong>Action Step:</strong> Rewrite your resume using the functional or hybrid format. Lead with relevant skills, not chronological job history. Use keywords from your target industry. Quantify achievements whenever possible.</p>
+
+                    <h2>Step 6: Gain Practical Experience</h2>
+                    <p>Employers want proof you can do the work. Freelance projects, volunteering, internships, and side hustles provide real experience and portfolio pieces.</p>
+                    <p><strong>Action Step:</strong> Take on 1-2 small projects in your new field—even if unpaid. Document your process and results. These become powerful interview stories and portfolio samples.</p>
+
+                    <h2>Step 7: Network Strategically</h2>
+                    <p>Most career changers get their first role through someone they know. Building relationships in your target industry is essential.</p>
+                    <p><strong>Action Step:</strong> Join professional associations, attend industry events (virtual or in-person), engage on LinkedIn, and ask for warm introductions from mutual connections. Focus on building genuine relationships, not asking for favors.</p>
+
+                    <h2>Overcoming Age-Related Concerns</h2>
+                    <p>If you're changing careers later in life, you might worry about age discrimination. Focus on your strengths: wisdom, stability, work ethic, and transferable experience that younger candidates lack.</p>
+                    <p><strong>Action Step:</strong> Remove graduation dates from your resume unless they're recent. Focus on recent achievements and skills. Address experience as an asset, not a liability. Emphasize your adaptability and willingness to learn.</p>
+
+                    <h2>Financial Planning for a Career Change</h2>
+                    <p>Career changes often involve a temporary pay cut or time off work. Planning ahead reduces stress during the transition.</p>
+                    <p><strong>Action Step:</strong> Build a financial runway of 3-6 months of expenses before making a full transition. Consider part-time or contract work to ease into your new field. Reduce expenses temporarily if needed.</p>
+
+                    <blockquote>"It is never too late to be what you might have been." — George Eliot</blockquote>
+
+                    <h2>Conclusion</h2>
+                    <p>Changing careers is challenging, but millions of people do it successfully every year—at every age. Follow this roadmap, be patient with yourself, and trust that your experience and wisdom are valuable assets in any field. Your next chapter is waiting. Start with step one today.</p>
+                `
+            }
+        ];
+
+        // State variables
+        let currentView = "grid";
+        let currentPage = 1;
+        const POSTS_PER_PAGE = 3;
+        let activeCategory = null;
+
+        // Helper functions
+        function formatDate(dateStr) {
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+        }
+
+        // Get filtered posts
+        function getFilteredPosts() {
+            if (activeCategory) {
+                return blogPosts.filter(post => post.category === activeCategory);
+            }
+            return blogPosts;
+        }
+
+        // Render blog grid
+        function renderGrid() {
+            const filteredPosts = getFilteredPosts();
+            const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+            const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+            const pagePosts = filteredPosts.slice(startIndex, currentPage * POSTS_PER_PAGE);
+
+            const mainContent = document.getElementById("mainContent");
+
+            mainContent.innerHTML = `
+                <div class="mb-8 flex flex-wrap justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900">Career Blog</h1>
+                        <p class="text-gray-600 mt-2">Expert advice to help you succeed in your career journey</p>
+                    </div>
+                    ${activeCategory ? `
+                        <button onclick="clearCategoryFilter()" class="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1">
+                            <i class="fas fa-times"></i> Clear filter: ${activeCategory}
+                        </button>
+                    ` : ''}
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${pagePosts.map(post => `
+                        <div class="blog-card rounded-xl overflow-hidden cursor-pointer" onclick="showPost(${post.id})">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-3">
+                                    <span class="category-badge">${post.category}</span>
+                                    <span class="text-xs text-gray-400"><i class="far fa-clock mr-1"></i> ${post.readTime}</span>
+                                </div>
+                                <h2 class="text-xl font-bold text-gray-800 mb-2 hover:text-blue-600 transition line-clamp-2">${escapeHtml(post.title)}</h2>
+                                <p class="text-gray-600 text-sm mb-4 line-clamp-3">${escapeHtml(post.excerpt)}</p>
+                                <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                            ${post.authorImage}
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-medium text-gray-700">${post.author}</p>
+                                            <p class="text-xs text-gray-400">${formatDate(post.date)}</p>
+                                        </div>
+                                    </div>
+                                    <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">Read More →</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                ${totalPages > 1 ? `
+                    <div class="flex justify-center items-center gap-4 mt-10">
+                        <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''} class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fas fa-chevron-left mr-2"></i> Previous
+                        </button>
+                        <span class="text-gray-600 font-medium">Page ${currentPage} of ${totalPages}</span>
+                        <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''} class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            Next <i class="fas fa-chevron-right ml-2"></i>
+                        </button>
+                    </div>
+                ` : ''}
+            `;
+
+            // Update SEO
+            document.title = "Career Blog | Job Search Tips, Interview Advice & Professional Growth | ZyloTech Studios";
+            document.getElementById("metaDescription").setAttribute("content", "Expert career advice, job search strategies, interview tips, resume writing guides, and professional development insights.");
+            document.getElementById("canonicalUrl").setAttribute("href", "https://zylotechstudios.space/career-blog.html");
+            document.getElementById("ogTitle").setAttribute("content", "Career Blog | Expert Job Search & Career Advice");
+            document.getElementById("ogDescription").setAttribute("content", "Timeless career advice, job search strategies, and professional development insights.");
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        // Show single post
+        function showPost(postId) {
+            const post = blogPosts.find(p => p.id === postId);
+            if (!post) return;
+
+            currentView = "single";
+            const mainContent = document.getElementById("mainContent");
+
+            // Update SEO for this post
+            document.title = `${post.title} | ZyloTech Career Blog`;
+            document.getElementById("metaDescription").setAttribute("content", post.excerpt);
+            document.getElementById("canonicalUrl").setAttribute("href", `https://zylotechstudios.space/career-blog.html?post=${post.id}`);
+            document.getElementById("ogTitle").setAttribute("content", post.title);
+            document.getElementById("ogDescription").setAttribute("content", post.excerpt);
+
+            mainContent.innerHTML = `
+                <div class="max-w-4xl mx-auto fade-in">
+                    <button onclick="backToGrid()" class="mb-6 text-blue-600 hover:text-blue-700 flex items-center gap-2 transition">
+                        <i class="fas fa-arrow-left"></i> Back to all posts
+                    </button>
+
+                    <article class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="p-8 md:p-10">
+                            <div class="flex flex-wrap gap-3 items-center mb-4">
+                                <span class="category-badge">${post.category}</span>
+                                <span class="text-sm text-gray-500"><i class="far fa-clock mr-1"></i> ${post.readTime}</span>
+                                <span class="text-sm text-gray-500"><i class="far fa-calendar-alt mr-1"></i> ${formatDate(post.date)}</span>
+                            </div>
+
+                            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6">${escapeHtml(post.title)}</h1>
+
+                            <div class="author-card flex items-center gap-4 mb-8">
+                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-lg font-bold">
+                                    ${post.authorImage}
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800">${post.author}</p>
+                                    <p class="text-sm text-gray-500">${post.authorRole}</p>
+                                    <p class="text-xs text-gray-400 mt-1">${post.authorBio}</p>
+                                </div>
+                            </div>
+
+                            <div class="prose prose-lg max-w-none">
+                                ${post.content}
+                            </div>
+
+                            <div class="mt-8 pt-6 border-t border-gray-200">
+                                <div class="flex flex-wrap justify-between items-center gap-4">
+                                    <div class="flex gap-3">
+                                        <span class="text-sm text-gray-500">Share this article:</span>
+                                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}" target="_blank" class="text-blue-600 hover:text-blue-800"><i class="fab fa-linkedin"></i></a>
+                                        <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(window.location.href)}" target="_blank" class="text-sky-500 hover:text-sky-700"><i class="fab fa-twitter"></i></a>
+                                        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" class="text-blue-600 hover:text-blue-800"><i class="fab fa-facebook"></i></a>
+                                    </div>
+                                    <button onclick="backToGrid()" class="text-blue-600 hover:text-blue-700 text-sm font-medium">← Back to blog</button>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <div class="mt-10 text-center">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">More Articles You Might Like</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            ${blogPosts.filter(p => p.id !== post.id).slice(0, 2).map(p => `
+                                <div class="bg-white rounded-xl p-5 cursor-pointer hover:shadow-md transition border border-gray-100" onclick="showPost(${p.id})">
+                                    <span class="category-badge text-xs">${p.category}</span>
+                                    <h4 class="font-bold text-gray-800 mt-2 mb-1">${escapeHtml(p.title)}</h4>
+                                    <p class="text-gray-500 text-sm">${escapeHtml(p.excerpt.substring(0, 100))}...</p>
+                                    <p class="text-blue-600 text-sm mt-2">Read more →</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function backToGrid() {
+            currentView = "grid";
+            currentPage = 1;
+            renderGrid();
+        }
+
+        function changePage(delta) {
+            const filteredPosts = getFilteredPosts();
+            const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+            const newPage = currentPage + delta;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderGrid();
+            }
+        }
+
+        function filterByCategory(category) {
+            activeCategory = category;
+            currentPage = 1;
+            renderGrid();
+        }
+
+        function clearCategoryFilter() {
+            activeCategory = null;
+            currentPage = 1;
+            renderGrid();
+        }
+
+        // Back to top button
+        function setupBackToTop() {
+            const btn = document.getElementById("backToTop");
+            window.addEventListener("scroll", () => {
+                if (window.scrollY > 300) {
+                    btn.classList.add("visible");
+                } else {
+                    btn.classList.remove("visible");
+                }
+            });
+            btn.addEventListener("click", () => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+        }
+
+        // Mobile menu
+        document.getElementById("mobileMenuBtn")?.addEventListener("click", () => {
+            document.getElementById("mobileMenu")?.classList.toggle("hidden");
+        });
+
+        // Make functions global for onclick
+        window.showPost = showPost;
+        window.backToGrid = backToGrid;
+        window.changePage = changePage;
+        window.filterByCategory = filterByCategory;
+        window.clearCategoryFilter = clearCategoryFilter;
+
+        // Initialize
+        renderGrid();
+        setupBackToTop();
+    </script>
+</body>
+</html>
