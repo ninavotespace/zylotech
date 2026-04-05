@@ -1,0 +1,47 @@
+# robots.txt for ZyloTech Creators Studio
+# https://www.zylotechstudios.space/robots.txt
+
+User-agent: *
+Allow: /
+
+# Allow all crawlers to access all tools
+Allow: /image-converter.html
+Allow: /audio-converter.html
+Allow: /video-converter.html
+Allow: /video-to-audio.html
+Allow: /video-to-gif.html
+Allow: /compressor.html
+Allow: /document-converter.html
+Allow: /color-maker.html
+Allow: /color-converter.html
+Allow: /font-converter.html
+Allow: /data-converter.html
+Allow: /hash-tool.html
+Allow: /developer-tools.html
+Allow: /text-manipulator.html
+Allow: /word-processor.html
+Allow: /unit-converter.html
+Allow: /scientific-calc.html
+Allow: /math-converter.html
+Allow: /date-converter.html
+Allow: /geo-converter.html
+Allow: /freekaraoke.html
+Allow: /karaoke.html
+Allow: /about.html
+Allow: /privacy.html
+Allow: /terms.html
+
+# Disallow admin or private directories
+Disallow: /components/
+Disallow: /js/
+Disallow: /css/
+Disallow: /static/
+
+# Sitemap location
+Sitemap: https://www.zylotechstudios.space/sitemap.xml
+
+# Crawl delay to be respectful (1 second)
+Crawl-delay: 1
+
+# Specify your host
+Host: https://www.zylotechstudios.space

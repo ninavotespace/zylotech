@@ -1,0 +1,40 @@
+/* TEAM */
+    Name: ZyloTech Creators Studio
+    Contact: support@zylotechstudios.space
+    Website: https://www.zylotechstudios.space
+    Location: Nairobi, Kenya
+
+/* TOOLS */
+    Image Converter: Convert between 10+ image formats
+    Audio Studio: Convert, trim, adjust volume & speed
+    Video Converter: MP4, WebM, MOV conversion
+    Video to Audio: Extract audio from videos
+    Video to GIF: Create animated GIFs
+    File Compressor: ZIP and GZIP compression
+    Document Converter: TXT, CSV, JSON, XML, HTML, MD
+    Color Maker Studio: Create custom colors & palettes
+    Color Converter: HEX, RGB, HSL, CMYK conversion
+    Font Converter: TTF, WOFF, WOFF2 conversion
+    Data Converter: YAML, JSON, TOML, INI, Base64, Hex
+    Hash & Encode: MD5, SHA1, SHA256, Base64
+    Developer Tools: CSS/JS/HTML minify/beautify
+    Text Manipulator: Case, sort, replace, slugify
+    Word Processor: Rich text editor with PDF export
+    Unit Converter: Length, weight, temperature, etc.
+    Scientific Calculators: Percentage, VAT, loan, BMI
+    Number & Math: Binary, hex, roman, fractions
+    Date & Time: Timestamp, timezone, age calculator
+    Geo Converters: GPS, DMS, UTM, distance
+    Karaoke Maker: Create karaoke & lyric videos
+
+/* TECHNOLOGY */
+    Frontend: HTML5, CSS3, JavaScript, TailwindCSS
+    Libraries: FFmpeg.wasm, JSZip, pako, lamejs, gif.js
+    Principles: 100% Browser-Based, No Upload, Private
+
+/* THANKS */
+    Thanks to all open-source contributors and users
+    who support free tools for everyone!
+
+/* LAST UPDATE */
+    2026-04-05
