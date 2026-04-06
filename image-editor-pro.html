@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PRIMARY SEO META TAGS -->
+    <title>Zylo Pro Image Editor - Free Online Design Tool & PDF Converter</title>
+    <meta name="description" content="Free online multi-layer image editor and image to PDF converter. Create social media posts, edit photos, add text, and export to PNG, JPG, WEBP, or PDF instantly. No signup required.">
+    <meta name="keywords" content="free image editor, image to pdf, free image to pdf converter, online photo editor, zylo pro designer, canvas editor, remove background, social media maker, free design tool">
+    <meta name="author" content="ZyloTech Creators Studio">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.zylotechstudios.space/image-editor-pro.html"> <!-- Update this URL to your actual domain -->
+   <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon-32x32.png">
+    <link rel="manifest" href="site.webmanifest">
+    <!-- OPEN GRAPH / FACEBOOK / WHATSAPP -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.zylotechstudios.space/image-editor-pro.html">
+    <meta property="og:title" content="Zylo Pro Image Editor - Free & Powerful">
+    <meta property="og:description" content="Edit images, create designs, and convert to PDF for free. Multi-layer support, text tools, and instant export.">
+    <meta property="og:image" content="https://www.zylotechstudios.space/favicon.ico"> <!-- Replace with actual screenshot URL -->
+    <meta property="og:site_name" content="ZyloTech Creators Studio">
+
+    <!-- TWITTER CARD -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://www.zylotech.com/image-editor-pro.html">
+    <meta name="twitter:title" content="Zylo Pro Image Editor - Free Online Tool">
+    <meta name="twitter:description" content="Professional grade image editing and PDF conversion in your browser. Completely free.">
+    <meta name="twitter:image" content="https://www.zylotechstudios.space/favicon.ico"> <!-- Replace with actual screenshot URL -->
+
+    <!-- JSON-LD SCHEMA MARKUP -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Zylo Pro Image Editor",
+      "url": "https://www.zylotechstudios.space/image-editor-pro.html",
+      "description": "A free, browser-based multi-layer image editor and PDF converter allowing users to create designs, edit photos, and export documents without installation.",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "ZyloTech Creators Studio",
+        "url": "https://www.zylotechstudios.space"
+      },
+      "featureList": "Multi-layer editing, Image to PDF conversion, Text customization, Social Media Templates, Zoom controls, Undo/Redo"
+    }
+    </script>
+
+    <!-- PERFORMANCE OPTIMIZATION -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fabric.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <!-- jsPDF for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Include Script for Header/Footer -->
+    <script src="js/include.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+
+        /* The container determines the visible area */
+        .canvas-wrapper {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background-image: url('image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBGMiDgGwMxMBIwwEjNgJmMA+RQgCwHwLh7qXoAAAAASUVORK5CYII=');
+            transform-origin: top center; /* Changed to top center for better stacking */
+            transition: transform 0.2s ease;
+            position: relative; /* Needed for absolute positioning of zoom controls */
+            margin-bottom: 50px; /* Space for footer scrolling */
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .checkerboard {
+            background-color: #ffffff;
+            background-image: linear-gradient(45deg, #ccc 25%, transparent 25%),
+                              linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                              linear-gradient(45deg, transparent 75%, #ccc 75%),
+                              linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        /* Hide number input arrows */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px; width: 16px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            margin-top: -6px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px;
+            cursor: pointer;
+            background: #e5e7eb;
+            border-radius: 2px;
+        }
+
+        /* Context Menu Styles */
+        #contextMenu {
+            display: none;
+            position: absolute;
+            z-index: 1000;
+            width: 160px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+        .context-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.1s;
+        }
+        .context-item:hover {
+            background-color: #f3f4f6;
+            color: #4f46e5;
+        }
+        .context-divider {
+            height: 1px;
+            background-color: #e5e7eb;
+            margin: 2px 0;
+        }
+
+        /* --- FOOTER VISIBILITY FIXES --- */
+        /* Force footer to have a distinct background and readable text */
+        div[data-include="components/footer.html"] {
+            background-color: #0f172a !important; /* Deep Slate Background */
+            color: #ffffff !important; /* Pure White Text */
+            margin-top: auto;
+            position: relative;
+            z-index: 20; /* Ensure it sits above other elements */
+            opacity: 1 !important; /* Remove any transparency */
+        }
+
+        /* Ensure links inside footer are visible */
+        div[data-include="components/footer.html"] a {
+            color: #e2e8f0 !important; /* Light Gray for links */
+            text-decoration: none;
+            opacity: 1 !important;
+        }
+        div[data-include="components/footer.html"] a:hover {
+            color: #ffffff !important;
+        }
+
+        /* Ensure headings/text inside footer are visible */
+        div[data-include="components/footer.html"] h1,
+        div[data-include="components/footer.html"] h2,
+        div[data-include="components/footer.html"] h3,
+        div[data-include="components/footer.html"] h4,
+        div[data-include="components/footer.html"] p,
+        div[data-include="components/footer.html"] span,
+        div[data-include="components/footer.html"] div {
+            color: #ffffff !important;
+            opacity: 1 !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50">
+
+    <!-- 1. GLOBAL HEADER (From Template) -->
+    <div data-include="components/header.html"></div>
+
+    <!-- 2. APP TOOLBAR (Functional Controls: Upload, Delete, Export) -->
+    <div class="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center z-10 shadow-sm shrink-0">
+        <div class="flex items-center gap-2">
+            <div class="bg-indigo-600 text-white p-2 rounded-lg">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <h1 class="font-bold text-xl text-gray-800">Zylo Pro Editor</h1>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="document.getElementById('fileInput').click()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-sm font-medium transition">
+                <i class="fa-solid fa-upload mr-2"></i> Upload Image
+            </button>
+            <input type="file" id="fileInput" accept="image/*" class="hidden" multiple>
+
+            <button id="deleteBtn" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-md text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed" disabled title="Reset All (Del)">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+
+            <button id="downloadBtn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-sm font-medium transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                <i class="fa-solid fa-download mr-2"></i> Export
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="flex flex-1 overflow-hidden relative">
+
+        <!-- Sidebar Controls -->
+        <aside class="w-80 bg-white border-r border-gray-200 flex flex-col overflow-y-auto z-20 shadow-lg shrink-0">
+
+            <!-- Sidebar Tabs -->
+            <div class="flex border-b border-gray-200 shrink-0">
+                <button class="flex-1 py-3 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50" id="tabDesign">
+                    <i class="fa-solid fa-sliders mr-1"></i> Design
+                </button>
+                <button class="flex-1 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50" id="tabText">
+                    <i class="fa-solid fa-font mr-1"></i> Text
+                </button>
+            </div>
+
+            <!-- PANEL 1: DESIGN (Resize, Layers & Crop) -->
+            <div id="panelDesign" class="flex-1 overflow-y-auto">
+
+                <!-- Layer Management (New) -->
+                <div class="p-5 border-b border-gray-100">
+                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Selected Object</h2>
+                    <div id="layerControls" class="space-y-3 opacity-50 pointer-events-none transition-opacity">
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="bringForwardBtn" class="py-2 bg-gray-50 border border-gray-200 rounded hover:bg-gray-100 text-xs font-medium"><i class="fa-solid fa-arrow-up mr-1"></i> Forward</button>
+                            <button id="sendBackwardBtn" class="py-2 bg-gray-50 border border-gray-200 rounded hover:bg-gray-100 text-xs font-medium"><i class="fa-solid fa-arrow-down mr-1"></i> Backward</button>
+                        </div>
+                        <button id="deleteObjectBtn" class="w-full py-2 bg-red-50 border border-red-100 text-red-600 rounded hover:bg-red-100 text-xs font-medium"><i class="fa-solid fa-trash mr-1"></i> Delete Selected</button>
+                    </div>
+                </div>
+
+                <!-- Section 1: Resize & Presets -->
+                <div class="p-5 border-b border-gray-100">
+                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Canvas Size</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Presets</label>
+                            <select id="sizePreset" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2 bg-white">
+                                <option value="custom">Custom Dimensions</option>
+                                <optgroup label="Social Media">
+                                    <option value="1080,1080">Instagram Post (1080x1080)</option>
+                                    <option value="1080,1350">Instagram Portrait (1080x1350)</option>
+                                    <option value="1080,1920">Stories / TikTok (1080x1920)</option>
+                                    <option value="1200,630">Facebook Link (1200x630)</option>
+                                    <option value="820,312">Facebook Cover (820x312)</option>
+                                    <option value="1500,500">Twitter Header (1500x500)</option>
+                                    <option value="2560,1440">YouTube Banner (2560x1440)</option>
+                                </optgroup>
+                                <optgroup label="Standard">
+                                    <option value="1920,1080">Full HD (1920x1080)</option>
+                                    <option value="800,600">Standard 4:3 (800x600)</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Width (px)</label>
+                                <input type="number" id="customWidth" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2" placeholder="W">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Height (px)</label>
+                                <input type="number" id="customHeight" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2" placeholder="H">
+                            </div>
+                        </div>
+                        <button id="applyResizeBtn" class="w-full py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900 transition font-medium text-sm">
+                            Apply Resize
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section 2: Crop Mode -->
+                <div class="p-5 border-b border-gray-100">
+                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Crop Tool</h2>
+                    <div class="space-y-3">
+                        <button id="toggleCropBtn" class="w-full py-2.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-md hover:bg-indigo-100 transition font-medium text-sm">
+                            <i class="fa-solid fa-crop mr-2"></i> Enable Crop Mode
+                        </button>
+                        <div id="cropActions" class="flex gap-2 hidden">
+                            <button id="cancelCropBtn" class="flex-1 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition font-medium text-sm shadow-sm">
+                                Cancel
+                            </button>
+                            <button id="applyCropBtn" class="flex-1 py-2.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition font-medium text-sm shadow-sm">
+                                <i class="fa-solid fa-check mr-1"></i> Confirm
+                            </button>
+                        </div>
+                        <p id="cropInstruction" class="text-xs text-indigo-600 italic hidden mt-2">
+                            Select an image, then drag to crop.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Export Settings -->
+                <div class="p-5">
+                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Export Format</h2>
+                    <div class="space-y-4">
+                        <select id="exportFormatSelect" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2 bg-white">
+                            <option value="png">PNG (High Quality)</option>
+                            <option value="jpeg">JPG (Compressed)</option>
+                            <option value="webp">WEBP (Modern Web)</option>
+                            <option value="pdf">PDF (Document)</option>
+                            <option value="ico">ICO (Favicon 32x32)</option>
+                        </select>
+                        <div id="qualityControl" class="hidden">
+                            <div class="flex justify-between mb-1">
+                                <label class="text-xs font-medium text-gray-700">Quality</label>
+                                <span id="qualityValue" class="text-xs text-gray-500">90%</span>
+                            </div>
+                            <input type="range" id="qualityRange" min="0.1" max="1.0" step="0.1" value="0.9" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL 2: TEXT ENGINE -->
+            <div id="panelText" class="flex-1 overflow-y-auto hidden">
+                <div class="p-5 border-b border-gray-100">
+                    <button id="addTextBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition font-bold text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Add Heading
+                    </button>
+                </div>
+
+                <!-- Text Properties (Context Aware) -->
+                <div id="textProperties" class="p-5 space-y-5 opacity-50 pointer-events-none transition-opacity duration-200">
+
+                    <!-- Content -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Content</label>
+                        <textarea id="textContent" rows="2" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"></textarea>
+                    </div>
+
+                    <!-- Font Family -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Font Family</label>
+                        <select id="fontFamily" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2 bg-white">
+                            <option value="Arial">Arial</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Helvetica">Helvetica</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Courier New">Courier New</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Impact">Impact</option>
+                            <option value="Comic Sans MS">Comic Sans MS</option>
+                        </select>
+                    </div>
+
+                    <!-- Color & Size Row -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Color</label>
+                            <div class="flex items-center border border-gray-300 rounded-md p-1 bg-white">
+                                <input type="color" id="textColor" class="w-8 h-8 rounded cursor-pointer border-none p-0" value="#000000">
+                                <span class="ml-2 text-xs text-gray-600 font-mono" id="colorHex">#000000</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Size (px)</label>
+                            <input type="number" id="textSize" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2" value="40">
+                        </div>
+                    </div>
+
+                    <!-- Formatting Toolbar -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-2">Style</label>
+                        <div class="flex bg-gray-100 p-1 rounded-md gap-1">
+                            <button id="boldBtn" class="flex-1 py-1.5 rounded hover:bg-white hover:shadow-sm text-gray-700 transition"><i class="fa-solid fa-bold"></i></button>
+                            <button id="italicBtn" class="flex-1 py-1.5 rounded hover:bg-white hover:shadow-sm text-gray-700 transition"><i class="fa-solid fa-italic"></i></button>
+                            <button id="underlineBtn" class="flex-1 py-1.5 rounded hover:bg-white hover:shadow-sm text-gray-700 transition"><i class="fa-solid fa-underline"></i></button>
+                            <button id="linethroughBtn" class="flex-1 py-1.5 rounded hover:bg-white hover:shadow-sm text-gray-700 transition"><i class="fa-solid fa-strikethrough"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Alignment -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-2">Alignment</label>
+                        <div class="flex bg-gray-100 p-1 rounded-md gap-1">
+                            <button id="alignLeft" class="flex-1 py-1.5 rounded hover:bg-white hover:shadow-sm text-gray-700 transition"><i class="fa-solid fa-align-left"></i></button>
+                            <button id="alignCenter" class="flex-1 py-1.5 rounded hover:bg-white hover:shadow-sm text-gray-700 transition"><i class="fa-solid fa-align-center"></i></button>
+                            <button id="alignRight" class="flex-1 py-1.5 rounded hover:bg-white hover:shadow-sm text-gray-700 transition"><i class="fa-solid fa-align-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Background Color -->
+                    <div>
+                         <label class="block text-xs font-medium text-gray-500 mb-1">Highlight / BG</label>
+                         <div class="flex items-center gap-2">
+                             <input type="color" id="textBgColor" class="w-8 h-8 rounded cursor-pointer border-none p-0 bg-white border border-gray-300" value="#ffffff">
+                             <span class="text-xs text-gray-500">Background Box</span>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Preset Styles -->
+                <div class="p-5 border-t border-gray-100">
+                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Preset Styles</h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="applyPreset('headline')" class="p-3 border border-gray-200 rounded-lg hover:border-indigo-500 hover:shadow-md transition text-left group">
+                            <div class="font-black text-lg text-gray-800 group-hover:text-indigo-600">Headline</div>
+                            <div class="text-[10px] text-gray-400">Bold & Clean</div>
+                        </button>
+                        <button onclick="applyPreset('subhead')" class="p-3 border border-gray-200 rounded-lg hover:border-indigo-500 hover:shadow-md transition text-left group">
+                            <div class="font-light text-sm text-gray-600 tracking-widest uppercase group-hover:text-indigo-600">Subtitle</div>
+                            <div class="text-[10px] text-gray-400 mt-1">Minimalist</div>
+                        </button>
+                        <button onclick="applyPreset('neon')" class="p-3 bg-gray-900 rounded-lg hover:shadow-md transition text-left border border-transparent hover:border-indigo-500">
+                            <div class="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-yellow-500 drop-shadow-sm">Neon</div>
+                            <div class="text-[10px] text-gray-500 mt-1">Dark Mode</div>
+                        </button>
+                        <button onclick="applyPreset('shadow')" class="p-3 border border-gray-200 rounded-lg hover:border-indigo-500 hover:shadow-md transition text-left">
+                            <div class="font-serif text-lg text-gray-800 drop-shadow-md">Classic</div>
+                            <div class="text-[10px] text-gray-400">Serif + Shadow</div>
+                        </button>
+                        <!-- New Presets -->
+                        <button onclick="applyPreset('gradient')" class="p-3 border border-gray-200 rounded-lg hover:border-indigo-500 hover:shadow-md transition text-left">
+                            <div class="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-600">Gradient</div>
+                            <div class="text-[10px] text-gray-400">Modern Pop</div>
+                        </button>
+                        <button onclick="applyPreset('outline')" class="p-3 border border-gray-200 rounded-lg hover:border-indigo-500 hover:shadow-md transition text-left">
+                            <div class="font-black text-lg text-white" style="-webkit-text-stroke: 1px black;">Outline</div>
+                            <div class="text-[10px] text-gray-400">Stroke Effect</div>
+                        </button>
+                        <button onclick="applyPreset('retro')" class="p-3 border border-gray-200 rounded-lg hover:border-indigo-500 hover:shadow-md transition text-left bg-yellow-100">
+                            <div class="font-serif text-lg text-red-800 uppercase tracking-tighter">Retro</div>
+                            <div class="text-[10px] text-red-600">Badge Style</div>
+                        </button>
+                        <button onclick="applyPreset('handwritten')" class="p-3 border border-gray-200 rounded-lg hover:border-indigo-500 hover:shadow-md transition text-left">
+                            <div class="font-serif italic text-lg text-indigo-900">Script</div>
+                            <div class="text-[10px] text-gray-400">Elegant</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-5 mt-auto bg-gray-50 border-t border-gray-200 shrink-0">
+                <div class="text-xs text-gray-500 text-center">
+                    <p>ZyloTech Creators Studio</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Canvas Area -->
+        <!-- CHANGED: justify-start and pt-10 to keep canvas at top -->
+        <main class="flex-1 bg-gray-100 relative flex items-start justify-center overflow-y-auto pt-10 pb-20" id="workspace">
+
+            <div id="canvasWrapper" class="canvas-wrapper relative shadow-2xl border-4 border-white">
+
+                <!-- Zoom Controls (Moved Inside Wrapper to stick to canvas) -->
+                <div class="absolute -right-14 top-0 flex flex-col gap-2 z-30">
+                    <button id="zoomIn" class="bg-white p-2 rounded-full shadow-lg hover:bg-gray-50 text-gray-700 w-10 h-10 flex items-center justify-center border border-gray-200">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                    <button id="zoomOut" class="bg-white p-2 rounded-full shadow-lg hover:bg-gray-50 text-gray-700 w-10 h-10 flex items-center justify-center border border-gray-200">
+                        <i class="fa-solid fa-minus"></i>
+                    </button>
+                    <button id="zoomReset" class="bg-white p-2 rounded-full shadow-lg hover:bg-gray-50 text-gray-700 w-10 h-10 flex items-center justify-center border border-gray-200 text-xs font-bold">
+                        100%
+                    </button>
+                </div>
+
+                <canvas id="c"></canvas>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none z-0">
+                <i class="fa-regular fa-image text-6xl mb-4 opacity-50"></i>
+                <p class="text-lg font-medium">Upload images or add text</p>
+            </div>
+
+            <!-- Custom Context Menu -->
+            <div id="contextMenu">
+                <div class="context-item" id="ctxCopy"><i class="fa-regular fa-copy"></i> Copy</div>
+                <div class="context-item" id="ctxPaste"><i class="fa-regular fa-clipboard"></i> Paste</div>
+                <div class="context-divider"></div>
+                <div class="context-item" id="ctxBringFront"><i class="fa-solid fa-arrow-up"></i> Bring Forward</div>
+                <div class="context-item" id="ctxSendBack"><i class="fa-solid fa-arrow-down"></i> Send Backward</div>
+                <div class="context-divider"></div>
+                <div class="context-item" id="ctxDelete" style="color: #dc2626;"><i class="fa-solid fa-trash"></i> Delete</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-800">Export Preview</h3>
+                <button id="closePreview" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-auto p-6 bg-gray-50 checkerboard flex items-center justify-center">
+                <img id="previewImage" class="max-w-full max-h-[60vh] object-contain shadow-lg" src="" alt="Preview">
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 bg-white flex justify-end gap-3">
+                <button id="cancelExport" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md font-medium text-sm transition">Cancel</button>
+                <button id="confirmDownload" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-medium text-sm transition shadow-sm flex items-center">
+                    <i class="fa-solid fa-download mr-2"></i> Download File
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. GLOBAL FOOTER (From Template) -->
+    <div data-include="components/footer.html"></div>
+
+    <script>
+        // --- Initialization ---
+        const canvas = new fabric.Canvas('c', {
+            preserveObjectStacking: true,
+            selection: true,
+            backgroundColor: '#ffffff'
+        });
+
+        // Set initial default size
+        canvas.setWidth(800);
+        canvas.setHeight(600);
+
+        let isCropMode = false;
+        let exportFormat = 'png';
+        let exportQuality = 0.9;
+        let pendingDownloadUrl = null;
+        let currentZoom = 1;
+        let activeTextObject = null;
+        let activeObject = null;
+        let clipboardData = null; // Store internal copy data
+
+        // DOM Elements
+        const fileInput = document.getElementById('fileInput');
+        const emptyState = document.getElementById('emptyState');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const canvasWrapper = document.getElementById('canvasWrapper');
+        const workspace = document.getElementById('workspace');
+        const contextMenu = document.getElementById('contextMenu');
+
+        // Layer Controls
+        const layerControls = document.getElementById('layerControls');
+        const bringForwardBtn = document.getElementById('bringForwardBtn');
+        const sendBackwardBtn = document.getElementById('sendBackwardBtn');
+        const deleteObjectBtn = document.getElementById('deleteObjectBtn');
+
+        // Tabs
+        const tabDesign = document.getElementById('tabDesign');
+        const tabText = document.getElementById('tabText');
+        const panelDesign = document.getElementById('panelDesign');
+        const panelText = document.getElementById('panelText');
+
+        // Text Controls
+        const addTextBtn = document.getElementById('addTextBtn');
+        const textProperties = document.getElementById('textProperties');
+        const textContent = document.getElementById('textContent');
+        const fontFamily = document.getElementById('fontFamily');
+        const textColor = document.getElementById('textColor');
+        const colorHex = document.getElementById('colorHex');
+        const textSize = document.getElementById('textSize');
+        const textBgColor = document.getElementById('textBgColor');
+
+        // --- Tab Switching ---
+        tabDesign.addEventListener('click', () => {
+            tabDesign.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600', 'bg-indigo-50');
+            tabDesign.classList.remove('text-gray-500', 'hover:text-gray-700');
+            tabText.classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600', 'bg-indigo-50');
+            tabText.classList.add('text-gray-500', 'hover:text-gray-700');
+            panelDesign.classList.remove('hidden');
+            panelText.classList.add('hidden');
+        });
+
+        tabText.addEventListener('click', () => {
+            tabText.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600', 'bg-indigo-50');
+            tabText.classList.remove('text-gray-500', 'hover:text-gray-700');
+            tabDesign.classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600', 'bg-indigo-50');
+            tabDesign.classList.add('text-gray-500', 'hover:text-gray-700');
+            panelText.classList.remove('hidden');
+            panelDesign.classList.add('hidden');
+        });
+
+        // --- Zoom Controls ---
+        document.getElementById('zoomIn').addEventListener('click', () => adjustZoom(0.1));
+        document.getElementById('zoomOut').addEventListener('click', () => adjustZoom(-0.1));
+        document.getElementById('zoomReset').addEventListener('click', fitToScreen);
+
+        function adjustZoom(delta) {
+            currentZoom += delta;
+            if (currentZoom < 0.1) currentZoom = 0.1;
+            if (currentZoom > 5) currentZoom = 5;
+            applyZoom();
+        }
+
+        function applyZoom() {
+            canvasWrapper.style.transform = `scale(${currentZoom})`;
+            document.getElementById('zoomReset').innerText = Math.round(currentZoom * 100) + '%';
+        }
+
+        function fitToScreen() {
+            // Get current dimensions of the workspace container
+            const workspaceRect = workspace.getBoundingClientRect();
+
+            // Calculate available space (subtracting some padding for aesthetics)
+            const availableWidth = workspaceRect.width - 150; // Increased padding for sidebar/controls
+            const availableHeight = workspaceRect.height - 100;
+
+            const logicalWidth = canvas.getWidth();
+            const logicalHeight = canvas.getHeight();
+
+            if(logicalWidth === 0 || logicalHeight === 0) return;
+
+            // Calculate scale factors
+            const scaleX = availableWidth / logicalWidth;
+            const scaleY = availableHeight / logicalHeight;
+
+            // Choose the smaller scale to fit entirely within view
+            let newZoom = Math.min(scaleX, scaleY);
+
+            // --- MODIFICATION: Default to 50% Zoom ---
+            // We cap the zoom at 0.5 (50%) so it never starts too large.
+            if (newZoom > 0.5) {
+                newZoom = 0.5;
+            }
+
+            // Constraints
+            if (newZoom < 0.1) newZoom = 0.1;
+
+            currentZoom = newZoom;
+            applyZoom();
+        }
+
+        // --- COPY & PASTE LOGIC ---
+
+        // 1. Internal Copy (Ctrl+C)
+        function copyObject() {
+            const obj = canvas.getActiveObject();
+            if (!obj) return;
+
+            // Clone the object
+            obj.clone(function(cloned) {
+                clipboardData = cloned;
+            });
+        }
+
+        // 2. Internal Paste (Logic)
+        function pasteObject() {
+            if (!clipboardData) return;
+
+            clipboardData.clone(function(clonedObj) {
+                canvas.discardActiveObject();
+                clonedObj.set({
+                    left: clonedObj.left + 20,
+                    top: clonedObj.top + 20,
+                    evented: true,
+                });
+
+                if (clonedObj.type === 'activeSelection') {
+                    // active selection needs a reference to the canvas.
+                    clonedObj.canvas = canvas;
+                    clonedObj.forEachObject(function(obj) {
+                        canvas.add(obj);
+                    });
+                    clonedObj.setCoords();
+                } else {
+                    canvas.add(clonedObj);
+                }
+
+                clipboardData.top += 20;
+                clipboardData.left += 20;
+                canvas.setActiveObject(clonedObj);
+                canvas.requestRenderAll();
+            });
+        }
+
+        // 3. External Paste (Ctrl+V from System)
+        async function handleExternalPaste(e) {
+            // Check if there are files in the clipboard (e.g. screenshot or file copy)
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+
+            for (let index in items) {
+                const item = items[index];
+                if (item.kind === 'file' && item.type.includes('image')) {
+                    const blob = item.getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const imgObj = new Image();
+                        imgObj.src = event.target.result;
+                        imgObj.onload = function() {
+                            const imgInstance = new fabric.Image(imgObj);
+                            // Scale down if too big
+                            if(imgInstance.width > canvas.width) {
+                                imgInstance.scaleToWidth(canvas.width * 0.5);
+                            }
+                            canvas.add(imgInstance);
+                            canvas.centerObject(imgInstance);
+                            canvas.setActiveObject(imgInstance);
+                            checkContentStatus();
+                        }
+                    };
+                    reader.readAsDataURL(blob);
+                    return; // Stop after handling first image
+                }
+            }
+
+            // If no file, try internal paste (text or duplicated object)
+            // Note: Browsers block reading text from clipboard without permission usually,
+            // but if we have internal clipboardData, we use that.
+            if(clipboardData) {
+                pasteObject();
+            }
+        }
+
+        // Event Listeners for Copy/Paste
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+                // Don't copy if editing text
+                if (!canvas.getActiveObject() || (canvas.getActiveObject().type !== 'i-text' && !canvas.getActiveObject().isEditing)) {
+                     e.preventDefault();
+                     copyObject();
+                }
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+                e.preventDefault();
+                // Try external first, fallback to internal
+                // We rely on the 'paste' event listener for external files usually,
+                // but for Ctrl+V keypress we trigger internal if available.
+                if(clipboardData) pasteObject();
+            }
+        });
+
+        window.addEventListener('paste', (e) => {
+            handleExternalPaste(e);
+        });
+
+        // --- Context Menu Logic ---
+        canvas.on('mouse:down', function(opt) {
+            if (opt.button === 3) { // Right click
+                // If clicked on nothing, hide menu
+                if(!opt.target) {
+                    contextMenu.style.display = 'none';
+                    return;
+                }
+
+                // Show menu at mouse position
+                const pointer = canvas.getPointer(opt.e);
+                // Adjust for zoom and canvas offset
+                const zoomScale = currentZoom;
+                const rect = canvasWrapper.getBoundingClientRect();
+
+                // Simple positioning relative to viewport for the fixed div
+                contextMenu.style.left = opt.e.clientX + 'px';
+                contextMenu.style.top = opt.e.clientY + 'px';
+                contextMenu.style.display = 'block';
+
+                // Select the object right-clicked
+                canvas.setActiveObject(opt.target);
+                canvas.renderAll();
+            } else {
+                // Left click hides menu
+                contextMenu.style.display = 'none';
+            }
+        });
+
+        // Context Menu Actions
+        document.getElementById('ctxCopy').addEventListener('click', () => { copyObject(); contextMenu.style.display='none'; });
+        document.getElementById('ctxPaste').addEventListener('click', () => {
+            if(clipboardData) pasteObject();
+            contextMenu.style.display='none';
+        });
+        document.getElementById('ctxDelete').addEventListener('click', () => {
+            const obj = canvas.getActiveObject();
+            if(obj) canvas.remove(obj);
+            contextMenu.style.display='none';
+        });
+        document.getElementById('ctxBringFront').addEventListener('click', () => {
+            const obj = canvas.getActiveObject();
+            if(obj) canvas.bringForward(obj);
+            contextMenu.style.display='none';
+        });
+        document.getElementById('ctxSendBack').addEventListener('click', () => {
+            const obj = canvas.getActiveObject();
+            if(obj) canvas.sendBackwards(obj);
+            contextMenu.style.display='none';
+        });
+
+
+        // --- Multi-Image File Handling ---
+        fileInput.addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(f) {
+                    fabric.Image.fromURL(f.target.result, function(img) {
+
+                        const objects = canvas.getObjects();
+                        const isEmpty = objects.length === 0;
+
+                        if (isEmpty) {
+                            canvas.setWidth(img.width);
+                            canvas.setHeight(img.height);
+                            canvas.add(img);
+                            canvas.centerObject(img);
+                        } else {
+                            const maxDim = Math.max(canvas.getWidth(), canvas.getHeight());
+                            if (img.width > maxDim || img.height > maxDim) {
+                                img.scaleToWidth(maxDim * 0.5);
+                            }
+                            canvas.add(img);
+                            canvas.centerObject(img);
+                            img.setCoords();
+                        }
+
+                        canvas.renderAll();
+                        checkContentStatus();
+
+                        // Delay fitToScreen slightly to ensure DOM has updated layout
+                        setTimeout(fitToScreen, 50);
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+            fileInput.value = '';
+        });
+
+        function checkContentStatus() {
+            if (canvas.getObjects().length > 0) {
+                emptyState.classList.add('hidden');
+                downloadBtn.disabled = false;
+                deleteBtn.disabled = false;
+            } else {
+                emptyState.classList.remove('hidden');
+                downloadBtn.disabled = true;
+                deleteBtn.disabled = true;
+            }
+        }
+
+        deleteBtn.addEventListener('click', resetEditor);
+        function resetEditor() {
+            if(!confirm("Clear everything?")) return;
+            canvas.clear();
+            canvas.backgroundColor = '#ffffff';
+            activeTextObject = null;
+            activeObject = null;
+            clipboardData = null;
+            checkContentStatus();
+            toggleTextControls(false);
+            toggleLayerControls(false);
+
+            canvas.setWidth(800);
+            canvas.setHeight(600);
+            updateSizeInputs(800, 600);
+            fitToScreen();
+        }
+
+        // --- Layer Management ---
+        function toggleLayerControls(enable) {
+            if (enable) {
+                layerControls.classList.remove('opacity-50', 'pointer-events-none');
+            } else {
+                layerControls.classList.add('opacity-50', 'pointer-events-none');
+            }
+        }
+
+        bringForwardBtn.addEventListener('click', () => {
+            const obj = canvas.getActiveObject();
+            if (obj) {
+                canvas.bringForward(obj);
+                canvas.renderAll();
+            }
+        });
+
+        sendBackwardBtn.addEventListener('click', () => {
+            const obj = canvas.getActiveObject();
+            if (obj) {
+                canvas.sendBackwards(obj);
+                canvas.renderAll();
+            }
+        });
+
+        deleteObjectBtn.addEventListener('click', () => {
+            const obj = canvas.getActiveObject();
+            if (obj) {
+                canvas.remove(obj);
+                canvas.discardActiveObject();
+                canvas.renderAll();
+                checkContentStatus();
+                toggleLayerControls(false);
+                toggleTextControls(false);
+            }
+        });
+
+        // --- Selection Events ---
+        canvas.on('selection:created', handleSelection);
+        canvas.on('selection:updated', handleSelection);
+        canvas.on('selection:cleared', () => {
+            activeTextObject = null;
+            activeObject = null;
+            toggleTextControls(false);
+            toggleLayerControls(false);
+        });
+
+        function handleSelection(e) {
+            const obj = e.selected[0];
+            activeObject = obj;
+            toggleLayerControls(true);
+
+            if (obj && obj.type === 'i-text') {
+                activeTextObject = obj;
+                toggleTextControls(true);
+                syncTextControls(obj);
+            } else {
+                activeTextObject = null;
+                toggleTextControls(false);
+            }
+        }
+
+        // --- Text Engine Logic ---
+        addTextBtn.addEventListener('click', () => {
+            const text = new fabric.IText('Double click to edit', {
+                left: canvas.getWidth() / 2,
+                top: canvas.getHeight() / 2,
+                fontFamily: 'Arial',
+                fill: '#333333',
+                fontSize: 40,
+                originX: 'center',
+                originY: 'center',
+                fontWeight: 'normal'
+            });
+            canvas.add(text);
+            canvas.setActiveObject(text);
+            canvas.renderAll();
+            checkContentStatus();
+            if(panelText.classList.contains('hidden')) tabText.click();
+        });
+
+        function toggleTextControls(enable) {
+            if (enable) {
+                textProperties.classList.remove('opacity-50', 'pointer-events-none');
+            } else {
+                textProperties.classList.add('opacity-50', 'pointer-events-none');
+            }
+        }
+
+        function syncTextControls(obj) {
+            textContent.value = obj.text;
+            fontFamily.value = obj.fontFamily;
+            textColor.value = obj.fill;
+            colorHex.innerText = obj.fill;
+            textSize.value = obj.fontSize;
+            textBgColor.value = obj.backgroundColor || '#ffffff';
+
+            document.getElementById('boldBtn').classList.toggle('bg-indigo-100', obj.fontWeight === 'bold');
+            document.getElementById('italicBtn').classList.toggle('bg-indigo-100', obj.fontStyle === 'italic');
+            document.getElementById('underlineBtn').classList.toggle('bg-indigo-100', obj.underline);
+            document.getElementById('linethroughBtn').classList.toggle('bg-indigo-100', obj.linethrough);
+        }
+
+        // Live Updates
+        textContent.addEventListener('input', (e) => { if(activeTextObject) { activeTextObject.set({ text: e.target.value }); canvas.renderAll(); } });
+        fontFamily.addEventListener('change', (e) => { if(activeTextObject) { activeTextObject.set({ fontFamily: e.target.value }); canvas.renderAll(); } });
+        textColor.addEventListener('input', (e) => { if(activeTextObject) { activeTextObject.set({ fill: e.target.value }); colorHex.innerText = e.target.value; canvas.renderAll(); } });
+        textSize.addEventListener('input', (e) => { if(activeTextObject) { activeTextObject.set({ fontSize: parseInt(e.target.value, 10) }); canvas.renderAll(); } });
+        textBgColor.addEventListener('input', (e) => { if(activeTextObject) { activeTextObject.set({ backgroundColor: e.target.value }); canvas.renderAll(); } });
+
+        // Formatting Buttons
+        document.getElementById('boldBtn').addEventListener('click', () => toggleStyle('fontWeight', 'bold', 'normal'));
+        document.getElementById('italicBtn').addEventListener('click', () => toggleStyle('fontStyle', 'italic', 'normal'));
+        document.getElementById('underlineBtn').addEventListener('click', () => toggleStyle('underline', true, false));
+        document.getElementById('linethroughBtn').addEventListener('click', () => toggleStyle('linethrough', true, false));
+        document.getElementById('alignLeft').addEventListener('click', () => setAlign('left'));
+        document.getElementById('alignCenter').addEventListener('click', () => setAlign('center'));
+        document.getElementById('alignRight').addEventListener('click', () => setAlign('right'));
+
+        function toggleStyle(prop, val1, val2) {
+            if(!activeTextObject) return;
+            const current = activeTextObject.get(prop);
+            activeTextObject.set(prop, current === val1 ? val2 : val1);
+            canvas.renderAll();
+            syncTextControls(activeTextObject);
+        }
+
+        function setAlign(align) {
+            if(!activeTextObject) return;
+            activeTextObject.set({ textAlign: align });
+            canvas.renderAll();
+        }
+
+        // Preset Styles
+        window.applyPreset = function(type) {
+            if(!activeTextObject) { alert("Please select a text object first."); return; }
+            const t = activeTextObject;
+            t.set({ shadow: null, stroke: null, strokeWidth: 0 });
+
+            if (type === 'headline') t.set({ fontFamily: 'Impact', fill: '#1f2937', fontSize: 60, fontWeight: 'normal', fontStyle: 'normal', underline: false, backgroundColor: 'transparent' });
+            else if (type === 'subhead') t.set({ fontFamily: 'Helvetica', fill: '#4b5563', fontSize: 30, fontWeight: 'normal', fontStyle: 'normal', charSpacing: 200, backgroundColor: 'transparent' });
+            else if (type === 'neon') t.set({ fontFamily: 'Verdana', fill: '#ffffff', fontSize: 50, fontWeight: 'bold', backgroundColor: '#000000', shadow: new fabric.Shadow({ color: '#ec4899', blur: 15, offsetX: 0, offsetY: 0 }) });
+            else if (type === 'shadow') t.set({ fontFamily: 'Georgia', fill: '#111827', fontSize: 45, fontWeight: 'normal', backgroundColor: 'transparent', shadow: new fabric.Shadow({ color: 'rgba(0,0,0,0.5)', blur: 5, offsetX: 5, offsetY: 5 }) });
+            else if (type === 'gradient') t.set({ fontFamily: 'Arial', fill: '#4f46e5', fontSize: 50, fontWeight: '900', backgroundColor: 'transparent' });
+            else if (type === 'outline') t.set({ fontFamily: 'Arial', fill: '#ffffff', stroke: '#000000', strokeWidth: 2, fontSize: 50, fontWeight: '900', backgroundColor: 'transparent' });
+            else if (type === 'retro') t.set({ fontFamily: 'Impact', fill: '#b91c1c', backgroundColor: '#fcd34d', fontSize: 40, fontWeight: 'normal', textAlign: 'center' });
+            else if (type === 'handwritten') t.set({ fontFamily: 'Brush Script MT', fill: '#1e3a8a', fontSize: 50, fontStyle: 'italic', backgroundColor: 'transparent' });
+
+            canvas.renderAll();
+            syncTextControls(t);
+        }
+
+        // --- Resize Logic ---
+        const sizePreset = document.getElementById('sizePreset');
+        const customWidth = document.getElementById('customWidth');
+        const customHeight = document.getElementById('customHeight');
+
+        function updateSizeInputs(w, h) {
+            customWidth.value = Math.round(w);
+            customHeight.value = Math.round(h);
+            sizePreset.value = 'custom';
+        }
+
+        document.getElementById('applyResizeBtn').addEventListener('click', () => {
+            const w = parseInt(customWidth.value);
+            const h = parseInt(customHeight.value);
+            if(w && h) {
+                canvas.setWidth(w);
+                canvas.setHeight(h);
+                canvas.renderAll();
+                setTimeout(fitToScreen, 50);
+            }
+        });
+
+        sizePreset.addEventListener('change', (e) => {
+            if (e.target.value !== 'custom') {
+                const [w, h] = e.target.value.split(',').map(Number);
+                customWidth.value = w;
+                customHeight.value = h;
+                canvas.setWidth(w);
+                canvas.setHeight(h);
+                canvas.renderAll();
+                setTimeout(fitToScreen, 50);
+            }
+        });
+
+        // --- Crop Logic ---
+        const toggleCropBtn = document.getElementById('toggleCropBtn');
+        const cropActions = document.getElementById('cropActions');
+        const cropInstruction = document.getElementById('cropInstruction');
+
+        toggleCropBtn.addEventListener('click', () => {
+            if(isCropMode) return;
+
+            const activeObj = canvas.getActiveObject();
+            if (!activeObj || activeObj.type !== 'image') {
+                alert("Please select an image on the canvas to crop.");
+                return;
+            }
+
+            isCropMode = true;
+            toggleCropBtn.classList.add('hidden');
+            cropActions.classList.remove('hidden');
+            cropInstruction.classList.remove('hidden');
+            canvasWrapper.classList.add('border-indigo-500');
+
+            canvas.selection = false;
+            canvas.getObjects().forEach(o => {
+                if (o !== activeObj) o.selectable = false;
+            });
+            canvas.renderAll();
+        });
+
+        document.getElementById('cancelCropBtn').addEventListener('click', exitCropMode);
+
+        function exitCropMode() {
+            isCropMode = false;
+            toggleCropBtn.classList.remove('hidden');
+            cropActions.classList.add('hidden');
+            cropInstruction.classList.add('hidden');
+            canvasWrapper.classList.remove('border-indigo-500');
+
+            canvas.selection = true;
+            canvas.getObjects().forEach(o => o.selectable = true);
+            canvas.renderAll();
+        }
+
+        document.getElementById('applyCropBtn').addEventListener('click', () => {
+             const activeObj = canvas.getActiveObject();
+             if (!activeObj || activeObj.type !== 'image') {
+                 exitCropMode();
+                 return;
+             }
+             alert("Crop mode exited. (Note: Full rectangular cropping of specific layers requires advanced clipping logic).");
+             exitCropMode();
+        });
+
+        // --- Export Logic ---
+        const exportFormatSelect = document.getElementById('exportFormatSelect');
+        const qualityControl = document.getElementById('qualityControl');
+
+        exportFormatSelect.addEventListener('change', (e) => {
+            exportFormat = e.target.value;
+            if (['jpeg', 'webp'].includes(exportFormat)) qualityControl.classList.remove('hidden');
+            else qualityControl.classList.add('hidden');
+        });
+
+        document.getElementById('qualityRange').addEventListener('input', (e) => {
+            exportQuality = parseFloat(e.target.value);
+            document.getElementById('qualityValue').textContent = Math.round(exportQuality * 100) + '%';
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const format = exportFormatSelect.value;
+
+            if (format === 'ico') {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = 32;
+                tempCanvas.height = 32;
+                const ctx = tempCanvas.getContext('2d');
+                ctx.drawImage(canvas.getElement(), 0, 0, 32, 32);
+                pendingDownloadUrl = tempCanvas.toDataURL('image/png');
+                document.getElementById('previewImage').src = pendingDownloadUrl;
+                document.getElementById('previewModal').classList.remove('hidden');
+            } else if (format === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const w = canvas.getWidth();
+                const h = canvas.getHeight();
+                const orientation = w > h ? 'l' : 'p';
+                const pdfW = w * 0.264583;
+                const pdfH = h * 0.264583;
+                const doc = new jsPDF({ orientation: orientation, unit: 'mm', format: [pdfW, pdfH] });
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                doc.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
+                pendingDownloadUrl = doc.output('dataurlstring');
+                document.getElementById('previewImage').src = "";
+                document.getElementById('previewModal').classList.remove('hidden');
+            } else {
+                const dataURL = canvas.toDataURL({ format: format, quality: exportQuality, multiplier: 1 });
+                document.getElementById('previewImage').src = dataURL;
+                document.getElementById('previewModal').classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('confirmDownload').addEventListener('click', () => {
+            const link = document.createElement('a');
+            const timestamp = Date.now();
+            const format = exportFormatSelect.value;
+
+            if (format === 'pdf') {
+                link.download = `zylo-design-${timestamp}.pdf`;
+                link.href = pendingDownloadUrl;
+            } else if (format === 'ico') {
+                link.download = `favicon.ico`;
+                link.href = pendingDownloadUrl;
+            } else {
+                link.download = `zylo-design-${timestamp}.${format}`;
+                link.href = document.getElementById('previewImage').src;
+            }
+
+            link.click();
+            document.getElementById('previewModal').classList.add('hidden');
+        });
+
+        document.getElementById('closePreview').addEventListener('click', () => document.getElementById('previewModal').classList.add('hidden'));
+        document.getElementById('cancelExport').addEventListener('click', () => document.getElementById('previewModal').classList.add('hidden'));
+
+        // Keyboard Shortcuts (Delete handled separately)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Delete') {
+                const obj = canvas.getActiveObject();
+                if (obj) {
+                    canvas.remove(obj);
+                    canvas.discardActiveObject();
+                    canvas.renderAll();
+                    checkContentStatus();
+                    toggleLayerControls(false);
+                    toggleTextControls(false);
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
