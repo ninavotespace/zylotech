@@ -215,7 +215,7 @@
     <script>
         // --- CONFIGURATION ---
         const API_KEY = 'giqysVdd3F1dNdbggG2Hkwjn';
-        const PAYSTACK_KEY = 'pk_test_523330227caf84ef2b25a3900c453cdfad3ffd40';
+        const PAYSTACK_KEY = 'pk_live_39e56c13242c01788403d8c474d2c230bd4573f4';
         const PRICE_USD = 0.50;
 
         // --- STATE ---
@@ -318,7 +318,7 @@
             const handler = PaystackPop.setup({
                 key: PAYSTACK_KEY,
                 email: 'customer@example.com',
-                amount: PRICE_USD * 100 * 100,
+                amount: PRICE_USD * 100,
                 currency: 'USD',
                 ref: ''+Math.floor((Math.random() * 1000000000) + 1),
                 callback: function(response) {
