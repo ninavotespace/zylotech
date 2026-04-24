@@ -49,13 +49,6 @@
     </url>
 
     <url>
-        <loc>https://www.zylotechstudios.space/karaoke.html</loc>
-        <lastmod>2026-04-05</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.9</priority>
-    </url>
-
-    <url>
         <loc>https://www.zylotechstudios.space/image-editor-pro.html</loc>
         <lastmod>2026-04-05</lastmod>
         <changefreq>weekly</changefreq>
@@ -94,14 +87,6 @@
     <!-- Audio Studio -->
     <url>
         <loc>https://www.zylotechstudios.space/audio-converter.html</loc>
-        <lastmod>2026-04-05</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.9</priority>
-    </url>
-
-     <!-- Karaoke Studio -->
-    <url>
-        <loc>https://www.zylotechstudios.space/freekaraoke.html</loc>
         <lastmod>2026-04-05</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
